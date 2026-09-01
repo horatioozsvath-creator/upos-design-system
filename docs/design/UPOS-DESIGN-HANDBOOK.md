@@ -289,8 +289,8 @@ Removing it from the grid loses the staff's muscle memory for where it lives.
 
 **Red is never decorative.** Red means a problem someone has to act on: late tickets, 86'd items,
 voids, comps flagged for review, the offline queue, COGS over target, stock under threshold. Red is
-not a delete button at rest, not a brand accent, not a divider, and not the kitchen display's house
-color (§11).
+not a delete button at rest (destructive controls: §11), not a brand accent, not a divider, and not
+the kitchen display's house color (§11).
 
 Status shows up in exactly these places: `.u-chip-status--*` chips, the 1px status border on
 `.u-data-row`, the 2px border on a floor-plan table, the top edge of a kitchen chit, and
@@ -558,11 +558,13 @@ The terminal keeps taking orders with no network. Offline is a state, never a wa
 - `--upos-touch-kiosk` `60px` is the minimum for kiosk primary actions.
 - Adjacent targets sit at least `--upos-space-gap-row` 8px apart, and two irreversible controls are
   never adjacent — void does not touch send.
-- **A destructive control takes `.u-btn--ghost` at rest** — void, comp, refund, remove line. Red
-  marks a problem that exists (§4), and an action nobody has taken yet is not one, so the button
-  stays quiet until it is pressed. The red arrives on the confirming step, where the dialog names
-  the consequence in `--upos-status-late-text` and the confirm button is `.u-btn--primary` carrying
-  the verb. There is no red button variant in the kit, and adding one would make red decorative.
+- **A destructive control takes `.u-btn--ghost` at rest** — void, comp, refund, remove line — with
+  its label at `--upos-ink`, not ghost's default `--upos-ink-subtle` (`#8b95a1` on white computes
+  3.0:1 and fails AA at 13px; the ink label reads 15.9:1). Red marks a problem that exists (§4),
+  and an action nobody has taken yet is not one, so the button stays quiet until it is pressed. The
+  red arrives on the confirming step, where the dialog names the consequence in
+  `--upos-status-late-text` and the confirm button is `.u-btn--primary` carrying the verb. There is
+  no red button variant in the kit, and adding one would make red decorative.
 - **Prefer a modal or drawer over navigation.** The five bottom-nav destinations are the only
   full-screen transitions in the order flow; everything else opens over the current screen so the
   check stays visible behind it.
