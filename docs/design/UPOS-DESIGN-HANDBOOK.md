@@ -52,6 +52,14 @@ Part I is complete. Parts II, III and IV carry a written-in marker naming the ta
   - [12 · Using the kit in Blazor and MAUI](#12--using-the-kit-in-blazor-and-maui)
 - [Part II · Screen specs](#part-ii--screen-specs)
   - [Part II-A · Terminal](#part-ii-a--terminal)
+    - [Order entry](#order-entry)
+    - [Modifier modal](#modifier-modal)
+    - [Item info modal](#item-info-modal)
+    - [Floor plan](#floor-plan)
+    - [Table drawer](#table-drawer)
+    - [Payment](#payment)
+    - [Channels queue](#channels-queue)
+    - [Offline behavior](#offline-behavior)
   - [Part II-B · Back office](#part-ii-b--back-office)
   - [Part II-C · Kitchen display](#part-ii-c--kitchen-display)
   - [Part II-D · Kiosk](#part-ii-d--kiosk)
@@ -736,8 +744,455 @@ from the artboards; styling rules come from Part I.
 
 ### Part II-A · Terminal
 
-*Written in Task 5.* Eight specs: Order entry · Modifier modal · Item info modal · Floor plan ·
-Table drawer · Payment · Channels queue · Offline behavior.
+The terminal is one 1440×900 shell at `--upos-radius-panel`, `--upos-surface`, clipped, with a fixed
+76px top bar and a fixed 78px bottom nav. Everything between them is a destination, and everything
+that is not a destination opens over the destination. Order entry carries the shell; the other seven
+specs assume it.
+
+#### Order entry
+
+**Purpose.** You build a check here — pick a category, tap items, adjust the lines, send them to the
+kitchen and charge.
+
+**Layout.** The shell's chrome belongs to this spec because every destination inherits it.
+
+- **Top bar, 76px**, `--upos-surface-inset`, 1px `--upos-border` bottom, padding `0 28px`, three
+  groups: a 26px `--upos-grad-primary` mark, the venue and terminal id at 800/15px
+  (`Riverside Grill · Counter 2`) and the offline pill slot on the left; the server and clock at
+  700/13px in `--upos-ink-subtle` on the right.
+- **Bottom nav, 78px**, same inset fill, 1px top hairline, 8px between items. Five `.u-nav-item`
+  buttons, each `flex:1` capped at 150px, `--upos-radius-inset`, a 17px icon over a 700/10.5px
+  label — ORDER · TABLES · PAYMENTS · CHANNELS · MORE. The active destination fills with
+  `--upos-grad-primary` and white ink; the rest are `--upos-ink-subtle` on transparent. MORE is a
+  placeholder in this handoff and renders one statement line.
+- **Category rail, 170px**, inset fill, right hairline, padding `14px 10px`, 6px gaps. One button per
+  category at `--upos-radius-inset`, 700/13px, active on `--upos-grad-primary`.
+- **Item grid**, fills the middle, 22px padding, its own scroll. Above it, right-aligned, the
+  `ITEM INFO` mode pill at `--upos-radius-pill`, `6px 14px`, 700/11px. The grid is
+  `repeat(auto-fill,minmax(190px,1fr))` at 16px gaps. A tile is `--upos-surface`, 1px
+  `--upos-border`, `--upos-radius-card` 18px, `--upos-shadow-card`, 18px padding, 6px column gaps:
+  name 700/14px, price 800/15px in `--upos-accent-deep`, then `.u-chip-allergen` chips.
+- **Cart panel, 380px**, inset fill, left hairline, three bands. Header `18px 22px` above a
+  hairline: the check label at 800/14px and a loyalty pill button. Line list scrolls at `14px 22px`,
+  12px between lines. Footer `18px 22px` under a hairline.
+- **Cart line**: left, `{qty} × {name}` at 700/14px, the mods line at 400/12px `--upos-ink-subtle`,
+  then allergen chips. Right, a round send-one button, a `−`, the line total at 800/14px in a 52px
+  right-aligned slot, and a `+`. The artboard draws those at 26px and 24px; ship them at
+  `--upos-touch-terminal` 48px through `.u-qty-stepper` and `.u-icon-btn` — §11's rule outranks the
+  artboard's pixels.
+- **Footer**: Subtotal and Tax rows 700/13px `--upos-ink-subtle`, Total 800/20px, a 48px
+  `.u-btn--secondary` send-all button, and a 58px `.u-btn--primary` carrying `Charge $NN.NN` and
+  `--upos-shadow-button`.
+
+**States.**
+
+- Category selected or not; exactly one is always selected.
+- Item available, or 86'd — opacity `.5`, the name struck through, the price replaced by a red `86'D`
+  pill (`.u-chip-status--late`), and no response to a tap. The tile keeps its place in the grid (§4).
+- Item info mode armed or off. Armed, the pill fills with `--upos-grad-primary`.
+- Cart empty — `No items yet — tap the menu to build the order.` at 400/13px `--upos-ink-subtle`.
+- Line not sent (paper-plane glyph on the inset) or sent (check on `--upos-grad-primary`).
+- Send-all at rest reads `SEND ALL TO KITCHEN` and confirms as `SENT TO KITCHEN` for 2s. Draw the
+  confirmation's check as an inline SVG, not a `✓` character (§9).
+- Loyalty control: `Identify guest`, or the identified guest at `M. RIVERA · 420 PTS` in
+  `--upos-accent-deep`.
+- Check label: `Order #482 · Dine In` for a counter check, `Table T5` once the check belongs to a
+  table.
+- Offline adds the top-bar pill and the per-action annotations — see Offline behavior.
+
+**Interactions.**
+
+- Tap a category to filter the grid. Nothing navigates.
+- Tap a tile: a plain item joins the cart directly and merges with a matching line at `qty + 1`; a
+  burger or a drink opens the Modifier modal; any tile in info mode opens the Item info modal; an
+  86'd tile does nothing.
+- The `ITEM INFO` pill toggles info mode and closes any open info item.
+- `−` removes one and drops the line at zero; `+` adds one.
+- Send-one marks that line sent; send-all marks every line. Either one moves the active table to
+  `ORDERED` on the floor plan.
+- `Charge` goes to Payment. The loyalty pill toggles the guest identity.
+- The bottom nav is the only full-screen transition in this flow; everything else opens over the
+  check (§11). Modals rise with `fl-rise` at `--upos-dur-slow`. Press feedback is the ripple tint —
+  ship no `:hover` transforms to `Restaurant.Mobile` (§8).
+
+**Data.**
+
+- Grid: `MenuItemDto` from `GET /api/menu`, grouped by `Category` to build the rail; the 86'd state
+  reads the DTO's availability flag.
+- The cart is client state. No `Order` exists until you send.
+- Send builds a `CreateOrderDto` with one `OrderItemDto` per line, posts it to `POST /api/orders`,
+  and the API broadcasts `ReceiveNewOrder` on `/hubs/orders`. The order comes back as an `OrderDto`
+  at `OrderStatus.Pending`, then `Confirmed` when the kitchen accepts it.
+- Sending one line has no endpoint — the POC posts a whole order.
+- Money is client-side: subtotal from the lines, tax at the venue's rate, total from both.
+- The loyalty control has no binding; no loyalty entity exists in the POC.
+
+**Gaps.**
+
+- GAP-01 — `MenuItem` has no modifier groups or options, so a line's mods text has nothing to bind to.
+- GAP-02 — no combo entity, so a combo line and its upcharge are free text.
+- GAP-04 — `Order` has no channel or order type, so `Dine In` in the check header is a literal.
+- GAP-05 — `MenuItem` has no allergens, so every violet chip in the grid and the cart is design-only.
+
+#### Modifier modal
+
+**Purpose.** You resolve the choices an item requires before it joins the check.
+
+**Layout.** 480px wide, `max-height:820px`, its own scroll, `--upos-radius-panel` (the artboard draws
+24px), `--upos-surface`, 26px padding, 16px gaps, `--upos-shadow-modal`, centered on `--upos-scrim`.
+
+- Header: the item name at 800/18px, `.u-chip-allergen` chips under it, and a 30px round
+  `.u-icon-btn` close on the inset fill.
+- Burger body, three blocks. `DONENESS · REQUIRED` at 700/10.5px `.08em` `--upos-ink-subtle`, then
+  single-select pills at `10px 16px`. `ADD-ONS · OPTIONAL`, then multi-select pills at `9px 14px`
+  carrying the upcharge in the label — `Bacon +$1.50`, `Avocado +$1.75`, `Extra Cheese +$1.00`. Then
+  a combo block: `--upos-surface-inset`, 16px radius, `14px 16px`, `Make it a combo` at 700/13px over
+  `+ side, + drink · +$3.50` at 400/11px, and a 50×28px switch whose 22px knob slides `3px → 25px`.
+- Combo on adds `CHOOSE A SIDE` and `CHOOSE A DRINK` pill groups under it.
+- Drink body is one block: `SIZE · REQUIRED` and three pills — Small · Medium · Large.
+- Footer row: a qty stepper (`.u-qty-stepper`, `−`, the count at 800/15px, `+`) and then a
+  full-width 52px `.u-btn--primary` reading `Add to order — $NN.NN`. The artboard draws the stepper
+  buttons at 30px; ship them at `--upos-touch-terminal` 48px (§11).
+
+**States.**
+
+- A pill is selected (`--upos-grad-primary`, white ink) or not (`--upos-surface-inset`, `--upos-ink`).
+- Doneness and size are single-select; add-ons, sides and drinks toggle independently.
+- Combo off or on; on reveals the two picker sections and adds `$3.50` to the unit price.
+- Quantity floors at 1. The primary's amount recomputes on every change.
+- Burger variant and drink variant are mutually exclusive; a plain item never opens this modal.
+
+**Interactions.** Opens from an Order entry tile when the item carries choices. Selecting a required
+option replaces the previous one; selecting an add-on toggles it. The combo switch reveals the side
+and drink groups. Confirm pushes one cart line carrying a middot-joined mods string —
+`Medium · Bacon · Combo w/ Fries + Iced Tea` — and closes. Close discards everything. The modal rises
+with `fl-rise` at `--upos-dur-slow` over `--upos-scrim` at `--upos-blur-scrim`; while it is up the top
+bar drops its blur (§7).
+
+**Data.** `MenuItemDto` supplies the name and base price and nothing else. Every group, option,
+upcharge and delta on this screen is artboard fixture. Pricing is client-side: a burger's unit is
+base plus selected add-ons plus the combo price; a drink's unit is base plus the size delta
+(`−$0.50` small, `$0` medium, `+$0.75` large — applied to the price, not shown in the label); the
+line is unit × quantity. The confirmed line reaches the API only inside `CreateOrderDto`, as an
+`OrderItemDto` with no field to carry the selection.
+
+**Gaps.**
+
+- GAP-01 — no modifier group or option model, so required, optional, single- and multi-select, and
+  upcharges all live in the client.
+- GAP-02 — no combo entity, so the combo switch, its two pickers and its `+$3.50` have nothing to
+  persist to.
+
+#### Item info modal
+
+**Purpose.** You answer a guest's question about an item without touching the check.
+
+**Layout.** 480px wide, `max-height:800px` — 20px shorter than the Modifier modal — its own scroll,
+24px radius, `--upos-surface`, 26px padding, 16px gaps, `--upos-shadow-modal`, centered on
+`--upos-scrim`.
+
+- Header: the item name at 800/18px, the price at 800/15px in `--upos-accent-deep`,
+  `.u-chip-allergen` chips at `3px 8px`, and a 30px round `.u-icon-btn` close.
+- `INGREDIENTS` label at 700/10.5px `.08em`, then an inset list — `--upos-surface-inset`, 16px
+  radius, `14px 16px`, 6px gaps, one row per ingredient at 700/12.5px.
+- When the item has both views, a `.u-segmented` track: 4px padding on the inset, two options at
+  `9px 0` reading `PLATING` and `STACK`, the active one on `--upos-grad-primary`.
+- Plating view: a 220×220 circular image slot on the inset fill, centered — food photography as
+  content, framed, never behind text (§3).
+- Stack view: an inset block at `--upos-radius-inset`, 10px padding, layers 30px tall in ingredient
+  colors rendered bottom-up (`column-reverse`), each carrying its name at 800/11px. The artboard
+  rounds the layers at 8px; ship `--upos-radius-inset` — nothing outside `.upos-kds` goes under 14px
+  (§7).
+
+**States.**
+
+- Reachable only while `ITEM INFO` mode is armed on Order entry.
+- Open on plating, or open on stack.
+- An item with no stack shows no tabs and only the plating view.
+- An item with no allergens shows no chips.
+
+**Interactions.** Arm `ITEM INFO`, then tap a tile to open. The tabs swap the view under the
+ingredient list. Close returns to the grid with info mode still armed, so you can read a second item
+without re-arming. This modal never adds anything to the check — that is the whole point of arming a
+mode instead of adding a second control to every tile. It rises with `fl-rise` at `--upos-dur-slow`.
+
+**Data.** None today. `MenuItem` carries a name, a price, a category, availability and an image; the
+ingredient rows, the plating photo and the stack layers are all artboard fixtures with no field
+behind them. The allergen chips have no field either.
+
+**Gaps.**
+
+- GAP-05 — `MenuItem` has no allergens, so the chips in the header are design-only.
+- GAP-06 — no recipe, ingredient or plating model, so the ingredient list, the photo slot and the
+  stack layers have nothing to read.
+
+#### Floor plan
+
+**Purpose.** You read the room at a glance and open the check you need.
+
+**Layout.**
+
+- **Header strip, 60px**, `--upos-surface-inset`, bottom hairline, padding `0 28px`: the room name at
+  800/14px (`Floor Plan · Dining Room`) on the left; the seated count and the instruction at 700/12px
+  `--upos-ink-subtle` (`18 / 24 seated · tap a table`) on the right.
+- **Status legend** sits at the right end of that strip: four 11px dots at `--upos-radius-pill` with
+  700/12px labels — NEW / SEATED, FIRED / ORDERED, LATE, READY / DONE. The artboard draws the legend
+  in the demo chrome above the shell; on the terminal it belongs where the statuses are.
+- **Canvas** fills the rest at 36px padding, tables positioned absolutely on the room's geometry.
+- **Table**: 104px tall; 150px wide for two- and four-tops, 230px for the large tops; `--upos-surface`
+  fill; a 2px status-colored border; `--upos-shadow-card`; a centered stack of the id at 800/19px,
+  the status line at 700/11.5px in the status color, and the guest count at 400/11px
+  `--upos-ink-subtle`. Shape carries seating: square tables take 20px (`--upos-radius-card` 18px in
+  the kit), rounds take `--upos-radius-pill`.
+- **Guest-count dialog**: 380px, 24px radius, 26px padding, 18px gaps, on a lighter scrim
+  (`rgba(20,25,31,.45)`, against `--upos-scrim`'s `.5` under the modals). Header `New order · T3` at
+  800/18px with a 30px close; a `GUESTS / SEATS` label; a centered stepper — `−`, the count at
+  800/32px, `+`, all at `--upos-touch-terminal` (the artboard draws 40px); and a 54px
+  `.u-btn--primary` reading `Start order`.
+
+**States.** One per table, each setting the border, the status line and the guest line:
+
+- Seated — `--upos-status-new`, `SEATED · 4m`.
+- Ordered — `--upos-status-fired`, `ORDERED · 6m`.
+- Late — `--upos-status-late`, `LATE · 24m`. Late is derived client-side by measuring
+  `Order.CreatedAt` against the configured SLA; it overrides the underlying status for as long as it
+  holds and nothing writes it back (§4).
+- Check presented — `--upos-status-ready`, `CHECK PRESENTED`.
+- Open — no status hue, no guest line, label `OPEN`. The artboard uses a neutral `#c7ced6`; ship
+  `--upos-border`.
+- Selected — the border goes `--upos-accent` while its dialog or drawer is up.
+
+**Interactions.** Tap an open table to open the guest-count dialog; `−` and `+` clamp the count
+between 1 and 12; `Start order` seats the table at that count, makes it the active check, clears the
+cart and switches to Order entry. Tap any other table to open the Table drawer. Close returns to the
+plan. Sending a line from a table's check moves that table to `ORDERED` without you coming back here.
+Both overlays rise with `fl-rise` at `--upos-dur-slow`.
+
+**Data.** One `Table` per tile. Position, width and radius are room geometry the artboard hard-codes
+and the model has no place for. The status line is `Table.IsOccupied` plus the open `Order`'s
+`OrderStatus` mapped through §4; the elapsed figure is derived client-side from `Order.CreatedAt`,
+never read from the API. The guest count and the server name have no fields. `Start order` writes
+nothing until the first line is sent, when the check posts as a `CreateOrderDto`.
+
+**Gaps.**
+
+- GAP-03 — no course or seat model, so a table's check cannot say which items run together.
+- GAP-07 — `Table` carries an `IsOccupied` bool, not a status enum with timestamps, so `SEATED · 4m`
+  and `CHECK PRESENTED` have nothing to bind to.
+
+#### Table drawer
+
+**Purpose.** You work an occupied table's check — read its courses, fire the next one, take it to
+payment.
+
+**Layout.** A 420px drawer on the right, full height, flush to the shell edge, `--upos-surface`, a
+left-cast `-30px 0 60px -30px rgba(20,25,31,.5)` shadow, over the `rgba(20,25,31,.45)` scrim. The
+kit's `.u-drawer` floats inset at 300px; this one overrides both the width and the inset, and Part
+III carries the variant.
+
+- Header `22px 24px` above a hairline: the table id at 800/16px over `4 guests · Server: Maya` at
+  700/12px `--upos-ink-subtle`; a 30px round `.u-icon-btn` close.
+- `Add to order`, a 46px `.u-btn--primary` at `--upos-radius-inset`, margin `16px 24px 0`.
+- Body scrolls at `20px 24px`, 18px between courses.
+- A course is a control row then its items. Control row: a status chip at `5px 12px` —
+  `COURSE 1 · FIRED` on `--upos-status-fired` — plus that course's actions. Item rows sit on
+  `--upos-surface-inset` at `--upos-radius-inset`, `12px 14px`, 8px apart, the name at 700/13px left
+  and the price at 800/13px right.
+- Course 1's action is a re-fire pill button, `7px 14px`, 1px `--upos-border`, transparent at rest.
+- A held course adds a `.u-segmented` track on the inset carrying `NOW` · `+5M` · `+10M`, then the
+  fire button on `--upos-grad-primary` in white 700/11px. The artboard draws both between 25px and
+  33px tall; ship them at `--upos-touch-terminal` 48px (§11).
+- Footer `20px 24px` under a hairline: `Total` at 800/18px and a 52px `.u-btn--primary` reading
+  `Split & go to payment`.
+
+**States.**
+
+- Course fired — orange chip, re-fire available.
+- Re-fire at rest reads `RE-FIRE TO KDS` as a quiet bordered control; pressed it fills with
+  `--upos-grad-primary` and reads `RE-FIRED` for 2s, then returns. Draw the artboard's `✓` as an
+  inline check icon (§9).
+- Course held — the chip sits on `--upos-surface-inset` in `--upos-ink-subtle` reading
+  `COURSE 2 · HOLD`, with the delay track and the fire button beside it.
+- Course sending — `COURSE 2 · SENDING` on a pale orange with dark-orange ink, controls gone, for
+  2.5s.
+- Delay selected: now, +5m or +10m. The fire button follows — `FIRE NOW`, or
+  `QUEUE · SEND IN 5M`.
+- Re-fire and void both need a manager. The control stays quiet at rest — `.u-btn--ghost` with its
+  label at `--upos-ink` — and the red arrives on the confirming step, which names the consequence in
+  `--upos-status-late-text` (§11).
+
+**Interactions.** Opens from any occupied table on the floor plan. `Add to order` closes the drawer
+and returns to Order entry with that table as the active check. Re-fire re-sends the course to the
+kitchen display. The delay track picks when the held course goes, and the fire button commits it —
+immediately on `NOW`, or after the timer, passing through the sending state. `Split & go to payment`
+closes the drawer, goes to Payment and opens the split modal on `EVENLY`. Close returns to the plan.
+
+**Data.** Item rows are `OrderItem` on the table's open `Order`; the total sums them client-side.
+Firing and re-firing both mean a status write — `PUT /api/orders/{id}/status` with an
+`UpdateOrderStatusDto` moving the order to `Preparing`, broadcast as `ReceiveOrderStatusUpdate` to
+the `Order_{id}` group — but the POC writes a whole order, not a course, so a held course and a fired
+course cannot coexist on one order today. The guest count and the server name have no fields.
+
+**Gaps.**
+
+- GAP-03 — no course or seat model, so `COURSE 2 · HOLD`, the delay and the per-course fire have
+  nowhere to persist.
+- GAP-09 — no employee, role or approval record, so `Server: Maya` is a literal and a re-fire or a
+  void has nobody to approve it.
+
+#### Payment
+
+**Purpose.** You take the money — pick a tender, set the tip, split when you have to, and close the
+check.
+
+**Layout.** Two panes and three overlays.
+
+- **Left pane** fills, 32px padding, 20px gaps. Header row: `Payment · Order #482` at 800/15px on the
+  left; on the right a 36px round guest-mirror `.u-icon-btn` and the amount due at 800/20px.
+- **Tender grid**: 2×2, `1fr 1fr` by `1fr 1fr`, 20px gaps, filling the pane. Each tile is a
+  `.u-tender-tile` at 22px radius (`--upos-radius-card` in the kit), an icon over its label at
+  800/14px.
+  `CREDIT / DEBIT` is the selected tender — `--upos-grad-primary`, white ink, `--upos-shadow-button`.
+  `CASH` and `GIFT CARD` sit on `--upos-surface-inset`. `SPLIT CHECK` takes the inset fill with a 2px
+  dashed `--upos-border`.
+- **Right rail, 400px**, inset fill, left hairline, 26px padding, 14px gaps: an `ADD A TIP` label at
+  800/12px `.05em`; a 2×2 grid of `.u-tip-btn` at 10px gaps, `16px 0`, `--upos-radius-inset`, 1px
+  border, 800/15px, labeled `18% · $NN.NN`, `20% · $NN.NN`, `25% · $NN.NN` and `NO TIP`; a hairline;
+  Subtotal and Tip rows at 700/13px `--upos-ink-subtle`; Total at 800/22px; and `CONFIRM PAYMENT`, a
+  60px `.u-btn--primary` pinned to the bottom with `margin-top:auto`.
+- **Split modal**: 460px, 24px radius, 26px padding, 18px gaps, on `--upos-scrim`. Header
+  `Split the check` with a 30px close; a `.u-segmented` track — `EVENLY` · `BY SEAT`; then either the
+  even body (a stepper around the count at 800/28px over a `GUESTS` label, then the per-guest amount
+  at 800/24px with `per guest` at 400/13px) or the seat body (four inset rows at `12px 14px`, seat
+  name left, amount right); and a 52px `.u-btn--primary` reading `Done`.
+- **Guest mirror**: a 520px sheet on the right, full height, `--upos-surface`, centered stack — a
+  `GUEST-FACING MIRROR` kicker at 700/11px `.15em`, the total at 800/30px with `--upos-grad-primary`
+  clipped to the text (the one clipped figure this screen gets, §3), and three tip labels at
+  `12px 20px`, `--upos-radius-inset`. A 30px close sits at `top:22px; right:22px`. The artboard draws
+  those tip labels as display-only; make them tappable and they take `--upos-touch-kiosk` 60px,
+  because the surface is guest-facing (§11).
+- **Confirmation** replaces the whole pane set: centered, 420px max — a 64px `--upos-grad-primary`
+  circle carrying a white check, `Order #482 confirmed` at 800/24px,
+  `$NN.NN charged · receipt ready to send` at 400/14px, `Email receipt` and `Print receipt` as
+  `.u-btn--secondary`, and `Start new order` as a `.u-btn--primary`.
+
+**States.**
+
+- Tender selected — `CREDIT / DEBIT` by default. Offline it drops `--upos-grad-primary` for a flat
+  neutral fill with `--upos-ink-subtle` ink and gains `will sync on reconnect` at 400/10.5px (see
+  Offline behavior).
+- Tip selected — one of 18%, 20%, 25% or none; the selected `.u-tip-btn` takes `--upos-grad-primary`
+  and white ink, and every dollar figure recomputes off the subtotal.
+- Split mode — evenly (2 to 6 guests) or by seat.
+- Guest mirror hidden or shown.
+- Screen taking payment, or confirmed.
+
+**Interactions.** The mirror button opens the sheet and the sheet's own close returns it.
+`SPLIT CHECK` opens the split modal and `Done` closes it; arriving from the table drawer opens it
+already on `EVENLY`. The tip buttons set the percentage. `CONFIRM PAYMENT` swaps the panes for the
+confirmation. `Start new order` clears the cart, resets the tip to 20%, releases the active table,
+increments the order number and returns to Order entry. `CASH`, `GIFT CARD`, `Email receipt` and
+`Print receipt` are drawn but unwired in the artboard — wire them to the same tender and receipt
+flows as their neighbors. Overlays rise with `fl-rise` at `--upos-dur-slow`.
+
+**Data.** Almost none today. `Order.OrderNumber` supplies the number in the header and the
+confirmation; every amount is summed client-side from the check — tax at the venue's rate, tip as a
+percentage of subtotal, the split as an even division or a per-seat allocation. Tender type, tip
+amount, split allocation, the paid transition and the receipt have no model, no DTO and no endpoint.
+Confirming a payment can only mean `PUT /api/orders/{id}/status` with an `UpdateOrderStatusDto`
+moving the order to `Completed`, broadcast as `ReceiveOrderCompleted` — which records that the check
+closed, not how it was paid.
+
+**Gaps.**
+
+- GAP-08 — no payments domain: tender, tip, split allocation and refund have nowhere to be stored, so
+  every number this screen writes is lost at `Completed`.
+
+#### Channels queue
+
+**Purpose.** You watch every order the venue has taken, whatever took it, one line each.
+
+**Layout.**
+
+- **Header, 60px**, `--upos-surface-inset`, bottom hairline, padding `0 28px`:
+  `Order queue · every channel, one line` at 800/14px on the left, the open count at 700/12px
+  `--upos-ink-subtle` on the right.
+- **List** scrolls at `20px 28px`, 10px between rows.
+- **Row**: `.u-data-row` geometry — `--upos-surface`, 1px `--upos-border`, `--upos-radius-inset`,
+  `14px 18px`, 16px gaps, no shadow at rest. Left, a 34px round channel badge carrying a two-letter
+  code in white 800/11px on the channel's own color. Middle, flexible: `Counter · #482` at 700/13.5px
+  over the item summary at 400/12px `--upos-ink-subtle`. Right, the price at 800/13px and a status
+  chip at `5px 12px`, 700/10.5px, `.03em`.
+- The badge is `.u-badge-channel` rendered as a 34px circle rather than the kit's pill; the status
+  chip is `.u-chip-status--*`, which fills solid with white ink where the artboard tints the pill and
+  inks it with the matching text token. Ship the kit chip — §4 names it as where status shows.
+
+**States.**
+
+- Per row, one of `NEW` (`--upos-status-new`), `FIRED` (`--upos-status-fired`), `READY`
+  (`--upos-status-ready`) or `LATE` (`--upos-status-late`). `LATE` is derived client-side from
+  `Order.CreatedAt` against the channel's SLA and overrides the row's real status while it holds; the
+  API never returns it (§4).
+- Empty queue — a statement, not an apology: `No open orders. Every channel is clear.`
+
+**Interactions.** Reached from `CHANNELS` in the bottom nav. The rows are a monitor: the artboard
+gives them no tap, and a status change restyles the row in place rather than announcing itself. A new
+order joins the list without a toast.
+
+**Data.** The Orders controller's list endpoint (`GET /api/orders`) returns the `OrderDto` list, one
+row each: the id from `Order.OrderNumber`, the summary counting `OrderItemDto` lines, the price
+summing them, and the chip mapping `OrderStatus` through §4. Live behavior comes off `/hubs/orders`
+— `ReceiveNewOrder` adds a row, `ReceiveOrderStatusUpdate` restyles its chip, `ReceiveOrderCompleted`
+drops it — with the `Order_{id}` groups carrying per-order detail. The channel name, its two-letter
+badge and its color have no field behind them.
+
+**Gaps.**
+
+- GAP-04 — `Order` has no channel or order type, so every badge, channel name and per-channel color
+  on this screen is unbindable.
+
+#### Offline behavior
+
+**Purpose.** The terminal keeps taking orders with no network, and says so in one place.
+
+**Layout.** Three elements, and nothing else moves.
+
+- **One pill in the top bar**, in the slot beside the venue name: `.u-pill-offline` —
+  `--upos-status-late` fill, white 800/11px at `.05em`, `--upos-radius-pill`, `6px 12px`, a 13px
+  wifi-off icon, reading `OFFLINE · 3 QUEUED`.
+- **One annotation per affected action.** On the card tender tile, `will sync on reconnect` at
+  400/10.5px under the label; on a line sent to the kitchen, `QUEUED` in place of `SENT`.
+- **No banner, no blocking modal, no disabled primary, and no toast per queued write** (§11).
+
+**States.**
+
+- Online — no pill, no annotations, the card tender renders as the selected tile on
+  `--upos-grad-primary`.
+- Offline with a queue — the pill carries the count; the card tender drops to a flat neutral fill
+  with `--upos-ink-subtle` ink and takes its sync line. Every control stays live.
+- Draining — the count falls as writes replay, and the pill leaves at zero. There is no success
+  toast; the absence of the pill is the message.
+- The pill pulses with `fl-pulse`, and keeps pulsing under `prefers-reduced-motion` because it
+  carries status rather than decoration (§8).
+
+**Interactions.** Connectivity is observed, never chosen — the artboard's offline toggle is demo
+scaffolding, not product UI. Offline you still build a check, send it, take a tender and confirm:
+each write applies to local state first and is enqueued, so no tap waits on the network (§11's 150ms
+rule). On reconnect the queue replays in order and the pill counts down to nothing.
+
+**Data.** The queue is a local SQLite table on `Restaurant.Mobile` — planned, not built (POC step 7).
+A row holds one pending write: a `CreateOrderDto` bound for `POST /api/orders`, or an
+`UpdateOrderStatusDto` bound for `PUT /api/orders/{id}/status`, with the time it was queued. Replay
+reissues them in order and the API answers on `/hubs/orders` — `ReceiveNewOrder`,
+`ReceiveOrderStatusUpdate`, `ReceiveOrderCompleted` — as each one lands. Losing the hub connection is
+what puts the terminal offline; it changes what the UI says, never what it lets you do. The contract
+replay has to honor: a write that reaches the API twice must not produce two orders, and nothing in
+`CreateOrderDto` carries a client-generated key to make that true.
+
+**Gaps.**
+
+- GAP-10 — no offline queue table and no idempotency key on `CreateOrderDto`, so a replayed write can
+  double an order.
 
 ### Part II-B · Back office
 
