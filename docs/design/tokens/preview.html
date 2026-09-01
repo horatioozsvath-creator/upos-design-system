@@ -66,7 +66,110 @@
   </div>
 
   <h2 id="pv-components">Component recipes (Task 3)</h2>
-  <section id="pv-components-body"><!-- Task 3 fills this in --></section>
+  <section id="pv-components-body">
+
+    <h3>Buttons</h3>
+    <div class="pv-grid" style="align-items:center">
+      <button class="u-btn u-btn--primary">Charge $18.40</button>
+      <button class="u-btn u-btn--secondary">Save order</button>
+      <button class="u-btn u-btn--ghost">Cancel</button>
+      <button class="u-icon-btn" aria-label="Settings">&#9881;</button>
+    </div>
+
+    <h3>Pills and chips</h3>
+    <div class="pv-grid" style="align-items:center">
+      <span class="u-pill">Lunch menu</span>
+      <span class="u-chip-status u-chip-status--new">New</span>
+      <span class="u-chip-status u-chip-status--fired">Fired</span>
+      <span class="u-chip-status u-chip-status--late">Late</span>
+      <span class="u-chip-status u-chip-status--ready">Ready</span>
+      <span class="u-chip-allergen">Contains nuts</span>
+      <span class="u-pill-offline">Offline</span>
+      <span class="u-badge-channel">Dine-in</span>
+      <span class="u-badge-channel">DoorDash</span>
+    </div>
+
+    <h3>Segmented control</h3>
+    <div class="u-segmented">
+      <button class="u-segmented__opt is-active" type="button">Open</button>
+      <button class="u-segmented__opt" type="button">Held</button>
+      <button class="u-segmented__opt" type="button">Closed</button>
+    </div>
+
+    <h3>Stat card and data rows</h3>
+    <div class="pv-grid" style="align-items:flex-start">
+      <div class="u-stat-card">
+        <span style="font:var(--upos-type-label);letter-spacing:.15em;color:var(--upos-ink-subtle)">NET SALES</span>
+        <span style="font:var(--upos-type-display)">$4,820</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:420px;margin:10px 0 26px">
+      <div class="u-data-row"><span>#128 &middot; Classic Cheeseburger</span></div>
+      <div class="u-data-row is-late"><span>#129 &middot; Table 6 &mdash; running late</span></div>
+    </div>
+
+    <h3>Tender, tip and quantity controls</h3>
+    <div class="pv-grid" style="align-items:center">
+      <div class="u-tender-tile is-selected">Cash</div>
+      <div class="u-tender-tile">Card</div>
+      <button class="u-tip-btn" type="button">15%</button>
+      <button class="u-tip-btn is-selected" type="button">18%</button>
+      <button class="u-tip-btn" type="button">20%</button>
+      <div class="u-qty-stepper">
+        <button type="button" aria-label="Decrease">&minus;</button>
+        <span>2</span>
+        <button type="button" aria-label="Increase">+</button>
+      </div>
+    </div>
+
+    <h3>Overlays &mdash; modal, scrim, drawer, toast</h3>
+    <div style="position:relative;height:260px;border-radius:var(--upos-radius-panel);overflow:hidden;background:var(--upos-surface-inset);margin:10px 0 14px">
+      <div class="u-scrim"></div>
+      <div class="u-modal" style="position:absolute;top:20px;left:50%;transform:translateX(-50%)">
+        <div style="display:flex;align-items:center">
+          <strong style="font:var(--upos-type-heading)">Void item?</strong>
+          <button class="u-icon-btn" aria-label="Close" style="margin-left:auto">&times;</button>
+        </div>
+        <p style="margin:0;color:var(--upos-ink-subtle)">This removes the item from the check.</p>
+        <div class="pv-grid" style="margin:0">
+          <button class="u-btn u-btn--secondary">Keep item</button>
+          <button class="u-btn u-btn--primary">Void item</button>
+        </div>
+      </div>
+    </div>
+    <div style="position:relative;height:220px;border-radius:var(--upos-radius-panel);overflow:hidden;background:var(--upos-surface-inset);margin:0 0 14px">
+      <div class="u-drawer">
+        <strong style="font:var(--upos-type-heading)">Order notes</strong>
+        <p style="margin:0;color:var(--upos-ink-subtle)">No allergies on file.</p>
+      </div>
+    </div>
+    <div style="position:relative;height:70px;margin:0 0 26px">
+      <div class="u-toast" style="position:absolute;bottom:0;left:0">Order #128 sent to kitchen</div>
+    </div>
+
+    <h3>Bottom navigation</h3>
+    <nav class="u-nav-bottom" style="max-width:420px;margin:10px 0 26px">
+      <div class="u-nav-item is-active">Orders</div>
+      <div class="u-nav-item">Tables</div>
+      <div class="u-nav-item">Reports</div>
+      <div class="u-nav-item">Settings</div>
+    </nav>
+
+    <h3>KDS chit</h3>
+    <div class="upos-kds" style="padding:20px;border-radius:8px;background:var(--upos-kds-board)">
+      <div class="u-chit">
+        <div style="padding:12px 14px;display:flex;justify-content:space-between;align-items:center">
+          <strong>#128 &middot; Table 6</strong>
+          <span class="u-chit__timer">04:12</span>
+        </div>
+        <div style="padding:0 14px 14px;display:flex;justify-content:space-between;align-items:center">
+          <span>Order overdue</span>
+          <span class="u-chit__timer u-chit__timer--late">12:41</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
 
   <h2>KDS scope</h2>
   <div class="upos-kds" style="padding:24px;border-radius:8px;background:var(--upos-kds-board)">
