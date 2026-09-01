@@ -1988,16 +1988,18 @@ lands in.
   as the back-office sidebar (§2, §3): `MENU` in the label class, one 88px button per category at
   800/20px, selected on `--upos-grad-primary`, and a closing note at 400/19px at `.72`. The rest
   carries the category title at 800/66px `-.03em` beside its count, then full-width rows — a 104px
-  photo at `--upos-radius-inset`, the name at 800/30px with its tag, the description at 400/19px, the
-  price in `--upos-type-mono` at 28px, and a 60px `+` on `--upos-grad-primary`.
+  photo at `--upos-radius-inset`, the name at 800/30px with its tag, the description at 400/19px,
+  `.u-chip-allergen` chips (§5), the price in `--upos-type-mono` at 28px, and a 60px `+` on
+  `--upos-grad-primary`.
 - **Suggestion strip**, at the foot of browse above the bag bar, `--upos-surface` at `20px 40px 24px`:
   `SUGGESTED WITH YOUR ORDER` in the label class beside its note at 400/19px, then three `1fr` cards
   at 14px gaps — a 56px photo at `--upos-radius-inset`, the name at 800/19px over its counter in the
   label class, the price in `--upos-type-mono` at 19px, and a 60px `+` on `--upos-grad-primary`. On a
   list row and on a suggestion card the whole element is the target and the `+` is its affordance.
 - **Item detail.** A 420×300 photo frame at `--upos-radius-card` beside a block at `30px 36px`: a
-  `Back` `.u-btn--secondary`, the item name at 800/48px `-.02em`, the description at 400/19px, and the
-  running unit price pinned to the bottom in `--upos-type-mono` at 32px in `--upos-accent-deep`. Below
+  `Back` `.u-btn--secondary`, the item name at 800/48px `-.02em`, `.u-chip-allergen` chips under it
+  (§5), the description at 400/19px, and the running unit price pinned to the bottom in
+  `--upos-type-mono` at 32px in `--upos-accent-deep`. Below
   at `26px 40px`, groups 24px apart: the title at 800/22px `.02em` beside its rule — `PICK ONE` or
   `ANY` — in the label class at `--upos-ink`, then `1fr 1fr 1fr` options at 12px gaps, each at
   `--upos-radius-inset` on `--upos-surface-inset` with its label at 800/19px and its delta in
@@ -2015,17 +2017,21 @@ lands in.
   `.u-btn--ghost` at `--upos-ink` (§11), then the confirm.
 - **Cart.** Head at `36px 40px 24px`: `Review your order` at 800/56px `-.02em` over
   `4 items · 2 from the deli · 2 from the tea bar · nothing is sent until you submit` at 400/19px,
-  with `Add more` as a `.u-btn--secondary`. Lines group by concept under a header row — a 22px
-  `--upos-radius-pill` mark, the concept name at 800/20px `.12em`, its counter note in the label
-  class, a `--upos-border` hairline, and the group sum in `--upos-type-mono` at 18px. A line runs
-  `{n}×` in `--upos-type-mono` at 26px in a 52px column, the item name at 800/28px `-.015em`, the
-  middot-joined mods at 400/19px, and the combo chip `COMBO · Fries + Fountain Soda` at
+  with `Add more` as a `.u-btn--secondary` and `Start over` as a `.u-btn--ghost` at `--upos-ink`
+  (§11) on the right. Lines group by concept under a header row — a 22px `--upos-radius-pill` mark,
+  the concept name at 800/20px `.12em`, its counter note in the label class, a `--upos-border`
+  hairline, and the group sum in `--upos-type-mono` at 18px. A line runs `{n}×` in `--upos-type-mono`
+  at 26px in a 52px column, the item name at 800/28px `-.015em`, the middot-joined mods at 400/19px,
+  `.u-chip-allergen` chips (§5), and the combo chip `COMBO · Fries + Fountain Soda` at
   `--upos-radius-pill` on `--upos-surface-inset` in `--upos-accent-deep` 800/14px; right, the line
   price in `--upos-type-mono` at 26px over a `Remove` `.u-btn--ghost` at `--upos-ink` (§11).
 - **Cart totals**, under a hairline: `Subtotal` at 400/19px, `Combo savings` `−$N.NN` at 800/19px in
   `--upos-accent-deep`, `Tax`, a 2px `--upos-border` rule, then `Total` at 800/42px with its amount in
-  `--upos-type-mono`. The 96px footer band is flush to the panel edge: `Start over` on a 300px
-  `.u-btn--ghost` at `--upos-ink`, then `Submit order · $NN.NN` as a `.u-btn--primary` taking the rest.
+  `--upos-type-mono`. The 96px footer band carries one full-width `Submit order · $NN.NN` as a
+  `.u-btn--primary`. **The artboard has no pay screen**, so it lands `START OVER` and `SUBMIT ORDER`
+  together on this band, flush and adjacent; **`Start over` moves to the head** for the reason
+  `CANCEL` was dropped from the item screen — width is not separation, and on both screens the commit
+  owns the footer alone with every exit a scroll region away in the head.
 - **Pay** is centered on `--upos-surface`: the amount at 800/96px in `--upos-type-mono`,
   `Insert, tap or swipe` at 800/34px, a reader illustration at `--upos-radius-card`, and `Cancel` as a
   60px `.u-btn--ghost` at `--upos-ink`. No tip prompt and no signature — neither has anywhere to be
@@ -2058,8 +2064,9 @@ lands in.
   `.u-btn--secondary` reading `Pick a side and a drink` and does not respond; the second choice makes
   it a `.u-btn--primary` reading `Add the combo · +$4.50`. The artboard greys it instead, and a grey
   control on a guest screen reads as broken rather than as waiting.
-- Cart empty — `Nothing in the bag yet. Tap Add more to start.` at 400/22px in `--upos-ink` (§10).
-  The savings line, a line's mods and a line's combo chip each render only when there is one.
+- Cart empty — `Nothing in the bag yet. Tap Add more to start.` at 400/22px in `--upos-ink`. The
+  artboard stops at the first sentence; the next move is a UPOS addition under §10's empty-state
+  rule. The savings line, a line's mods and a line's combo chip each render only when there is one.
 - Bag bar at zero reads `0` and `$0.00` with a `.u-btn--secondary`; the first line makes it primary.
 - Idle, then warned, then wiped — Guest-facing rules holds the timing. 86'd never appears: an
   unavailable item is absent from the menu, not marked in it.
@@ -2110,7 +2117,8 @@ is what keeps the savings arithmetic exact. The order number on the done screen 
   lives in the client.
 - GAP-02 — no combo entity, so the auto-detection, the combo price and the per-line saving have
   nothing to persist to.
-- GAP-05 — `MenuItem` has no allergens, so the chips on the card and the detail are design-only.
+- GAP-05 — `MenuItem` has no allergens, so the chips on the grid card, the list row, the item detail
+  and the cart line are design-only.
 - GAP-08 — no payments domain, so the pay screen records nothing it does.
 
 #### Guest-facing rules
@@ -2139,9 +2147,10 @@ item names and the order number run well above the scale at the call-site sizes 
 
 **Every target clears `--upos-touch-kiosk` 60px**, and the two order-committing controls —
 `Add to order` and `Submit order` — take the full 96px band. Adjacent targets stand at least
-`--upos-space-gap-row` 8px apart, and two irreversible controls are never adjacent (§11): `Start over`
-sits behind its own 300px edge away from `Submit order`, and the item screen's discard was dropped for
-the same reason.
+`--upos-space-gap-row` 8px apart, and two irreversible controls are never adjacent (§11): every footer
+band on this surface carries its commit alone, and the discard the artboard draws flush beside it —
+`CANCEL` on the item screen, `START OVER` on the cart — is dropped or moved up into that screen's
+head. Width is not separation.
 
 **WCAG 2.2 AA, and one pairing fails it.** `--upos-ink-subtle` on `--upos-surface` computes 3.0:1
 (§11). Size does not rescue it here — the large-text allowance starts at 24px regular and kiosk body
@@ -2153,7 +2162,7 @@ not on the quantity column, not on a ghost button's label. The pairings that do 
 | --- | --- | --- |
 | `--upos-ink` on `--upos-surface` | 15.9:1 | Every sentence and every name |
 | `--upos-accent-deep` on `--upos-surface` | 9.4:1 | Prices, the combo chip, the savings line |
-| `--upos-accent` on `--upos-surface` | 6.3:1 | The merchandising tag's fill against white ink |
+| White on `--upos-accent` | 6.3:1 | The merchandising tag, whose fill is flat rather than the gradient |
 | White on `--upos-grad-primary` | 6.3:1 to 9.4:1 | Primary buttons, the attract and done screens |
 | `--upos-kds-ink` on `--upos-grad-dark` | 14.2:1 | The promo band and the list rail |
 
@@ -2281,7 +2290,7 @@ status.
 - GAP-10 — no idempotency key on `CreateOrderDto`, so a submit retried across a flaky link can produce
   two orders and two numbers for one guest.
 - GAP-12 — no loyalty account entity, so a kiosk cannot identify the guest it is serving.
-- GAP-05 — `MenuItem` has no allergens, so the chips the kiosk card and detail carry are design-only.
+- GAP-05 — `MenuItem` has no allergens, so every chip §5 puts on a kiosk surface is design-only.
 
 ---
 
