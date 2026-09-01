@@ -2781,8 +2781,10 @@ replayed write can double an order (GAP-10).
 **Props:** `Checked` (bool), `CheckedChanged` (EventCallback<bool>), `Label` (string, the accessible
 name), `Disabled` (bool).
 **States:** off — a 50×28 `--upos-border` track with its 22px white knob at `3px`; on —
-`--upos-grad-primary` with the knob at `25px`. The knob and the fill both move at `--upos-dur-fast` on
-`--upos-ease`, the one curve; the artboard runs `.2s` linear and the kit wins (§8, Integrations).
+`--upos-grad-primary` with the knob at `25px`. The knob slides at `--upos-dur-fast` on `--upos-ease`,
+the one curve, and the fill swaps rather than fading — a gradient is `background-image` and does not
+interpolate, which `.u-tip-btn` already does the same way. The artboard runs `.2s` linear and the kit
+wins (§8, Integrations).
 **Consumed by:** Integrations (the per-channel connection toggle), Modifier modal (the combo control).
 **Notes:** **this is the recipe Part II-B routes to this part, and it now ships in
 `upos-components.css`.** The knob sits inside the track at pill radius, so §7's overflow rule has
