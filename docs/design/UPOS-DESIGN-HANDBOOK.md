@@ -617,8 +617,10 @@ does not.
 - A dedicated bump affordance per chit, full width, not a small target: a gloved hand must not be
   able to fire the wrong ticket.
 - Chit density: a 5-column by 2-row grid at 1920×800, chits 9px apart on 12px board padding.
-- Per-item strike on tap, whole-chit bump on the bump bar, and expo chits that wait on every
-  station before they can be bagged.
+- Whole-chit bump on the bump bar, and expo chits that wait on every station before they can be
+  bagged. (Per-item strike on tap is a UPOS addition, not artboard content — the artboard's item
+  `done` state is derived from station bumps and shown only on expo chits; Part II-C specs the
+  addition.)
 - Plate view armed from the header, then tap a chit.
 
 **KDS drops:**
