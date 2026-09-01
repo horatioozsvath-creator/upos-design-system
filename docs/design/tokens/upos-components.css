@@ -138,7 +138,8 @@
 /* Qty stepper — [- qty +] compound control; children are plain elements */
 .u-qty-stepper { display:inline-flex; align-items:center; border-radius:var(--upos-radius-pill);
   background:var(--upos-surface-inset); overflow:hidden; }
-.u-qty-stepper button { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px;
+.u-qty-stepper button { display:inline-flex; align-items:center; justify-content:center;
+  min-width:var(--upos-touch-terminal); min-height:var(--upos-touch-terminal);
   border:none; background:transparent; color:var(--upos-ink); font:800 15px/1 Archivo,system-ui,sans-serif; cursor:pointer;
   transition:background var(--upos-dur-fast) var(--upos-ease); }
 .u-qty-stepper button:hover { background:var(--upos-surface-hover); }
