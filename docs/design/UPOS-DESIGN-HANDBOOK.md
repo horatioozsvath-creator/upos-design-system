@@ -744,10 +744,18 @@ from the artboards; styling rules come from Part I.
 
 ### Part II-A · Terminal
 
-The terminal is one 1440×900 shell at `--upos-radius-panel`, `--upos-surface`, clipped, with a fixed
-76px top bar and a fixed 78px bottom nav. Everything between them is a destination, and everything
-that is not a destination opens over the destination. Order entry carries the shell; the other seven
-specs assume it.
+The terminal is one 1440×900 shell at `--upos-radius-panel` 26px (the artboard draws 20px),
+`--upos-surface`, clipped, with a fixed 76px top bar and a fixed 78px bottom nav. Everything between
+them is a destination, and everything that is not a destination opens over the destination. Order
+entry carries the shell; the other seven specs assume it.
+
+Two rulings hold across all eight specs, so no spec below repeats them. **Every round close, mirror
+and utility control is `.u-icon-btn`** — 34px at `--upos-radius-pill` — centered in a hit area of at
+least `--upos-touch-terminal` 48px. The artboard draws those controls at 30px, and the payment
+screen's guest-mirror button at 36px; both are under §11's minimum, and §11's rule outranks the
+artboard's pixels. **Every quantity control is `.u-qty-stepper`**, whose buttons already set
+`--upos-touch-terminal`; the artboard draws its steppers between 24px and 40px. Where a spec names an
+icon button or a stepper it means those shipped sizes.
 
 #### Order entry
 
@@ -768,7 +776,8 @@ kitchen and charge.
 - **Category rail, 170px**, inset fill, right hairline, padding `14px 10px`, 6px gaps. One button per
   category at `--upos-radius-inset`, 700/13px, active on `--upos-grad-primary`.
 - **Item grid**, fills the middle, 22px padding, its own scroll. Above it, right-aligned, the
-  `ITEM INFO` mode pill at `--upos-radius-pill`, `6px 14px`, 700/11px. The grid is
+  `ITEM INFO` mode pill at `--upos-radius-pill` and `--upos-space-pad-pill` (the artboard draws
+  `8px 14px`), 700/11px. The grid is
   `repeat(auto-fill,minmax(190px,1fr))` at 16px gaps. A tile is `--upos-surface`, 1px
   `--upos-border`, `--upos-radius-card` 18px, `--upos-shadow-card`, 18px padding, 6px column gaps:
   name 700/14px, price 800/15px in `--upos-accent-deep`, then `.u-chip-allergen` chips.
@@ -776,10 +785,8 @@ kitchen and charge.
   hairline: the check label at 800/14px and a loyalty pill button. Line list scrolls at `14px 22px`,
   12px between lines. Footer `18px 22px` under a hairline.
 - **Cart line**: left, `{qty} × {name}` at 700/14px, the mods line at 400/12px `--upos-ink-subtle`,
-  then allergen chips. Right, a round send-one button, a `−`, the line total at 800/14px in a 52px
-  right-aligned slot, and a `+`. The artboard draws those at 26px and 24px; ship them at
-  `--upos-touch-terminal` 48px through `.u-qty-stepper` and `.u-icon-btn` — §11's rule outranks the
-  artboard's pixels.
+  then allergen chips. Right, a send-one `.u-icon-btn`, then a `.u-qty-stepper` whose `−` and `+`
+  bracket the line total at 800/14px in a 52px right-aligned slot.
 - **Footer**: Subtotal and Tax rows 700/13px `--upos-ink-subtle`, Total 800/20px, a 48px
   `.u-btn--secondary` send-all button, and a 58px `.u-btn--primary` carrying `Charge $NN.NN` and
   `--upos-shadow-button`.
@@ -842,8 +849,8 @@ kitchen and charge.
 **Layout.** 480px wide, `max-height:820px`, its own scroll, `--upos-radius-panel` (the artboard draws
 24px), `--upos-surface`, 26px padding, 16px gaps, `--upos-shadow-modal`, centered on `--upos-scrim`.
 
-- Header: the item name at 800/18px, `.u-chip-allergen` chips under it, and a 30px round
-  `.u-icon-btn` close on the inset fill.
+- Header: the item name at 800/18px, `.u-chip-allergen` chips under it, and a close `.u-icon-btn` on
+  the inset fill.
 - Burger body, three blocks. `DONENESS · REQUIRED` at 700/10.5px `.08em` `--upos-ink-subtle`, then
   single-select pills at `10px 16px`. `ADD-ONS · OPTIONAL`, then multi-select pills at `9px 14px`
   carrying the upcharge in the label — `Bacon +$1.50`, `Avocado +$1.75`, `Extra Cheese +$1.00`. Then
@@ -851,9 +858,8 @@ kitchen and charge.
   `+ side, + drink · +$3.50` at 400/11px, and a 50×28px switch whose 22px knob slides `3px → 25px`.
 - Combo on adds `CHOOSE A SIDE` and `CHOOSE A DRINK` pill groups under it.
 - Drink body is one block: `SIZE · REQUIRED` and three pills — Small · Medium · Large.
-- Footer row: a qty stepper (`.u-qty-stepper`, `−`, the count at 800/15px, `+`) and then a
-  full-width 52px `.u-btn--primary` reading `Add to order — $NN.NN`. The artboard draws the stepper
-  buttons at 30px; ship them at `--upos-touch-terminal` 48px (§11).
+- Footer row: a `.u-qty-stepper` around the count at 800/15px, then a 52px `.u-btn--primary` taking
+  the remaining width (`flex:1`) and reading `Add to order — $NN.NN`.
 
 **States.**
 
@@ -889,11 +895,11 @@ line is unit × quantity. The confirmed line reaches the API only inside `Create
 **Purpose.** You answer a guest's question about an item without touching the check.
 
 **Layout.** 480px wide, `max-height:800px` — 20px shorter than the Modifier modal — its own scroll,
-24px radius, `--upos-surface`, 26px padding, 16px gaps, `--upos-shadow-modal`, centered on
-`--upos-scrim`.
+`--upos-radius-panel` 26px (the artboard draws 24px), `--upos-surface`, 26px padding, 16px gaps,
+`--upos-shadow-modal`, centered on `--upos-scrim`.
 
 - Header: the item name at 800/18px, the price at 800/15px in `--upos-accent-deep`,
-  `.u-chip-allergen` chips at `3px 8px`, and a 30px round `.u-icon-btn` close.
+  `.u-chip-allergen` chips at `3px 8px`, and a close `.u-icon-btn`.
 - `INGREDIENTS` label at 700/10.5px `.08em`, then an inset list — `--upos-surface-inset`, 16px
   radius, `14px 16px`, 6px gaps, one row per ingredient at 700/12.5px.
 - When the item has both views, a `.u-segmented` track: 4px padding on the inset, two options at
@@ -940,16 +946,18 @@ behind them. The allergen chips have no field either.
   700/12px labels — NEW / SEATED, FIRED / ORDERED, LATE, READY / DONE. The artboard draws the legend
   in the demo chrome above the shell; on the terminal it belongs where the statuses are.
 - **Canvas** fills the rest at 36px padding, tables positioned absolutely on the room's geometry.
-- **Table**: 104px tall; 150px wide for two- and four-tops, 230px for the large tops; `--upos-surface`
-  fill; a 2px status-colored border; `--upos-shadow-card`; a centered stack of the id at 800/19px,
+- **Table**: 104px tall and either 150px or 230px wide as the room's geometry demands, not as the
+  cover count implies — the artboard runs a six-top at 150px and its eight- and ten-tops at 230px;
+  `--upos-surface` fill; a 2px status-colored border; `--upos-shadow-card`; a centered stack of the
+  id at 800/19px,
   the status line at 700/11.5px in the status color, and the guest count at 400/11px
   `--upos-ink-subtle`. Shape carries seating: square tables take 20px (`--upos-radius-card` 18px in
   the kit), rounds take `--upos-radius-pill`.
-- **Guest-count dialog**: 380px, 24px radius, 26px padding, 18px gaps, on a lighter scrim
-  (`rgba(20,25,31,.45)`, against `--upos-scrim`'s `.5` under the modals). Header `New order · T3` at
-  800/18px with a 30px close; a `GUESTS / SEATS` label; a centered stepper — `−`, the count at
-  800/32px, `+`, all at `--upos-touch-terminal` (the artboard draws 40px); and a 54px
-  `.u-btn--primary` reading `Start order`.
+- **Guest-count dialog**: 380px, `--upos-radius-panel` 26px (the artboard draws 24px), 26px padding,
+  18px gaps, on a lighter scrim (`rgba(20,25,31,.45)`, against `--upos-scrim`'s `.5` under the
+  modals). Header `New order · T3` at 800/18px with a close `.u-icon-btn`; a `GUESTS / SEATS` label;
+  a centered `.u-qty-stepper` around the count at 800/32px; and a 54px `.u-btn--primary` reading
+  `Start order`.
 
 **States.** One per table, each setting the border, the status line and the guest line:
 
@@ -988,15 +996,18 @@ payment.
 
 **Layout.** A 420px drawer on the right, full height, flush to the shell edge, `--upos-surface`, a
 left-cast `-30px 0 60px -30px rgba(20,25,31,.5)` shadow, over the `rgba(20,25,31,.45)` scrim. The
-kit's `.u-drawer` floats inset at 300px; this one overrides both the width and the inset, and Part
-III carries the variant.
+kit's `.u-drawer` floats inset 16px precisely so all four corners stay rounded — §7 allows no square
+corner outside `.upos-kds`. This drawer overrides the width and runs full height flush to the shell
+edge, so round its two inboard corners at `--upos-radius-panel` and let the outboard edge meet the
+shell's own rounded clip; no square corner is exposed either way. Part III carries the variant.
 
 - Header `22px 24px` above a hairline: the table id at 800/16px over `4 guests · Server: Maya` at
-  700/12px `--upos-ink-subtle`; a 30px round `.u-icon-btn` close.
+  700/12px `--upos-ink-subtle`; a close `.u-icon-btn`.
 - `Add to order`, a 46px `.u-btn--primary` at `--upos-radius-inset`, margin `16px 24px 0`.
 - Body scrolls at `20px 24px`, 18px between courses.
-- A course is a control row then its items. Control row: a status chip at `5px 12px` —
-  `COURSE 1 · FIRED` on `--upos-status-fired` — plus that course's actions. Item rows sit on
+- A course is a control row then its items. Control row: a `.u-chip-status` at its recipe's
+  `5px 12px` (the artboard draws `5px 14px`) reading `COURSE 1 · FIRED` on `--upos-status-fired`,
+  plus that course's actions. Item rows sit on
   `--upos-surface-inset` at `--upos-radius-inset`, `12px 14px`, 8px apart, the name at 700/13px left
   and the price at 800/13px right.
 - Course 1's action is a re-fire pill button, `7px 14px`, 1px `--upos-border`, transparent at rest.
@@ -1049,7 +1060,7 @@ check.
 **Layout.** Two panes and three overlays.
 
 - **Left pane** fills, 32px padding, 20px gaps. Header row: `Payment · Order #482` at 800/15px on the
-  left; on the right a 36px round guest-mirror `.u-icon-btn` and the amount due at 800/20px.
+  left; on the right a guest-mirror `.u-icon-btn` and the amount due at 800/20px.
 - **Tender grid**: 2×2, `1fr 1fr` by `1fr 1fr`, 20px gaps, filling the pane. Each tile is a
   `.u-tender-tile` at 22px radius (`--upos-radius-card` in the kit), an icon over its label at
   800/14px.
@@ -1061,17 +1072,21 @@ check.
   border, 800/15px, labeled `18% · $NN.NN`, `20% · $NN.NN`, `25% · $NN.NN` and `NO TIP`; a hairline;
   Subtotal and Tip rows at 700/13px `--upos-ink-subtle`; Total at 800/22px; and `CONFIRM PAYMENT`, a
   60px `.u-btn--primary` pinned to the bottom with `margin-top:auto`.
-- **Split modal**: 460px, 24px radius, 26px padding, 18px gaps, on `--upos-scrim`. Header
-  `Split the check` with a 30px close; a `.u-segmented` track — `EVENLY` · `BY SEAT`; then either the
-  even body (a stepper around the count at 800/28px over a `GUESTS` label, then the per-guest amount
-  at 800/24px with `per guest` at 400/13px) or the seat body (four inset rows at `12px 14px`, seat
-  name left, amount right); and a 52px `.u-btn--primary` reading `Done`.
+- **Split modal**: 460px, `--upos-radius-panel` 26px (the artboard draws 24px), 26px padding, 18px
+  gaps, on `--upos-scrim`. Header `Split the check` with a close `.u-icon-btn`; a `.u-segmented`
+  track — `EVENLY` · `BY SEAT`; then either the even body (a `.u-qty-stepper` around the count at
+  800/28px over a `GUESTS` label, then the per-guest amount at 800/24px with `per guest` at
+  400/13px) or the seat body (four inset rows at `12px 14px`, seat name left, amount right); and a
+  52px `.u-btn--primary` reading `Done`.
 - **Guest mirror**: a 520px sheet on the right, full height, `--upos-surface`, centered stack — a
   `GUEST-FACING MIRROR` kicker at 700/11px `.15em`, the total at 800/30px with `--upos-grad-primary`
   clipped to the text (the one clipped figure this screen gets, §3), and three tip labels at
-  `12px 20px`, `--upos-radius-inset`. A 30px close sits at `top:22px; right:22px`. The artboard draws
-  those tip labels as display-only; make them tappable and they take `--upos-touch-kiosk` 60px,
-  because the surface is guest-facing (§11).
+  `12px 20px`, `--upos-radius-inset`. A close `.u-icon-btn` sits at `top:22px; right:22px`. The sheet
+  runs flush to the shell edge like the table drawer, so it takes the same treatment `.u-drawer`'s
+  16px inset exists to guarantee: inboard corners at `--upos-radius-panel`, outboard edge inside the
+  shell's rounded clip, no square corner exposed (§7). The artboard draws those tip labels as
+  display-only; make them tappable and they take `--upos-touch-kiosk` 60px, because the surface is
+  guest-facing (§11).
 - **Confirmation** replaces the whole pane set: centered, 420px max — a 64px `--upos-grad-primary`
   circle carrying a white check, `Order #482 confirmed` at 800/24px,
   `$NN.NN charged · receipt ready to send` at 400/14px, `Email receipt` and `Print receipt` as
@@ -1134,7 +1149,8 @@ closed, not how it was paid.
   (`--upos-status-ready`) or `LATE` (`--upos-status-late`). `LATE` is derived client-side from
   `Order.CreatedAt` against the channel's SLA and overrides the row's real status while it holds; the
   API never returns it (§4).
-- Empty queue — a statement, not an apology: `No open orders. Every channel is clear.`
+- Empty queue — a statement, not an apology: `No open orders. Every channel is clear.` The artboard
+  draws no empty state; this one is a UPOS addition under §10's empty-state rule.
 
 **Interactions.** Reached from `CHANNELS` in the bottom nav. The rows are a monitor: the artboard
 gives them no tap, and a status change restyles the row in place rather than announcing itself. A new
