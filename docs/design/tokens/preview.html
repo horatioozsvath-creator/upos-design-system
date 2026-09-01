@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" data-accent="slate">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UPOS token kit preview</title>
+<link rel="stylesheet" href="upos-tokens.css">
+<link rel="stylesheet" href="upos-components.css">
+<style>
+  .pv-grid{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0 26px}
+  .pv-swatch{width:120px;border-radius:14px;overflow:hidden;font:700 10px/1.4 Archivo,system-ui,sans-serif}
+  .pv-swatch > div:first-child{height:56px}
+  .pv-swatch > div:last-child{padding:6px 8px;background:var(--upos-surface)}
+  .pv-controls{position:fixed;top:14px;right:14px;display:flex;gap:8px;z-index:10}
+</style>
+</head>
+<body>
+<div class="pv-controls">
+  <button onclick="var h=document.documentElement; h.getAttribute('data-theme')==='dark' ? h.removeAttribute('data-theme') : h.setAttribute('data-theme','dark')">theme</button>
+  <select onchange="document.documentElement.setAttribute('data-accent',this.value)">
+    <option>slate</option><option>teal</option><option>indigo</option><option>sky</option>
+  </select>
+</div>
+<main style="max-width:1100px;margin:0 auto;padding:40px 24px">
+  <h1>UPOS Fusion Fluid · token kit preview</h1>
+
+  <h2>Ground and surfaces</h2>
+  <div class="pv-grid">
+    <div class="pv-swatch"><div style="background:var(--upos-surface)"></div><div>--upos-surface</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-surface-inset)"></div><div>--upos-surface-inset</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-panel-dark)"></div><div>--upos-panel-dark</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-border)"></div><div>--upos-border</div></div>
+  </div>
+
+  <h2>Ink and blues</h2>
+  <div class="pv-grid">
+    <div class="pv-swatch"><div style="background:var(--upos-ink)"></div><div>--upos-ink</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-ink-subtle)"></div><div>--upos-ink-subtle</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-value-1)"></div><div>--upos-value-1</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-value-2)"></div><div>--upos-value-2</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-value-3)"></div><div>--upos-value-3</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-value-4)"></div><div>--upos-value-4</div></div>
+  </div>
+
+  <h2>Status</h2>
+  <div class="pv-grid">
+    <div class="pv-swatch"><div style="background:var(--upos-status-new)"></div><div>--upos-status-new</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-status-fired)"></div><div>--upos-status-fired</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-status-late)"></div><div>--upos-status-late</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-status-ready)"></div><div>--upos-status-ready</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-allergen-bg)"></div><div>--upos-allergen-bg</div></div>
+  </div>
+
+  <h2>Type roles</h2>
+  <div style="font:var(--upos-type-display)">Display 800 · $4,820</div>
+  <div style="font:var(--upos-type-heading)">Heading 800 · Riverside Grill · Today</div>
+  <div style="font:var(--upos-type-row)">Row title 700 · Classic Cheeseburger</div>
+  <div style="font:var(--upos-type-body);color:var(--upos-ink-subtle)">Body 400 · Tap the menu to build the order.</div>
+  <div style="font:var(--upos-type-label);letter-spacing:.15em;color:var(--upos-ink-subtle)">LABEL · NET SALES</div>
+
+  <h2>Elevation and motion</h2>
+  <div class="pv-grid">
+    <div style="width:180px;height:90px;border-radius:var(--upos-radius-card);background:var(--upos-surface);box-shadow:var(--upos-shadow-card)"></div>
+    <div style="width:180px;height:90px;border-radius:var(--upos-radius-panel);background:var(--upos-surface);box-shadow:var(--upos-shadow-modal)"></div>
+    <div style="width:180px;height:90px;border-radius:var(--upos-radius-card);background:var(--upos-grad-primary);box-shadow:var(--upos-shadow-button);animation:fl-rise .6s var(--upos-ease)"></div>
+  </div>
+
+  <h2 id="pv-components">Component recipes (Task 3)</h2>
+  <section id="pv-components-body"><!-- Task 3 fills this in --></section>
+
+  <h2>KDS scope</h2>
+  <div class="upos-kds" style="padding:24px;border-radius:8px;background:var(--upos-kds-board)">
+    <span style="color:var(--upos-kds-ink);font:800 15px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em">GRILL STATION</span>
+    <span style="color:var(--upos-kds-status-late);font:800 15px/1 ui-monospace,Menlo,monospace"> 12:41</span>
+  </div>
+</main>
+</body>
+</html>
