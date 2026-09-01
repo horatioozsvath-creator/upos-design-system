@@ -67,6 +67,10 @@ Part I is complete. Parts II, III and IV carry a written-in marker naming the ta
     - [Reports](#reports)
     - [Employees, Devices, Settings (roadmap)](#employees-devices-settings-roadmap)
   - [Part II-C · Kitchen display](#part-ii-c--kitchen-display)
+    - [Station board](#station-board)
+    - [Chit anatomy](#chit-anatomy)
+    - [Chit actions](#chit-actions)
+    - [KDS data contract](#kds-data-contract)
   - [Part II-D · Kiosk](#part-ii-d--kiosk)
 - [Part III · Component inventory](#part-iii--component-inventory)
 - [Part IV · Data-model gaps](#part-iv--data-model-gaps)
@@ -1618,7 +1622,295 @@ the current schema, so it is API work rather than a hole in an existing model.
 
 ### Part II-C · Kitchen display
 
-*Written in Task 7.* Four specs: Station board · Chit anatomy · Chit actions · KDS data contract.
+The kitchen display is one board on a fixed landscape screen — 1280×800 through 1920×800 — mounted
+above a station and read at two metres by someone wearing gloves. Its root carries `.upos-kds`, and it
+stays dark whatever `data-theme` says (§11).
+
+**This whole section is a restyle, and this is the one place it is declared.** The secondary artboard
+settles what a board shows and what a cook does with it: chit fields, station tabs, timers, bump,
+plate view. Every visual value below comes from §11's derivation instead — `--upos-kds-board` under
+the grid, `--upos-kds-inset` under a chit, `--upos-kds-ink` on top, status hues from the on-dark set,
+and the product's one radius exception at 10px. §11 already reconciled the two languages, so no spec
+below repeats the comparison per element the way Part II-A records the terminal's pixels.
+
+Two rulings hold across all four specs. **Every control on the board clears `--upos-touch-terminal`
+48px**, and the bump affordance clears it twice over: it runs the full width of its chit, so a gloved
+hand cannot fire the wrong ticket (§11). **The artboard's timing constants — amber at four minutes,
+red at seven — are demo props over a demo ticket set.** UPOS thresholds are in Chit anatomy, they are
+configuration rather than data, and no number in this section is a default a venue cannot change.
+
+#### Station board
+
+**Purpose.** You see one station's open work, oldest first, from across the line.
+
+**Layout.**
+
+- **Board root**, `.upos-kds` on `--upos-kds-board` with `--upos-kds-ink`, landscape at 1280×800
+  through 1920×800. The board never scrolls: it is a fixed canvas for a whole shift, and what does not
+  fit is counted rather than scrolled to.
+- **Header, 60px**, `--upos-kds-inset`, three groups. Left, §9's brand mark — the 34px
+  `--upos-grad-primary` tile carrying `UF` in white 800/13px — beside the station name at 800/15px,
+  `.14em`. Middle, three load counters, each a 10px label class line over its value: `OPEN TICKETS` at
+  800/20px, `AVG TICKET` as mean elapsed in `--upos-type-mono` sized to 20px, `OVER TARGET` at 800/20px
+  in `--upos-kds-status-late` when it is above zero and `--upos-kds-ink` when it is not. Right,
+  `PLATE VIEW`, `ALL DAY` and `RECALL · N` at 800/11px `.08em`, then the clock in `--upos-type-mono` at
+  15px, 24-hour. All-day and recall are UPOS additions, specified in Chit actions. The artboard's
+  A/B/C chit-layout switch is demo chrome — this board ships one chit, and it is Chit anatomy.
+- **Station strip, 78px** (§11). Tabs are `flex:1`, each carrying its station name at 800/17px `.04em`
+  over `{n} ACTIVE` in the 10px label class at `.72` opacity. The selected tab fills
+  `--upos-grad-primary` with white ink and a 4px bottom edge; the rest sit on `--upos-kds-inset`. A
+  station holding a late chit shows an 8px `--upos-radius-pill` dot in `--upos-kds-status-late` running
+  `fl-pulse` beside its count.
+- **Paddles, 56px** at each end of the strip, `--upos-kds-inset`, carrying `‹` and `›`. They page the
+  strip when a venue runs more stations than the width fits. The drawn set is six — `COLD / PREP` ·
+  `FRYER` · `SANDWICHES` · `GRILL` · `EXPO / PASS` · `DRINKS` — and stations are venue configuration,
+  not a fixed list. There is no ALL tab: `EXPO / PASS` is the whole-ticket view, and every other tab is
+  a filter over the lines routed to it.
+- **Chit grid** fills the rest — 12px board padding, `--upos-space-gap-row-loose` 9px gaps,
+  `repeat(auto-fill,minmax(340px,1fr))` over two rows. That is five columns at 1920 (§11's density),
+  three at 1280, and a chit about 314px tall at either width.
+- **Oldest leftmost.** The grid fills left to right, then down, by elapsed time: the oldest ticket sits
+  top-left and the newest joins at the tail. That is bump-bar muscle memory — the ticket you are most
+  likely to fire next is where your hand already goes.
+- **Depth is stated, not hidden.** A station holding more chits than the grid renders `+N WAITING` in
+  the last cell at the 10px label class. The artboard caps the grid at ten and drops the rest in
+  silence; nobody should work a board that understates its own queue.
+
+**States.**
+
+- Exactly one station is selected, and the grid holds only the lines routed to it.
+- A tab holds a late chit, or it does not. The pulsing dot is the only motion on the strip.
+- `OVER TARGET` at zero reads in `--upos-kds-ink`; above zero it turns `--upos-kds-status-late`. The
+  count carries the message and there is no banner behind it.
+- Station clear — a statement, not an apology: `Nothing on the grill. The station is clear.` at
+  400/15px in `--upos-kds-ink`. The artboard draws no empty state; this one is a UPOS addition under
+  §10's empty-state rule.
+- Board, plate view or all-day. The two alternate views replace the grid, keep the header, and return
+  from the same `‹ BOARD` control at the head of their own strip.
+
+**Interactions.**
+
+- Tap a tab to filter the grid; tap a paddle to page the strip. Nothing on this screen navigates away.
+- Everything a chit does is Chit actions. The grid itself only orders, counts and clears them.
+- A new chit enters with `fl-rise`; a bumped chit leaves by fading over `--upos-dur-fast`. `fl-pulse`
+  on a late timer and on a late station dot is the only animation that repeats, and it survives
+  `prefers-reduced-motion` because it carries status (§8).
+- The board is touch. Ship no `:hover` transforms to it — press feedback is the ripple tint (§8).
+
+**Data.** The board is the live `OrderDto` set at `OrderStatus.Confirmed` and `Preparing`, sorted by
+`Order.CreatedAt` ascending and filtered to the selected station. `GET /api/orders` fills it on load
+and `/hubs/orders` keeps it current — the wiring is the KDS data contract. All three counters are
+derived and none is stored: open tickets counts the chits, avg ticket means their elapsed times, over
+target counts the ones past the station's threshold. The station filter has nothing behind it —
+`OrderItem` names a menu item and no station — so the strip, its counts and its filter are literals
+today.
+
+**Gaps.**
+
+- GAP-06 — no recipe, ingredient or station model, so item-to-station routing has nothing to bind to
+  and the whole strip is a literal; the station linkage belongs with the recipe entry, because which
+  station makes an item is a property of how it is made.
+- GAP-13 — no venue or organization entity, so the per-station threshold that `OVER TARGET` counts
+  against has no scope to be stored on.
+
+#### Chit anatomy
+
+**Purpose.** You read one ticket's build in the order you work it, without leaning in.
+
+**Layout.** `.u-chit` — `--upos-kds-inset`, `--upos-kds-ink`, 10px radius, `overflow:hidden`, no border
+and no shadow. Chits separate by the 9px grid gap (§11). The kit's 280px width is the floor; on the
+board a chit takes its grid column.
+
+- **Status edge, 5px**, across the top, carrying the chit's current age color. This is §4's named place
+  for status on a chit, and late overrides it for as long as it holds.
+- **Header row**, `--upos-kds-inset-hover`, padding `10px 12px`: the order number `#B-118` in
+  `--upos-type-mono` sized to 800/20px on the left (§6 — an order number is read digit by digit), the
+  elapsed `mm:ss` on the right as `.u-chit__timer` at the same call-site size.
+- **Identity row**, `10px 12px`, 8px gaps: `.u-badge-channel` carrying `KIOSK` · `COUNTER` · `ONLINE` ·
+  `DELIVERY`, then the guest at 700/13px — `MARTA G.`, `WALK-IN`, `RIDER 4`, `TABLE 3`, data in its own
+  casing (§6). On the board the badge takes `--upos-kds-inset-hover` with `--upos-kds-ink`; the kit's
+  light pairing does not hold contrast here. A rushed ticket adds `RUSH` at `--upos-radius-pill`,
+  `--upos-accent` fill, white 800/10px `.05em` — the accent role is `--upos-accent` on a board (§11),
+  and it does not pulse, because `fl-pulse` marks late (§8).
+- **Allergen row**, directly under the header and above the build, always (§5). `.u-chip-allergen`
+  inverted for dark: fill `--upos-allergen-text`, ink `--upos-kds-ink`. The label is the allergen word
+  alone — `GLUTEN`, `DAIRY`, `NUTS` — so a chit reading `NO GLUTEN` in the source renders `GLUTEN`, and
+  the violet says the rest.
+- **Item lines**, `10px 12px`, 10px between lines: quantity at 800/16px in a fixed 26px column, then
+  the item name at 800/17px. Modifiers indent under the name at 700/13px, each prefixed by its kind at
+  the 10px label class — `NO` in `--upos-kds-status-late`, `SUB` in `--upos-status-fired`, `ADD` in
+  `--upos-kds-status-ready`. Those are §4's hues doing §4's job: a removal is the line that sends a
+  plate back, a substitution is a change to catch, an addition is a normal build step.
+- **Expo lines add two marks**: the station that owes the item, at the 10px label class in
+  `--upos-kds-ink` at `.72`, and `UP` on `--upos-kds-status-ready` once that station has bumped it.
+- **Footer**, full width, two parts. Left, the assembly label — `BAG 1`, `TRAY`, and on an expo chit
+  `{n}/{m} UP` — at the 10px label class. Right and dominant, the bump bar: 56px tall, the full
+  remaining width, `--upos-grad-primary`, white 800/13px `.1em`. Its labels and its refusals are Chit
+  actions.
+
+The timer's thresholds, measured from `Order.CreatedAt`:
+
+| Elapsed | Timer | Status edge |
+| --- | --- | --- |
+| 0–5m | `--upos-kds-ink` | `--upos-kds-status-new` |
+| 5–10m | `--upos-status-fired` | `--upos-status-fired` |
+| Over 10m | `.u-chit__timer--late` `--upos-kds-status-late`, pulsing `fl-pulse` | `--upos-kds-status-late` |
+
+Both thresholds are configured per station — a fry station's five minutes is not a braise's — and the
+state is derived on every tick and never stored (§4).
+
+**States.**
+
+- Nothing started · some items struck · every item struck. An expo chit adds a fourth: every station
+  up and waiting to be bagged.
+- Item made — the name drops to `--upos-kds-ink` at `.4` with `line-through`, its modifiers fall to
+  `.35` opacity, and `UP` appears on the line.
+- Allergen present or absent. Rush or not. Late or not, which overrides the edge and pulses the timer.
+- Station chit or expo chit: a station chit holds only the lines routed to that station, an expo chit
+  holds every line on the order with its station tag.
+
+**Interactions.** Every tap on a chit is Chit actions. What belongs to the chit itself is the timer:
+it counts up once a second, recolors at its thresholds, and pulses past the second one. Nothing else
+on a chit moves.
+
+**Data.** The order number is `Order.OrderNumber`. The timer is derived from `Order.CreatedAt` and
+nothing else. Item lines are `OrderItemDto` — quantity and menu-item name, which is the whole of what
+binds. Everything else on the chit is unbound: the channel badge, the guest name, the rush flag, the
+allergen chips and the modifier lines all render from artboard fixture. The assembly label is the one
+field that is plain API work rather than a hole — a bag or tray number is a new column on `Order`
+contradicting nothing in the schema.
+
+**Gaps.**
+
+- GAP-01 — no modifier group or option model, so `NO`, `ADD` and `SUB` lines have no structured source
+  and the kitchen reads free text.
+- GAP-04 — `Order` has no channel or order type, so `.u-badge-channel` on every chit is a literal.
+- GAP-05 — `MenuItem` has no allergens, so the row a cook is meant to read first is design-only.
+
+#### Chit actions
+
+**Purpose.** You work a ticket with one hand, in a glove, without a mis-tap costing you a plate.
+
+**Layout.** Three zones on a chit, and each one is either large or armed.
+
+- **Item line**, the full chit width and at least `--upos-touch-terminal` 48px tall.
+- **Bump bar**, the full chit width at 56px — the one control on the board that is deliberately
+  oversized (§11).
+- **Armed chit**, the whole card, live only while plate view is armed: it takes a 2px `--upos-accent`
+  outline and every other tap on it is suspended.
+
+The artboard puts a 46px recipe button beside the bump bar. It is dropped: a small target next to the
+one control that must not misfire is exactly what §11's full-width bump rule exists to prevent, and
+§11 already routes plate view through the header instead.
+
+**States.**
+
+- Item not made, or made — struck per Chit anatomy. Tapping it again undoes the strike.
+- Bump bar live (`BUMP`, `--upos-grad-primary`) or refusing. An expo chit reads `WAITING` on
+  `--upos-kds-inset` and does not respond until every station line is up, then turns `BAG IT`.
+- Plate view armed or off. Armed, the header button fills and every chit outlines.
+- All-day open or closed; recall lane open or closed.
+
+**Interactions.**
+
+- **Tap an item line to strike it** on a station chit — that item is made. On an expo chit the strikes
+  are not tappable: they mirror the station bumps, which is what the artboard implements. Per-item
+  strike by tap is a UPOS addition, and it is local state (see Data).
+- **Tap the bump bar to fire the whole chit.** A station chit leaves that station's grid; an expo chit
+  bags the ticket and moves the order to `Ready`. The chit leaves on the tap and the write follows —
+  no tap waits on the network (§11's 150ms rule).
+- **Recall.** The last three bumps stay recoverable for 60 seconds behind `RECALL · N` in the header,
+  which opens a 120px lane under the station strip: each recalled chit shows its order number, its
+  still-running timer and a full-width `RETURN` bar that puts it back in the grid at its true age. Both
+  numbers are configuration. The artboard has no recall — its bump is one-way — and a board without one
+  makes an irreversible control out of the largest target on the screen.
+- **Plate view.** Arm `PLATE VIEW` in the header, then tap a chit: the board is replaced by the plating
+  reference for that chit's item. There is no long press — a long press through a glove is a coin
+  flip, and arm-then-tap says out loud what the next tap will do. The view runs a 64px strip
+  (`‹ BOARD`, the chit and item it came from, a tab per item, the target time in
+  `--upos-kds-status-ready`) over three columns: plated reference photos with the cut-and-present note,
+  the stack top to bottom with a quantity per layer, and the ingredient order with timing, hold and
+  what sends the plate back.
+- **All day.** `ALL DAY` replaces the grid with one row per item across the station's open chits —
+  quantity at `--upos-type-display` in a 90px column, item name at 800/17px, and the number of tickets
+  it spans at the 10px label class — sorted by quantity. It answers the station's real question — how
+  many fries, not how many chits. The artboard does not implement it; it is a UPOS addition, and it is
+  pure derivation over the same chit set.
+
+**Data.** A strike is client state. A bump is the only action here that writes, and it writes a whole
+order's status (KDS data contract), so a station bump on a multi-station order is local until the last
+station goes — the POC has no per-item and no per-station status to write. Recall re-posts the chit's
+previous status through the same endpoint, so it needs no new API. Plate view has no source at all.
+A per-item done flag is API work rather than a hole: a column on `OrderItem` contradicts nothing in
+the current model.
+
+**Gaps.**
+
+- GAP-06 — no recipe, ingredient or plating model, so every panel in plate view — photos, stack,
+  ingredient order, timing, hold — is drawn from fixture, and the same entry carries the
+  item-to-station linkage that decides which chit a line lands on.
+- GAP-01 — no modifier model, so an all-day count aggregates item names and cannot separate a build
+  from its variants.
+
+#### KDS data contract
+
+**Purpose.** You know what the board reads, what a bump writes, and what nothing behind it can say.
+
+**Layout.** This spec has no geometry of its own. The board's regions are Station board, the ticket is
+Chit anatomy, and what follows is the wiring under both.
+
+**States.** `OrderStatus` decides what is on the board at all:
+
+| `OrderStatus` | On the board |
+| --- | --- |
+| `Pending` | Not shown — built on a terminal, not yet sent |
+| `Confirmed` | A new chit, status edge `--upos-kds-status-new` |
+| `Preparing` | Working; from here the age color owns the edge |
+| `Ready` | Bumped off — the expo `BAG IT` is what writes it |
+| `Served` · `Completed` | Never on the board |
+| `Cancelled` | Pulled from the grid on arrival, with no confirmation step |
+
+Late is not in that table and never will be. It is derived from `DateTime.UtcNow - Order.CreatedAt`
+against the station's threshold, it overrides the edge and the timer for as long as it holds, and no
+endpoint returns it (§4).
+
+**Interactions.**
+
+- **A bump writes status.** `PUT /api/orders/{id}/status` with an `UpdateOrderStatusDto` — `Preparing`
+  when the first station fires, `Ready` when expo bags it. The API broadcasts
+  `ReceiveOrderStatusUpdate` on `/hubs/orders` to the `Order_{id}` group, and every other board and
+  terminal restyles in place.
+- **New work arrives on the hub.** `ReceiveNewOrder` adds a chit at `Confirmed`;
+  `ReceiveOrderCompleted` drops one that closed elsewhere.
+- **A recall is the same call in reverse** — the previous `OrderStatus` back through
+  `PUT /api/orders/{id}/status`. Nothing records that a recall happened.
+- **On reconnect the board refetches** `GET /api/orders` and rebuilds rather than replaying missed
+  events. A board that missed a bump must not keep a chit that is already bagged.
+
+**Data.**
+
+- The chit set is `GET /api/orders` filtered to `Confirmed` and `Preparing`, ordered by
+  `Order.CreatedAt`.
+- **Timers are derived client-side from `Order.CreatedAt`, every second, and never stored.** No elapsed
+  value, no late flag and no threshold breach is written back or returned by any endpoint. The
+  thresholds themselves are configuration, not data.
+- **The POC writes a whole order's status, not a station's or an item's.** A five-station board still
+  moves one `OrderStatus`, so per-station progress lives in the client until expo closes the order —
+  the single largest thing this contract cannot express.
+- Header counters, all-day counts and the recall lane are all derived from the same chit set; none of
+  the three needs an endpoint.
+- Per-item done flags, a station column on `OrderItem` and an assembly label on `Order` are additive
+  API work — new fields that contradict nothing in the current model, and the dev team's call.
+
+**Gaps.**
+
+- GAP-06 — no recipe, ingredient or station model, so this entry carries the item-to-station linkage
+  the board routes on as well as plate view's content: which station makes an item is part of how the
+  item is made, so it belongs with the recipe rather than with the order.
+- GAP-04 — `Order` has no channel or order type, so the chit's channel badge is unbindable and a
+  per-channel target has no field to key on.
+- GAP-05 — `MenuItem` has no allergens, so the allergen row cannot be driven by data.
+- GAP-01 — no modifier model, so the build lines a cook actually works from arrive as free text.
 
 ### Part II-D · Kiosk
 
