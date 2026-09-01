@@ -2148,7 +2148,7 @@ item names and the order number run well above the scale at the call-site sizes 
 **Every target clears `--upos-touch-kiosk` 60px**, and the two order-committing controls —
 `Add to order` and `Submit order` — take the full 96px band. Adjacent targets stand at least
 `--upos-space-gap-row` 8px apart, and two irreversible controls are never adjacent (§11): every footer
-band on this surface carries its commit alone, and the discard the artboard draws flush beside it —
+band that commits the order carries its commit alone, and the discard the artboard draws flush beside it —
 `CANCEL` on the item screen, `START OVER` on the cart — is dropped or moved up into that screen's
 head. Width is not separation.
 
