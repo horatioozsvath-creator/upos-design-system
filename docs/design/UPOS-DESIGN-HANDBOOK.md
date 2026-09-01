@@ -61,6 +61,11 @@ Part I is complete. Parts II, III and IV carry a written-in marker naming the ta
     - [Channels queue](#channels-queue)
     - [Offline behavior](#offline-behavior)
   - [Part II-B · Back office](#part-ii-b--back-office)
+    - [Dashboard](#dashboard)
+    - [Menu manager](#menu-manager)
+    - [Integrations](#integrations)
+    - [Reports](#reports)
+    - [Employees, Devices, Settings (roadmap)](#employees-devices-settings-roadmap)
   - [Part II-C · Kitchen display](#part-ii-c--kitchen-display)
   - [Part II-D · Kiosk](#part-ii-d--kiosk)
 - [Part III · Component inventory](#part-iii--component-inventory)
@@ -1213,8 +1218,389 @@ replay has to honor: a write that reaches the API twice must not produce two ord
 
 ### Part II-B · Back office
 
-*Written in Task 6.* Five specs: Dashboard · Menu manager · Integrations · Reports · Employees,
-Devices, Settings (roadmap).
+The back office is one desktop-web shell: a 224px dark sidebar and a main panel standing
+`--upos-space-main-offset` 14px off it, both floating on the ground. Five specs share that chrome, so
+none of them repeats it.
+
+- **Sidebar, 224px**, `--upos-grad-dark`, `--upos-radius-panel` 26px, padding `22px 16px`, 8px gaps,
+  `--upos-shadow-modal`. It opens with §9's brand mark — a 34px `--upos-grad-primary` square carrying
+  `UF`, `UPOS Fusion` at 800/15px in white, and a `BACK OFFICE` kicker at 700/8.5px `.2em` in
+  `--upos-on-dark-accent` — then seven `.u-nav-item` buttons at `--upos-radius-inset`, `12px 14px`,
+  12px gaps, a 16px icon beside a 700/13px label: Dashboard · Menu · Integrations · Employees ·
+  Reports · Devices · Settings. The active destination fills with `--upos-grad-primary` and white ink;
+  the rest are `--upos-ink-subtle` on transparent. Sidebar icons run `stroke-width:1.7` (§9); the
+  artboard draws them at 2.
+- **The rail is sticky** — `top:14px`, `max-height:calc(100vh - 28px)` (§2). The artboard is a fixed
+  canvas and draws it static.
+- **Main panel** fills the rest at `min-width:1000px`, `--upos-radius-panel` 26px, `--upos-surface`,
+  `--upos-shadow-card`, `overflow:hidden` and `position:relative`, so an overlay scrims the panel and
+  leaves the sidebar lit.
+- **Blocks inside that white panel take `--upos-surface-inset` and no shadow** — §2's ladder, and the
+  reason the dashboard's stat cards and every report card below are flat rather than floating. The
+  kit's `.u-stat-card` ships `--upos-surface` plus `--upos-shadow-card`, which is right for a card on
+  the ground and wrong for one inside a panel; take its geometry and override the fill at the call
+  site.
+- **This surface is pointer input.** §8's hover table applies in full, and §11's touch minimums do
+  not: `.u-icon-btn` is 34px with no enlarged hit area, and a control is sized by its density, not by
+  `--upos-touch-terminal`.
+- Nav swaps the panel's content and nothing else navigates. The artboard's `BACK OFFICE` kicker strip
+  above the shell, and its theme and accent pickers, are demo chrome — §11 owns the theming contract.
+
+#### Dashboard
+
+**Purpose.** You read the day in one screen — what sold, what it cost, and the one exception worth
+acting on.
+
+**Layout.** Panel padding 32px, `--upos-space-gap-section` between blocks (the artboard draws 24px).
+
+- **AI insight banner**, full width, `--upos-radius-panel` (the artboard draws 22px),
+  `--upos-grad-primary`, white ink, `--upos-shadow-button`, padding `22px 26px`, 8px gaps: an
+  `ASK THE BRAIN` kicker at 700/9.5px `.18em` in `--upos-on-dark-accent`, then the insight at
+  700/17px/1.5 inside quotation marks. This banner is the only surface in the product that runs
+  `fl-sheen` (§8).
+- **Title row**: `Riverside Grill · Today` at 800/24px on the left; the AI toggle on the right as a
+  700/11px underlined text button in `--upos-ink-subtle`.
+- **Stat strip**, `repeat(4,1fr)` at `--upos-space-gap-card` 16px. Each card is `.u-stat-card`
+  geometry on `--upos-surface-inset` — `--upos-radius-card` 18px, 20px padding, 8px gaps — carrying a
+  700/9.5px `.15em` label in `--upos-ink-subtle`, the value at `--upos-type-display`, then one 700/12px
+  comparison line in its own status color: `NET SALES` `$4,820` over `↑ 12% vs last Tue` in
+  `--upos-status-ready-text`; `LABOR %` `27%` over `target 24%` in `--upos-status-fired-text`;
+  `COVERS` `212` over `avg 1.9 turns` in `--upos-ink-subtle`; `AVG TICKET` `$22.70` over `↑ 4%` in
+  `--upos-status-ready-text`. Draw the direction arrow as an inline SVG — §9's glyph list carries no
+  `↑`.
+- **Charts row**, `1.3fr 1fr` at 20px, both cards `--upos-surface-inset` at `--upos-radius-card` (the
+  artboard draws 20px), 24px padding.
+- **Sales by daypart**: a 700/13px title, then four columns 22px apart in a 180px band, each a
+  `--upos-grad-bar` fill under a 700/12px `--upos-ink-subtle` label — Breakfast · Lunch · Dinner ·
+  Late Night. The artboard runs the gradient vertically and ties its far stop to the accent; ship
+  `--upos-grad-bar`, the one bar gradient §3 allows. Round the top pair at `--upos-radius-inset` (the
+  artboard draws `10px 10px 0 0`) and let the foot sit flush on the chart baseline, where §7 has no
+  exposed corner to govern.
+- **Top items**: a 700/13px title, then three 700/13px rows — the item name left, `142 · $1,491`
+  (units then revenue) right in `--upos-ink-subtle` — over a hairline and the exception row,
+  `3 comps flagged for review` with a trailing `→` at 700/12px in `--upos-status-late-text`.
+
+**States.**
+
+- AI banner shown or hidden. The toggle reads `Hide insight` while the banner is up and
+  `Ask the brain` while it is down; hiding it collapses the block and the page rises into the space.
+- Each stat card's comparison line is the only colored thing on the card: ready-green when the figure
+  beats its comparison, fired-orange when it misses a target, `--upos-ink-subtle` when it is neither
+  (§4). The value itself never takes a status color.
+- Exception row present or absent. Absent, the top-items card ends at its third row. The artboard
+  always draws it.
+- Empty day — before the first check closes, the values read `$0` and `0`, the daypart band draws no
+  bars, and the top-items card carries one statement line: `No sales yet today. The first check sets
+  the baseline.` The artboard draws no empty state; this one is a UPOS addition under §10.
+
+**Interactions.** The AI toggle hides and restores the banner, and touches nothing else on the page.
+The exception row is drawn without a handler — wire the row and its `→` to the flagged comps. Nothing
+else here is interactive: the stat cards, the bars and the top-items rows are read-only, and a figure
+that changes restyles in place rather than announcing itself. The banner rises with `fl-rise`; every
+bar runs `fl-grow` on mount (§8).
+
+**Data.** Every figure on this screen is an artboard fixture; none of it has an endpoint today.
+
+- Net sales, covers and avg ticket are computable from what already exists: sum the `OrderItem` lines
+  across the day's `Order` rows, count the checks, divide one by the other. The Orders controller
+  lists orders; it does not aggregate, and that endpoint is API work rather than a schema gap.
+- The daypart split buckets those same orders by `Order.CreatedAt`, and the service-period boundaries
+  have nowhere to be configured. Top items groups `OrderItem` by its `MenuItem`, counts and sums —
+  same shape, same missing endpoint.
+- Every comparison figure (`vs last Tue`, `target 24%`, `avg 1.9 turns`) is derived at read time
+  against a prior window or a configured target. Nothing stores it, and no API returns a
+  "vs last Tuesday" value.
+- The insight has no model, no endpoint and no prompt store. Whatever produces it, §10 rules how it
+  renders: quoted, attributed to the brain, shown as a draft beside the data it rests on.
+
+**Gaps.**
+
+- GAP-08 — no payments domain, so a comp has no record: `OrderStatus.Cancelled` voids a whole order,
+  not the three lines this row counts.
+- GAP-09 — no employee, role or shift model, so `LABOR %` and the insight resting on it have no
+  source.
+- GAP-13 — no venue or organization entity, so `Riverside Grill` is a literal and every aggregation
+  above is silently single-location.
+
+#### Menu manager
+
+**Purpose.** You keep the menu true — what is in a dish, what it costs, what a guest can change about
+it, and what is 86'd right now.
+
+**Layout.** Three panes across the panel, plus one modal.
+
+- **Major categories, 200px**, right hairline, padding `24px 0`: a `MAJOR CATEGORIES` label at
+  700/9.5px `.15em` `--upos-ink-subtle` at `0 22px 14px`, then one button per major at
+  `--upos-radius-inset`, `12px 14px`, margin `2px 12px`, 700/13px — the selected one on
+  `--upos-surface-inset` in `--upos-ink`, the rest transparent in `--upos-ink-subtle` — a quieter
+  selection than the sidebar's accent pill, because two accent pills in one row of chrome compete.
+- **Item list, 400px**, right hairline. Header `16px 24px` above a hairline: `{major} · {n} items` at
+  800/14px and `+ ADD ITEM` as a bare text button at 700/12px in `--upos-accent-deep`. Filter chips at
+  `12px 24px` above a second hairline, `--upos-space-gap-chip` apart (the artboard draws 6px),
+  wrapping — `All` then the major's minors at `--upos-radius-pill` and `6px 12px`, the active one on
+  `--upos-grad-primary` in white. Then the add-item form when open — an inset block at
+  `--upos-radius-inset`, 12px padding, 8px gaps, carrying a name field, a price field placeheld
+  `Price (e.g. 9.50)`, and `Cancel` on a bordered fill beside `Add` on `--upos-grad-primary`. Then the
+  rows at `12px 14px`, `--upos-radius-inset`, margin `6px 10px 0`: the name at 700/13px left, the
+  price at 700/13px and the availability badge right, the selected row filled `--upos-surface-inset`.
+  The artboard fills both inputs white at a 10px radius; ship §2's input contract at
+  `--upos-radius-inset`, here and in the add-group form.
+- **Detail pane** fills the rest at `24px 28px`, 16px gaps, its own scroll to 760px. Header: the item
+  name at 800/18px; right, a `VIEW PLATING` bordered pill at `8px 14px`, `--upos-radius-pill`,
+  700/11px with a 14px aperture icon, then the price at 800/16px in `--upos-accent-deep`. Under it,
+  `RECIPE · INGREDIENTS` at 700/11px `.08em` over an inset block at `--upos-radius-card` (the artboard
+  draws 16px), `14px 16px`, 8px gaps, one 700/12.5px row per ingredient with its cost right in
+  `--upos-ink-subtle`; then three cost cards at `repeat(3,1fr)` and 10px, inset at
+  `--upos-radius-inset`, 14px, centered — `COGS $`, `COGS %` and `MARGIN` at 700/9.5px over 800/16px
+  values. `COGS %` takes `--upos-status-late-text` over the 32% target and `--upos-status-ready-text`
+  under it; the artboard inks it with the fill tokens, and §4 gives text the text tokens.
+- **`PREP STEPS`, `ALLERGENS`, then modifier groups.** Steps are one 400/12.5px `--upos-ink-subtle`
+  line each, numbered (the artboard prefixes an em dash, and §9's glyph list has no bullet). Allergens
+  are toggle pills at `7px 14px` — `.u-chip-allergen` when on, `--upos-surface-inset` in
+  `--upos-ink-subtle` when off, labels uppercase per §5 against the artboard's sentence case. Modifier
+  groups take a 800/14px heading with `+ ADD GROUP` beside it and one card per group: inset at
+  `--upos-radius-card` (the artboard draws 18px), 16px padding, the name at 800/13px, its type chip at
+  `3px 10px` on `--upos-surface`, its options as 700/12px pills on `--upos-surface`. Its form matches
+  the add-item form and adds a three-way segmented row — `REQUIRED` · `OPTIONAL` · `NO / REMOVE`, the
+  selected one on `--upos-grad-primary` — over a comma-separated options field.
+- **Plate-view modal**, 520px, `--upos-radius-panel` (the artboard draws 24px), 26px padding, 16px
+  gaps, `--upos-shadow-modal`, on `--upos-scrim` inside the panel: `{item} · plating` at 800/18px with
+  a close `.u-icon-btn`, then the `.u-segmented` `PLATING` · `STACK` track when the item has both
+  views. It is the terminal's Item info modal with editing added — a 280×280 circular image slot
+  rather than 220×220, numbered `ON THE PLATE` callouts under it at 800/10px in 20px round chips, and
+  the stack turned from a read-only diagram into a builder: a 180px `column-reverse` column at
+  `--upos-radius-inset`, 10px padding, 30px layers 3px apart in their ingredient colors carrying down,
+  up and remove controls at `--upos-radius-pill` (the artboard draws 5px), beside `TAP A SLICE TO ADD`
+  palette pills with 10px color dots and `Reset to default stack` pinned to the bottom. Draw `▲` and
+  `▼` as inline SVG chevrons (§9); `×` on remove is permitted.
+
+**States.**
+
+- Exactly one major and one minor filter are selected, and switching majors returns the filter to
+  `All`. Exactly one item is selected, its row on the inset fill, and the detail pane follows it. That
+  item has both plate views (burgers and sandwiches) or plating only; with plating only the modal
+  draws no tabs, and with both, `VIEW PLATING` opens on stack.
+- Item available — the badge reads `86` on `--upos-border` in `--upos-ink`: an instruction, not a
+  status. Item 86'd — the row dims to `.5`, the name strikes through, and the badge reads `ON` on
+  `--upos-status-late` in white. The row holds its place in the list (§4).
+- Both forms open empty and close on cancel or commit. The artboard leaves them open when the
+  selection changes; close them with it, because the group form writes to whichever item is selected
+  when you press `Add`. A blank name makes `Add` do nothing, silently — ship a one-line message naming
+  the cause and the next move (§10).
+
+**Interactions.** Pick a major to refilter the list, a chip to filter within it, a row to load the
+detail pane; the sidebar is the only navigation here. The availability badge toggles in place with no
+dialog, since 86ing an item is something you do mid-service. `Add` appends an item to the current
+major, gives it that major's first minor and selects it. The group form splits options on commas and
+drops the blanks; a `NO / REMOVE` group prefixes each with `No ` and labels itself
+`REMOVE · NO CHARGE`. An allergen pill toggles that allergen on the selected item.
+`VIEW PLATING` opens the modal on `fl-rise` at `--upos-dur-slow`; inside it, up and down swap a layer
+with its neighbor, remove deletes it, a palette pill appends one on top, and `Reset to default stack`
+restores the item's default build.
+
+**Data.**
+
+- `MenuItem` carries the spine — `Name` and `Price` in the row and the detail header, `Category` in
+  the major rail, `IsAvailable` behind the 86 badge, `ImageUrl` for the plating photo — read as
+  `MenuItemDto` from the Menu controller. `Description` exists and this screen never renders it.
+- The badge writes `IsAvailable`; `Add` writes `Name`, `Price` and `Category`. Both need Menu write
+  endpoints — API work, not a schema gap, since the fields are already there. `Category` is one
+  string, so the major and minor levels share it: the artboard assigns minors client-side and the
+  chips filter a value nothing stores. Everything else is client state, lost on reload, and each
+  ingredient cost is derived from the item's own price — which makes `COGS $`, `COGS %` and `MARGIN`
+  circular: they restate the price rather than measure it.
+
+**Gaps.**
+
+- GAP-01 — no modifier group or option model, so every group, type and option this screen creates has
+  nowhere to be written.
+- GAP-05 — `MenuItem` has no allergens, so the toggle pills edit nothing.
+- GAP-06 — no recipe, ingredient, cost, prep-step or plating model, so the ingredient list, the cost
+  cards, the steps, the callouts and the stack are design-only.
+- GAP-11 — no stock model, so 86ing an item is a manual flag rather than the consequence of a count
+  reaching zero.
+
+#### Integrations
+
+**Purpose.** You connect the channels that send you orders, and you see at a glance which of them are
+live.
+
+**Layout.** Panel padding 32px.
+
+- `Delivery & ordering channels` at 800/20px, then the pipeline rule as one 400/13px
+  `--upos-ink-subtle` line capped at 560px: `Every connected channel injects into the same order
+  pipeline as counter and kiosk — one queue, one kitchen routing.` That sentence is the whole argument
+  for the screen, so it sits above the controls rather than inside a tooltip.
+- **Channel row**, one per channel, 8px apart, `16px 18px` at `--upos-radius-card` (the artboard draws
+  16px) on `--upos-surface-inset`, 16px gaps: a 38px icon tile at `--upos-radius-inset` (the artboard
+  draws 12px) filled `--upos-accent` with an 18px white glyph; the channel name at 700/14px over its
+  one-line description at 400/12px `--upos-ink-subtle`; the switch on the right.
+- **Switch**: a 50×28 track at `--upos-radius-pill` carrying a 22px white knob that slides
+  `3px → 25px`. On, the track is `--upos-grad-primary`; off, `--upos-border`. The artboard animates it
+  at `.2s` linear; ship `--upos-dur-fast` on `--upos-ease`, the one curve (§8). This is the same
+  switch the terminal's modifier modal uses for its combo control (Part II-A), and the kit has no
+  recipe for it — Part III adds one.
+
+**States.**
+
+- Per row, connected or not, carried by the track fill and the knob position and nothing else.
+- The artboard opens with Uber Eats, DoorDash and Online Ordering on, and SkipTheDish off.
+- The description is static per channel and does not follow the switch: SkipTheDish's
+  `Not yet connected` still reads that way once you turn it on. Either derive that line from the state
+  or write descriptions that hold in both.
+- No loading, authorizing or failing state exists in the artboard, and a real connection has all
+  three. Carry them on one status line under the name, in §4's colors — awaiting authorization in
+  new-blue, connected in ready-green, failing in late-red.
+- Every row draws the same glyph on the same accent tile. Per-channel color exists only on the
+  terminal's channels queue, where `.u-badge-channel` carries it (Part II-A); bring those colors here
+  or keep both surfaces neutral, but do not split the difference.
+
+**Interactions.** The switch is the only control on the screen: one press connects or disconnects,
+applied immediately, with no confirm step. That is right for a toggle you flip during a rush and wrong
+for one that stops a revenue channel — pair a disconnect with the confirming step §11 describes, where
+the dialog names the consequence in `--upos-status-late-text` and the control stays quiet until then.
+The rows open nothing: menu mapping, store hours, prep-time padding and commission all belong to a
+channel and have nowhere to live here, so give the row a detail pane on the list-and-detail pattern
+the roadmap spec sets out.
+
+**Data.**
+
+- The four switches are a client dictionary in the artboard, and nothing reads them.
+- Nothing about a channel — its name, its description, its on state, its credentials, its menu-sync
+  settings — has a model or an endpoint. A settings store is API work the POC has not started.
+- What a channel is actually for sits on the order side: an order arriving from Uber Eats has to say
+  so, and `Order` has no field that can. Until it does, connecting a channel changes nothing
+  downstream — the terminal's channels queue, kitchen routing and any report split by channel all read
+  the same missing field.
+
+**Gaps.**
+
+- GAP-04 — `Order` has no channel or order type, so a connected channel cannot mark the orders it
+  sends.
+- GAP-13 — no venue or organization entity, so a channel connects to the installation rather than to a
+  location, and a second restaurant has nowhere to keep its own.
+
+#### Reports
+
+**Purpose.** You check the three numbers that move margin — what is running out, what food costs, and
+what labor costs.
+
+**Layout.** Panel padding 32px, 22px between blocks, under `Reports · Riverside Grill` at 800/24px.
+
+- **Low stock**: a 700/13px title, then full-width rows 8px apart at `12px 16px`,
+  `--upos-radius-inset`, `--upos-surface-inset`, 14px gaps — an 8px status dot at
+  `--upos-radius-pill`, the ingredient name at 700/13px filling the row, a 120×6 level bar at
+  `--upos-radius-pill` with `overflow:hidden` over an `--upos-border` track, and the quantity at
+  700/12px `--upos-ink-subtle` right-aligned in a 100px slot.
+- **Two cards below**, `1fr 1fr` at 20px, each a 700/13px title over an inset card at
+  `--upos-radius-card` (the artboard draws 20px), 20px padding, 12px gaps.
+- **COGS by category**: one row per category — the name at 700/12.5px left, `{pct}% · target {n}%`
+  right in the row's status color — over an 8px bar at `--upos-radius-pill` on an `--upos-border`
+  track.
+- **Labor by role**: one 700/13px row per role, the role left and `38.5 hrs · $770` right in
+  `--upos-ink-subtle`; then a hairline and the footer — `Labor %` at 800/13px against
+  `27% · target 24%` in `--upos-status-fired-text`.
+- Every bar here is colored by status, not by the palette: its fill is a status token and never
+  `--upos-grad-bar`. The dashboard's daypart chart is the reverse case, and the two do not swap.
+
+**States.**
+
+- Low stock, per row: under threshold `--upos-status-late`, near it `--upos-status-fired`, healthy
+  `--upos-status-ready`. The dot and the bar take the same token, and both are fills (§4).
+- COGS, per category: over target fills `--upos-status-late`, under fills `--upos-status-ready`. The
+  label repeats that color as text, so ship `--upos-status-late-text` and `--upos-status-ready-text`
+  there; the artboard inks it with the fill tokens.
+- The bar length is the COGS percentage itself, not progress toward the target, so a 34% category
+  against a 30% target draws a bar barely past a third of the track. Mark the target on the track with
+  a 1px rule, or the bar says nothing the label has not already said.
+- The labor footer is over or under target, colored the same way.
+- Empty — with nothing under threshold, the low-stock block carries one statement line:
+  `Every tracked item is above its par level.` The artboard draws no empty state (§10).
+
+**Interactions.** None in the artboard: no row has a handler, no row opens a detail, and every figure
+is today's. Two things have to arrive before this page ships. A date-range control, because a report
+without a range is a dashboard. And a row detail on the list-and-detail pattern the roadmap spec sets
+out, because an ingredient at 8% and a category 4 points over target are both questions, and this page
+only states them. Bars grow with `fl-grow` on mount (§8).
+
+**Data.** Nothing on this screen binds today.
+
+- Low stock needs a level, a par threshold and a unit per ingredient. The units the artboard shows
+  (`18 left`, `4 bags left`, `9 heads left`) differ per ingredient, which puts the unit on the
+  ingredient rather than on the report.
+- COGS by category needs ingredient costs on a recipe, plus revenue by category — an aggregation over
+  `OrderItem` grouped through `MenuItem.Category`, which is API work once the costs exist. The
+  per-category targets have nowhere to be configured.
+- Labor by role needs hours and a pay rate per employee. The `Labor %` footer is the same figure as
+  the dashboard's `LABOR %` stat card, and it reads from one source or the two disagree.
+- `Riverside Grill` in the heading is the same literal the dashboard carries.
+
+**Gaps.**
+
+- GAP-06 — no recipe or ingredient cost, so COGS by category has nothing to compute from.
+- GAP-09 — no employee, role, shift or pay record, so labor hours, labor cost and labor percent are
+  all fixtures.
+- GAP-11 — no inventory model, so a level, its par threshold and its unit have nowhere to live, and
+  nothing can 86 an item automatically.
+
+#### Employees, Devices, Settings (roadmap)
+
+**Purpose.** You manage who works here, what hardware is registered and how the venue is configured —
+three destinations the sidebar already carries, the artboards do not draw, and one spec covers,
+because they ship the same pattern.
+
+**Layout.** The artboard renders one placeholder for all three: a centered block at 60px padding and a
+500px minimum height, the destination name at 800/20px over one 400/14px `--upos-ink-subtle` line. Its
+copy — `This section is wired in the build but not part of the fluid pass yet.` — is metadiscourse
+about the build, which §10 does not allow on a product surface. Replace it per destination with a
+statement of what belongs there.
+
+What each screen ships instead is list plus detail inside the panel:
+
+- **List column, 320px**, right hairline, its own scroll: a header at `16px 24px` above a hairline
+  carrying `{noun} · {n}` at 800/14px and one bare `+ ADD` text button in `--upos-accent-deep`, filter
+  chips where the set needs them, then `.u-data-row` rows 8px apart — `--upos-surface`,
+  `--upos-radius-inset`, 1px border, no shadow at rest, lifting `translateY(-3px)` onto
+  `--upos-shadow-card` under the pointer (§7, §8). The border carries status where a row has one: an
+  offline device is `--upos-status-late`, everything else is `--upos-border`.
+- **Detail pane** fills the rest at `24px 28px`, 16px gaps: the record name at 800/18px with its
+  actions on the right, then labeled inset blocks in the menu manager's geometry — a
+  `--upos-space-pad-inset` block at `--upos-radius-card` under a 700/11px `.08em` `--upos-ink-subtle`
+  label.
+- **Empty states are statements** (§10): `No employees yet. Add the first one and they can clock in.`
+  · `No devices registered. Pair a terminal and it appears here.` · `Nothing is overridden. This venue
+  runs the defaults.`
+- **Crib the density rather than inventing it.** The parent language's My Accounts is a 183-row table
+  at two row densities and settles how tight a long list goes; its Settings screen is sync sources,
+  sync logs and audits, and settles how a configuration row reads — a label, its current value, when
+  it last changed, and one control. Master Catalog settles the status-bordered row that became
+  `.u-data-row`.
+
+**States.** Four per destination: list loaded with a selection; list loaded with none, the detail pane
+carrying the empty statement; the record in edit; the record saving. Employees adds active or
+inactive on the row. Devices adds online, offline and unpaired, colored by §4 and never by the accent.
+Settings adds changed-not-saved, which keeps the save control live and changes nothing else.
+
+**Interactions.** Pick a row to load the detail. The sidebar is the only navigation, and everything
+else opens inside the panel. Destructive actions — deactivate an employee, unpair a device, reset a
+setting — take `.u-btn--ghost` at rest with the label at `--upos-ink`; the red arrives on the
+confirming step, which names the consequence in `--upos-status-late-text` (§11). Rows lift on hover
+and the detail rises with `fl-rise`.
+
+**Data.** Nothing. None of the three destinations has a model, a DTO, a controller or an endpoint:
+`MenuItem`, `Table`, `Order` and `OrderItem` are the whole schema, and none of them describes a
+person, a device or a preference. That is why one spec covers three screens — there is nothing to bind
+that would make them differ.
+
+**Gaps.**
+
+- GAP-09 — no employee, role, PIN or approval model, so Employees has no record to list, and every
+  manager approval elsewhere in the product has nobody to check it.
+- GAP-13 — no venue or organization entity, so Settings has no scope to attach a setting to, and a
+  second location has nowhere to keep its own.
+- No gap ID covers a device registry, and none should: devices, pairing and last-seen are a new table
+  that contradicts nothing in the current schema. Record it as API work, not as a hole in an existing
+  model.
 
 ### Part II-C · Kitchen display
 
