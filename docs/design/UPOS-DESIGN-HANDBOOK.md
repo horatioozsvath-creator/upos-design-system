@@ -833,6 +833,7 @@ kitchen and charge.
 - GAP-02 — no combo entity, so a combo line and its upcharge are free text.
 - GAP-04 — `Order` has no channel or order type, so `Dine In` in the check header is a literal.
 - GAP-05 — `MenuItem` has no allergens, so every violet chip in the grid and the cart is design-only.
+- GAP-12 — no loyalty account entity; the cart-header loyalty toggle has nothing to attach to.
 
 #### Modifier modal
 
