@@ -72,6 +72,9 @@ Part I is complete. Parts II, III and IV carry a written-in marker naming the ta
     - [Chit actions](#chit-actions)
     - [KDS data contract](#kds-data-contract)
   - [Part II-D · Kiosk](#part-ii-d--kiosk)
+    - [Kiosk flow](#kiosk-flow)
+    - [Guest-facing rules](#guest-facing-rules)
+    - [Kiosk data contract](#kiosk-data-contract)
 - [Part III · Component inventory](#part-iii--component-inventory)
 - [Part IV · Data-model gaps](#part-iv--data-model-gaps)
 
@@ -1916,7 +1919,369 @@ endpoint returns it (§4).
 
 ### Part II-D · Kiosk
 
-*Written in Task 8.* Three specs: Kiosk flow · Guest-facing rules · Kiosk data contract.
+The kiosk is one portrait floor unit — 1080×1920 — standing in a lobby and used once, by a stranger,
+with nobody to ask. It ships the standard light Fluid surfaces: `--upos-ground` behind,
+`--upos-surface` panels floating on it (§2), light whatever `data-theme` says (§11). What changes for
+the guest is scale, not language — the kiosk type scale and `--upos-touch-kiosk` 60px, both set in
+Guest-facing rules.
+
+**This whole section is a restyle, and this is the one place it is declared.** The secondary artboard
+settles what a kiosk shows and what a guest does with it: the screen sequence, the two-concept brand
+bar, the grid/list toggle, the modifier groups, the automatic combo, the cart and its savings line,
+the bag bar and the done screen. Every visual value below comes from Part I instead — the surface
+ladder, the radius scale, the shadow trio, `--upos-accent` and `--upos-accent-deep` in the accent
+role, `--upos-grad-primary` on the primary. The artboard's bone ground, its house red, its
+zero-radius chrome, its rules-as-structure and its Archivo 900 do not survive. §11 already reconciled
+the two languages for the kitchen display and the same reconciliation runs here, so no spec below
+repeats the comparison per element.
+
+**One recasing, declared once.** The artboard sets every control in uppercase Archivo 900 at display
+sizes. §6 puts UPPERCASE in the 10px label class and in status words only, and §10 makes a button a
+sentence-case verb, so the controls ship as `Start over`, `Submit order`, `Add to order`,
+`Keep it plain`, `Add the combo`, `Start a new order`, `Review and pay →`, `Add more`, `Back` and
+`Remove`. Kickers keep their case, because a kicker is the label class doing its job: `IN BAG`,
+`ORDER SENT TO THE KITCHEN`, `AUTO-COMBO FOUND`, `SUGGESTED WITH YOUR ORDER`, the step line, the
+category names and the group titles. `›` becomes `→`, and the em dash in the step line becomes the
+middot (§9, §10).
+
+Two rulings hold across all three specs. **Every control a guest can touch clears
+`--upos-touch-kiosk` 60px**, including the ones the artboard draws smaller — the layout toggle, the
+promo dots, the back control and the per-line `Remove`. `.u-btn` sets `--upos-touch-terminal`, so
+every kiosk call site raises `min-height` to `--upos-touch-kiosk`. **And nothing on this surface is
+staff-facing**: no 86 badge, no void, no `OrderStatus` word, no station name, no channel badge.
+Guest-facing rules holds that list in full.
+
+The artboard's second kiosk — the smoothie bar at 1F — draws one concept with the order building in a
+side rail and no item, combo or done step. It is a layout study of the same browse-and-add loop, not
+a second product, and the flow below is what UPOS ships.
+
+#### Kiosk flow
+
+**Purpose.** A guest orders and pays alone, and the order lands in the same queue a counter order
+lands in.
+
+**Layout.** One `--upos-surface` panel at `--upos-radius-panel`, clipped, filling 1080×1920 over
+`--upos-ground` at `--upos-space-page` 14px. A fixed 124px concept bar sits at the top and a fixed
+96px bag bar at the foot; everything between them is a screen.
+
+- **Concept bar, 124px**, `--upos-surface-inset` under a 1px `--upos-border`. One `flex:1` button per
+  concept at padding `0 32px`: the 34px `--upos-grad-primary` mark (§9), the concept name at 800/23px
+  `.13em` over its line in the 14px label class; selected, it fills `--upos-grad-primary` in white and
+  the rest sit on the inset at `--upos-ink`. A 280px right block carries the step kicker —
+  `STEP 1 · BROWSE BOTH MENUS` through `SENT` — over a `.u-segmented` grid/list toggle. A
+  single-concept venue drops the buttons and keeps the mark and the kicker.
+- **Attract** fills the panel with `--upos-grad-primary` in white, no bag bar: the mark at 96px, the
+  venue name at 800/72px `-.035em`, one line at 400/26px, and `Tap to start` on a 96px
+  `.u-btn--secondary`. A touch anywhere starts the order. UPOS addition — the artboard opens on browse.
+- **Promo band, 190px**, browse only, `--upos-grad-dark` with `--upos-kds-ink` (§2, §4): a kicker in
+  the label class at 14px `.16em` in `--upos-on-dark-accent`, the headline at 800/40px `-.02em`, one
+  line at 400/19px, a 120px column of three `--upos-radius-pill` dots each in a 60px hit area, and a
+  300px `--upos-radius-card` photo frame. It is merchandising and never carries status (§3, §4).
+- **Browse, grid.** The screen title at 800/62px `-.03em` over one line at 400/22px; a strip of
+  `flex:1` category buttons at 800/21px, selected on `--upos-grad-primary`; then `1fr 1fr` cards at
+  24px gaps. A card is `--upos-surface` at `--upos-radius-card` with `--upos-shadow-card`: a 220px
+  photo frame, then `20px 22px 22px` carrying the name at 800/27px `-.015em` beside the price in
+  `--upos-type-mono` at 24px in `--upos-accent-deep`, the description at 400/19px, `.u-chip-allergen`
+  chips (§5), and the merchandising tag — `MOST ORDERED`, `NEW` — at `--upos-radius-pill` on
+  `--upos-accent` in white 800/14px `.1em`.
+- **Browse, list.** A 280px category rail on `--upos-grad-dark` with `--upos-kds-ink`, the same move
+  as the back-office sidebar (§2, §3): `MENU` in the label class, one 88px button per category at
+  800/20px, selected on `--upos-grad-primary`, and a closing note at 400/19px at `.72`. The rest
+  carries the category title at 800/66px `-.03em` beside its count, then full-width rows — a 104px
+  photo at `--upos-radius-inset`, the name at 800/30px with its tag, the description at 400/19px, the
+  price in `--upos-type-mono` at 28px, and a 60px `+` on `--upos-grad-primary`.
+- **Suggestion strip**, at the foot of browse above the bag bar, `--upos-surface` at `20px 40px 24px`:
+  `SUGGESTED WITH YOUR ORDER` in the label class beside its note at 400/19px, then three `1fr` cards
+  at 14px gaps — a 56px photo at `--upos-radius-inset`, the name at 800/19px over its counter in the
+  label class, the price in `--upos-type-mono` at 19px, and a 60px `+` on `--upos-grad-primary`. On a
+  list row and on a suggestion card the whole element is the target and the `+` is its affordance.
+- **Item detail.** A 420×300 photo frame at `--upos-radius-card` beside a block at `30px 36px`: a
+  `Back` `.u-btn--secondary`, the item name at 800/48px `-.02em`, the description at 400/19px, and the
+  running unit price pinned to the bottom in `--upos-type-mono` at 32px in `--upos-accent-deep`. Below
+  at `26px 40px`, groups 24px apart: the title at 800/22px `.02em` beside its rule — `PICK ONE` or
+  `ANY` — in the label class at `--upos-ink`, then `1fr 1fr 1fr` options at 12px gaps, each at
+  `--upos-radius-inset` on `--upos-surface-inset` with its label at 800/19px and its delta in
+  `--upos-type-mono` at 19px, selected on `--upos-grad-primary`. The footer is one full-width 96px
+  `.u-btn--primary` reading `Add to order · $NN.NN`. **The artboard's `CANCEL` beside it is dropped**:
+  a discard against a commit is what §11's adjacency rule prevents, and `Back` already exits.
+- **Combo sheet**, 940px wide, `max-height:1400px`, its own scroll, `--upos-radius-panel`,
+  `--upos-surface`, `--upos-shadow-modal`, on `--upos-scrim`. Head on `--upos-grad-primary` in white:
+  `AUTO-COMBO FOUND` in the label class at 15px `.16em`, `Make it a combo, save $N.NN.` at 800/50px
+  `-.025em`, one line at 400/22px naming the item it found. Body: `1 · PICK A SIDE` and
+  `2 · PICK A DRINK` at 800/24px over `1fr 1fr 1fr` tiles carrying the name at 800/22px over
+  `à la carte $N.NN` in `--upos-type-mono` at 19px, selected on `--upos-grad-primary`. Then a summary
+  on `--upos-surface-inset`: `À LA CARTE $NN.NN` in the label class over `Combo $NN.NN` at 800/30px
+  with `You save $N.NN` at 800/20px in `--upos-accent-deep`. Footer, 96px: `Keep it plain` as a
+  `.u-btn--ghost` at `--upos-ink` (§11), then the confirm.
+- **Cart.** Head at `36px 40px 24px`: `Review your order` at 800/56px `-.02em` over
+  `4 items · 2 from the deli · 2 from the tea bar · nothing is sent until you submit` at 400/19px,
+  with `Add more` as a `.u-btn--secondary`. Lines group by concept under a header row — a 22px
+  `--upos-radius-pill` mark, the concept name at 800/20px `.12em`, its counter note in the label
+  class, a `--upos-border` hairline, and the group sum in `--upos-type-mono` at 18px. A line runs
+  `{n}×` in `--upos-type-mono` at 26px in a 52px column, the item name at 800/28px `-.015em`, the
+  middot-joined mods at 400/19px, and the combo chip `COMBO · Fries + Fountain Soda` at
+  `--upos-radius-pill` on `--upos-surface-inset` in `--upos-accent-deep` 800/14px; right, the line
+  price in `--upos-type-mono` at 26px over a `Remove` `.u-btn--ghost` at `--upos-ink` (§11).
+- **Cart totals**, under a hairline: `Subtotal` at 400/19px, `Combo savings` `−$N.NN` at 800/19px in
+  `--upos-accent-deep`, `Tax`, a 2px `--upos-border` rule, then `Total` at 800/42px with its amount in
+  `--upos-type-mono`. The 96px footer band is flush to the panel edge: `Start over` on a 300px
+  `.u-btn--ghost` at `--upos-ink`, then `Submit order · $NN.NN` as a `.u-btn--primary` taking the rest.
+- **Pay** is centered on `--upos-surface`: the amount at 800/96px in `--upos-type-mono`,
+  `Insert, tap or swipe` at 800/34px, a reader illustration at `--upos-radius-card`, and `Cancel` as a
+  60px `.u-btn--ghost` at `--upos-ink`. No tip prompt and no signature — neither has anywhere to be
+  stored. UPOS addition; the artboard's submit goes straight to done.
+- **Done** fills the panel with `--upos-grad-primary` in white, no bag bar, `0 40px`, 34px gaps:
+  `ORDER SENT TO THE KITCHEN` in the label class at 17px `.18em`; the order number at
+  `--upos-type-display` sized to 200px/.86 at `-.04em`, the role §6 names for it, tracking continuing
+  §6's ramp past its 42px row; the pickup note at 400/30px; then `Start a new order` as a 96px
+  `.u-btn--secondary`. The number renders bare, with no `#` — the kicker already says what it is.
+- **Bag bar, 96px**, on `--upos-surface` under a 1px `--upos-border`: `IN BAG` in the label class at
+  14px `.12em`, the line count at 800/30px, the running total in `--upos-type-mono` at 30px in
+  `--upos-accent-deep`, then a 420px `Review and pay →` `.u-btn--primary` filling the bar's height. It
+  rides browse, item detail and the combo sheet, and is hidden on attract, cart, pay and done — the
+  artboard renders it on every screen, which on done offers a second review of an order already sent.
+
+**States.**
+
+- Attract · browse · item · combo · cart · pay · done. The artboard implements the middle five;
+  attract and pay are UPOS additions.
+- Browse renders in grid or in list, and the toggle survives every category and concept change.
+- Exactly one concept is selected and exactly one category within it; switching concept resets the
+  category to that concept's first.
+- Promo band rotating, one panel every six seconds, or pinned by its dot. Pinning is one-way —
+  nothing resumes the rotation but a reset.
+- Item detail arrives with the first option of every single-select group chosen and every
+  multi-select group empty. Required and optional are carried by the words `PICK ONE` and `ANY` and
+  never by color: the artboard tints the required note red, and red marks a problem someone has to
+  act on (§4).
+- Combo sheet with neither, one, or both of side and drink chosen. Until both are, the confirm is a
+  `.u-btn--secondary` reading `Pick a side and a drink` and does not respond; the second choice makes
+  it a `.u-btn--primary` reading `Add the combo · +$4.50`. The artboard greys it instead, and a grey
+  control on a guest screen reads as broken rather than as waiting.
+- Cart empty — `Nothing in the bag yet. Tap Add more to start.` at 400/22px in `--upos-ink` (§10).
+  The savings line, a line's mods and a line's combo chip each render only when there is one.
+- Bag bar at zero reads `0` and `$0.00` with a `.u-btn--secondary`; the first line makes it primary.
+- Idle, then warned, then wiped — Guest-facing rules holds the timing. 86'd never appears: an
+  unavailable item is absent from the menu, not marked in it.
+
+**Interactions.**
+
+- **Tapping a concept** switches the menu, resets the category and returns to browse; the bag
+  survives, because one order carries both counters. **The layout toggle** swaps grid for list over
+  the same menu. **A promo dot pins its panel.** **A category** filters the menu and returns to browse
+  from wherever you were.
+- **Tapping an item opens the item detail**, from a grid card or a list row in either layout. Every
+  item opens it, so a guest never learns that some taps ask questions and others do not.
+- **The group logic is the terminal Modifier modal's, unchanged**: a single-select option replaces the
+  group's choice, a multi-select option toggles, the upcharge rides in the label (`+$2.50`, `−$1.50`,
+  nothing at zero), and every tap recomputes the running price in the header and on the primary. Only
+  the container differs — at 1080px with 60px targets and four groups the terminal's 480px modal
+  cannot hold it, so the kiosk builds an item on a screen rather than over one, and §11's
+  prefer-a-modal rule yields where the content does not fit.
+- **`Add to order` pushes one cart line** carrying the item, the middot-joined mods and the computed
+  unit price, then returns to browse — or raises the combo sheet.
+- **The combo prompt fires at most once per order.** The artboard raises it on every combo-eligible
+  item; UPOS raises it on the first and adds the rest silently. It is a sheet over browse, never a
+  step between the guest and their order (§11).
+- **`Keep it plain`** closes the sheet and leaves the line in the bag at à la carte price.
+  **`Add the combo`** rewrites the line just added: the price takes the combo price, the label takes
+  `COMBO · {side} + {drink}`, and the difference from à la carte becomes that line's saving, which is
+  what the cart's savings line sums.
+- **A suggestion adds in one tap**, at base price, with its mods line reading `as it comes` — no item
+  detail and no combo sheet. **`Remove` drops a line** with no confirmation: nothing is sent until
+  submit, and the line is one tap to add back.
+- **`Review and pay →` opens the cart and `Add more` returns to browse.** `Submit order` opens pay,
+  and an approved card opens done. **`Start over` and `Start a new order` are the same reset** — the
+  bag empties, the concept and category return to their first, and the kiosk goes back to attract.
+- Screens enter with `fl-rise` and the combo sheet rises with it at `--upos-dur-slow` over
+  `--upos-scrim` at `--upos-blur-scrim` (§7, §8). The kiosk is touch: ship no `:hover` transforms to
+  it, and press feedback is the ripple tint (§8).
+
+**Data.** Everything on these screens is client state until the card approves. The menu is
+`MenuItemDto` and the submit is a `CreateOrderDto` — both are the Kiosk data contract. The cart, the
+selections, the running price, the combo rewrite, the totals and the tax are all computed in the
+client and none of it survives a reset. Prices are held in cents and formatted once (`$14.95`), which
+is what keeps the savings arithmetic exact. The order number on the done screen is
+`Order.OrderNumber`; the artboard's is a fixture that never increments.
+
+**Gaps.**
+
+- GAP-01 — no modifier group or option model, so every group, option and upcharge on the item screen
+  lives in the client.
+- GAP-02 — no combo entity, so the auto-detection, the combo price and the per-line saving have
+  nothing to persist to.
+- GAP-05 — `MenuItem` has no allergens, so the chips on the card and the detail are design-only.
+- GAP-08 — no payments domain, so the pay screen records nothing it does.
+
+#### Guest-facing rules
+
+**Purpose.** You can hand this screen to someone who has never seen it and they finish without asking
+a question.
+
+**Layout.** This spec has no geometry of its own. Kiosk flow places the regions; what follows is the
+scale, the target minimum and the contrast floor every one of them is drawn to.
+
+**The kiosk type scale is Part I's roles at ×1.4**, rounded up to the whole pixel. Same six roles,
+same three weights, same family — nothing new is invented for the guest.
+
+| Role | Terminal | Kiosk | Carries at the kiosk |
+| --- | --- | --- | --- |
+| `--upos-type-display` | 28px | 40px | Screen totals · scaled again for the order number |
+| `--upos-type-heading` | 18px | 26px | Group and section titles |
+| `--upos-type-row` | 13px | 19px | Item names, control labels |
+| `--upos-type-body` | 13px | 19px | Descriptions, notes, every sentence |
+| `--upos-type-label` | 10px | 14px | Kickers, counts, the bag label, the step line |
+| `--upos-type-mono` | 13px | 19px | Prices, totals, line amounts |
+
+**19px is the floor for anything a guest reads and 14px is the floor for a label.** Screen titles,
+item names and the order number run well above the scale at the call-site sizes Kiosk flow records —
+62px, 48px, 200px — with tracking from §6's ramp. The scale is a minimum, not a cap.
+
+**Every target clears `--upos-touch-kiosk` 60px**, and the two order-committing controls —
+`Add to order` and `Submit order` — take the full 96px band. Adjacent targets stand at least
+`--upos-space-gap-row` 8px apart, and two irreversible controls are never adjacent (§11): `Start over`
+sits behind its own 300px edge away from `Submit order`, and the item screen's discard was dropped for
+the same reason.
+
+**WCAG 2.2 AA, and one pairing fails it.** `--upos-ink-subtle` on `--upos-surface` computes 3.0:1
+(§11). Size does not rescue it here — the large-text allowance starts at 24px regular and kiosk body
+copy is 19px — so **anything the guest must read takes `--upos-ink`**, which reads 15.9:1 (§11).
+`--upos-ink-subtle` has no role on this surface at all: not on the description, not on the mods line,
+not on the quantity column, not on a ghost button's label. The pairings that do hold:
+
+| Pairing | Ratio | Where |
+| --- | --- | --- |
+| `--upos-ink` on `--upos-surface` | 15.9:1 | Every sentence and every name |
+| `--upos-accent-deep` on `--upos-surface` | 9.4:1 | Prices, the combo chip, the savings line |
+| `--upos-accent` on `--upos-surface` | 6.3:1 | The merchandising tag's fill against white ink |
+| White on `--upos-grad-primary` | 6.3:1 to 9.4:1 | Primary buttons, the attract and done screens |
+| `--upos-kds-ink` on `--upos-grad-dark` | 14.2:1 | The promo band and the list rail |
+
+WCAG 2.2's target-size minimum is 24×24 (2.5.8) and this surface clears it two and a half times over.
+
+**States.**
+
+- Available or absent. **An 86'd item is not on the kiosk menu at all** — no struck name, no `86'D`
+  pill, no dimmed tile. §4 keeps the tile on the terminal because a server has muscle memory for where
+  it lives; a guest has none, and `86'D` is staff jargon before it is a label.
+- Daypart open or closed. A menu outside its window is absent the same way: no greyed section and no
+  "available from 11". The promo band is where a venue announces what is coming, and it is the only
+  place.
+- Attended or idle. Idle has two steps, below.
+- Reader idle, reading, approved or declined. A decline names the cause and the next move on one line
+  (§10): `Card declined · try another card`.
+
+**Interactions.**
+
+- **Idle wipes the cart, and warns first.** After 60 seconds untouched on any screen holding a cart, a
+  sheet rises: `Still there?` at 800/40px, `Your order clears in 10 seconds` at 400/26px counting
+  down, and a `Keep going` `.u-btn--primary` at 96px. A touch anywhere dismisses it. At zero the kiosk
+  resets to attract with an empty bag. Neither timer is in the artboard; both are UPOS additions and
+  both are configuration.
+- **The done screen resets itself after 30 seconds**, running the same reset `Start a new order` runs.
+  A kiosk left showing a stranger's order number is a kiosk out of service.
+- **Upsell is one combo prompt per order plus one suggestion band**, and neither stands between the
+  guest and the bag. The prompt is a sheet over browse; the band is a strip at the foot of browse.
+  Nothing on this surface is interstitial.
+- **No staff vocabulary reaches the guest.** Not `86'D`, not `VOID`, not `FIRED`, not `SENT` as a
+  status word, not a station name, not a seat or cover count, not a channel badge. The done screen
+  says the order went to the kitchen because that is the fact a guest needs, and nothing else on the
+  surface names an `OrderStatus` value.
+- **Loyalty, where a venue asks for it**, is one optional control on the cart above the totals — never
+  a gate in front of the menu and never a keypad a guest has to clear to order.
+- **No hover, ever** (§8). And `fl-pulse` does not run on this surface: it marks late, and nothing a
+  guest sees is late.
+
+**Data.** Availability is the one rule here with a field behind it — `MenuItem.IsAvailable`, read
+through `MenuItemDto`, which the kiosk filters on rather than renders. The type scale, the target
+minimum, the contrast floor and both timeouts are configuration and CSS, not data. Dayparting has no
+source at all: `IsAvailable` is a bool with no schedule behind it, so a daypart is a hand flip today
+and a menu-period window is schema work.
+
+**Gaps.**
+
+- GAP-05 — `MenuItem` has no allergens, so the one thing a guest may need to read before ordering is
+  design-only.
+- GAP-12 — no loyalty account entity, so a kiosk loyalty control has nothing to identify a guest
+  against.
+- GAP-13 — no venue or organization entity, so the daypart windows, the tax rate and both timeouts
+  have no scope to be stored on.
+
+#### Kiosk data contract
+
+**Purpose.** You know what the kiosk reads, what a submit writes, and what nothing behind it can say.
+
+**Layout.** This spec has no geometry of its own. Kiosk flow holds the screens; what follows is the
+wiring under them.
+
+**States.** The kiosk is a write-once client — it posts one order and stops — so `OrderStatus` shows
+the guest almost nothing:
+
+| `OrderStatus` | What the guest sees |
+| --- | --- |
+| `Pending` | Nothing — the order exists for the moment between the post and the kitchen accepting it |
+| `Confirmed` | The done screen, where the kiosk tracks status at all |
+| `Preparing` · `Ready` | Nothing — pickup is called from the board, not from the kiosk |
+| `Served` · `Completed` · `Cancelled` | Nothing |
+
+Nothing on the done screen changes after the number lands, and the auto-reset is a timer rather than a
+status.
+
+**Interactions.**
+
+- **Browse reads the menu.** `GET /api/menu` on the Menu controller returns `MenuItemDto`. The kiosk
+  uses `Name`, `Price`, `Category`, `Description` and `ImageUrl`, and filters on `IsAvailable`. It is
+  the one screen in UPOS that renders `Description`, because a guest has nobody to ask. Categories
+  come from grouping on `Category`, the same way the terminal builds its rail.
+- **Submit writes one order, after the reader approves.** `Submit order` opens pay; an approval builds
+  a `CreateOrderDto` with one `OrderItemDto` per cart line and posts it to `POST /api/orders` on the
+  Orders controller. The API broadcasts `ReceiveNewOrder` on `/hubs/orders` and the order reaches the
+  kitchen board like any other. The response is an `OrderDto` at `OrderStatus.Pending`, and its
+  `Order.OrderNumber` is the number the done screen prints. The kitchen never receives an order the
+  reader declined.
+- **The done screen may listen, and it may not.** Where a venue wants a live pickup line, the kiosk
+  joins `Order_{id}` on `/hubs/orders` and takes `ReceiveOrderStatusUpdate` for the thirty seconds it
+  is up, and the note under the number is the only thing that changes. Nothing else on this surface
+  subscribes.
+- **One tap waits on the network, and only one** (§11). Every control before pay applies its local
+  state change first; the done screen's number cannot, because the number is the response.
+- **No network means no orders.** A kiosk that cannot reach the API cannot take a card and cannot
+  promise a number, so it returns to attract and says so in one line. It does not queue the way the
+  terminal does — an unattended device holding writes nobody is watching is worse than a dark screen.
+
+**Data.**
+
+- The menu is the only read: one `GET /api/menu` on wake, refreshed on every reset. A kiosk that
+  caches a menu for a shift sells an item the kitchen 86'd an hour ago.
+- **The arithmetic is entirely client-side.** Unit price is base plus the selected upcharges; the
+  combo rewrite adds the combo price and records the difference from à la carte; subtotal sums the
+  lines; tax is the venue's rate on the subtotal; total is both. None of it is sent —
+  `CreateOrderDto` carries lines, not money.
+- **`OrderItemDto` has no field for a selection.** A guest's bread, toppings, sugar level and combo
+  pairing reach the API as nothing at all, and this is worse here than at the terminal: a server can
+  tell the kitchen what the modal could not carry, and a kiosk guest cannot.
+- **Nothing marks the order as a kiosk order.** The `KIOSK` badge a chit prints (Part II-C) is a
+  literal, and the same hole means a venue cannot route, price or count kiosk orders separately.
+- **Quantity is per line, not merged.** The artboard pushes a new line on every tap, so `qty` is
+  always 1 and two of the same sandwich are two lines. The terminal merges (Part II-A) and the kiosk
+  should; `OrderItemDto` carries the quantity either way, so this is a client fix rather than API
+  work.
+- An order-number sequence, a kiosk device identifier and a per-item note field are additive API work
+  — new fields that contradict nothing in the current model.
+
+**Gaps.**
+
+- GAP-01 — no modifier group or option model, so every choice a guest makes reaches the API as
+  nothing.
+- GAP-02 — no combo entity, so the auto-detection, the combo price and the savings line have no source
+  and nowhere to be stored.
+- GAP-04 — `Order` has no channel or order type, so nothing on a submitted order says it came from a
+  kiosk.
+- GAP-08 — no payments domain, so the card-present step records neither the approval nor the tender.
+- GAP-10 — no idempotency key on `CreateOrderDto`, so a submit retried across a flaky link can produce
+  two orders and two numbers for one guest.
+- GAP-12 — no loyalty account entity, so a kiosk cannot identify the guest it is serving.
+- GAP-05 — `MenuItem` has no allergens, so the chips the kiosk card and detail carry are design-only.
 
 ---
 
