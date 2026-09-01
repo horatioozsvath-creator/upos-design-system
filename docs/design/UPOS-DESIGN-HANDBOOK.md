@@ -1228,8 +1228,12 @@ none of them repeats it.
   `--upos-on-dark-accent` — then seven `.u-nav-item` buttons at `--upos-radius-inset`, `12px 14px`,
   12px gaps, a 16px icon beside a 700/13px label: Dashboard · Menu · Integrations · Employees ·
   Reports · Devices · Settings. The active destination fills with `--upos-grad-primary` and white ink;
-  the rest are `--upos-ink-subtle` on transparent. Sidebar icons run `stroke-width:1.7` (§9); the
-  artboard draws them at 2.
+  the rest are `--upos-ink-subtle` on transparent. The kit's `.u-nav-item` is the terminal's
+  bottom-nav item — a column of a 17px icon over a 700/10px label at `6px 10px`, active by tinting its
+  ink `--upos-accent` — so the sidebar is a call-site restyle of it, not a plain use: the row runs
+  horizontal at `12px 14px` and 12px gaps, the label goes 700/13px, and the active state fills rather
+  than tints. Part III carries the variant. Sidebar icons run `stroke-width:1.7` (§9); the artboard
+  draws them at 2.
 - **The rail is sticky** — `top:14px`, `max-height:calc(100vh - 28px)` (§2). The artboard is a fixed
   canvas and draws it static.
 - **Main panel** fills the rest at `min-width:1000px`, `--upos-radius-panel` 26px, `--upos-surface`,
@@ -1272,10 +1276,12 @@ acting on.
   artboard draws 20px), 24px padding.
 - **Sales by daypart**: a 700/13px title, then four columns 22px apart in a 180px band, each a
   `--upos-grad-bar` fill under a 700/12px `--upos-ink-subtle` label — Breakfast · Lunch · Dinner ·
-  Late Night. The artboard runs the gradient vertically and ties its far stop to the accent; ship
-  `--upos-grad-bar`, the one bar gradient §3 allows. Round the top pair at `--upos-radius-inset` (the
-  artboard draws `10px 10px 0 0`) and let the foot sit flush on the chart baseline, where §7 has no
-  exposed corner to govern.
+  Late Night. These columns grow upward, and §3 scopes `--upos-grad-bar` to horizontal fills, so the
+  call site rotates its `90deg` to `180deg` and changes nothing else — same token, same stops, turned
+  to follow the bar. The artboard additionally ties the gradient's far stop to the accent; the token
+  does not, and the token wins. Round the top pair at `--upos-radius-inset` (the artboard draws
+  `10px 10px 0 0`) and let the foot sit flush on the chart baseline, where §7 has no exposed corner to
+  govern.
 - **Top items**: a 700/13px title, then three 700/13px rows — the item name left, `142 · $1,491`
   (units then revenue) right in `--upos-ink-subtle` — over a hairline and the exception row,
   `3 comps flagged for review` with a trailing `→` at 700/12px in `--upos-status-late-text`.
@@ -1359,13 +1365,14 @@ it, and what is 86'd right now.
   are toggle pills at `7px 14px` — `.u-chip-allergen` when on, `--upos-surface-inset` in
   `--upos-ink-subtle` when off, labels uppercase per §5 against the artboard's sentence case. Modifier
   groups take a 800/14px heading with `+ ADD GROUP` beside it and one card per group: inset at
-  `--upos-radius-card` (the artboard draws 18px), 16px padding, the name at 800/13px, its type chip at
-  `3px 10px` on `--upos-surface`, its options as 700/12px pills on `--upos-surface`. Its form matches
-  the add-item form and adds a three-way segmented row — `REQUIRED` · `OPTIONAL` · `NO / REMOVE`, the
-  selected one on `--upos-grad-primary` — over a comma-separated options field.
+  `--upos-radius-card`, 16px padding, the name at 800/13px, its type chip at `3px 10px` on
+  `--upos-surface`, its options as 700/12px pills on `--upos-surface`. Its form matches the add-item
+  form, commits on `Add group`, and adds a three-way segmented row — `REQUIRED` · `OPTIONAL` ·
+  `NO / REMOVE`, the selected one on `--upos-grad-primary` — over a comma-separated options field.
 - **Plate-view modal**, 520px, `--upos-radius-panel` (the artboard draws 24px), 26px padding, 16px
   gaps, `--upos-shadow-modal`, on `--upos-scrim` inside the panel: `{item} · plating` at 800/18px with
-  a close `.u-icon-btn`, then the `.u-segmented` `PLATING` · `STACK` track when the item has both
+  a close `.u-icon-btn` at the preamble's 34px (the artboard draws 30px), then the `.u-segmented`
+  `PLATING` · `STACK` track when the item has both
   views. It is the terminal's Item info modal with editing added — a 280×280 circular image slot
   rather than 220×220, numbered `ON THE PLATE` callouts under it at 800/10px in 20px round chips, and
   the stack turned from a read-only diagram into a builder: a 180px `column-reverse` column at
@@ -1385,13 +1392,15 @@ it, and what is 86'd right now.
   `--upos-status-late` in white. The row holds its place in the list (§4).
 - Both forms open empty and close on cancel or commit. The artboard leaves them open when the
   selection changes; close them with it, because the group form writes to whichever item is selected
-  when you press `Add`. A blank name makes `Add` do nothing, silently — ship a one-line message naming
-  the cause and the next move (§10).
+  when you press `Add group`. Two silent failures ship with the artboard and neither should: a blank
+  name makes the commit button do nothing at all, and a non-numeric price is parsed to zero, so the
+  item lands on the list at `$0.00` with no warning. Both need a one-line message under the field
+  naming the cause and the next move (§10).
 
 **Interactions.** Pick a major to refilter the list, a chip to filter within it, a row to load the
 detail pane; the sidebar is the only navigation here. The availability badge toggles in place with no
 dialog, since 86ing an item is something you do mid-service. `Add` appends an item to the current
-major, gives it that major's first minor and selects it. The group form splits options on commas and
+major, gives it that major's first minor and selects it. `Add group` splits options on commas and
 drops the blanks; a `NO / REMOVE` group prefixes each with `No ` and labels itself
 `REMOVE · NO CHARGE`. An allergen pill toggles that allergen on the selected item.
 `VIEW PLATING` opens the modal on `fl-rise` at `--upos-dur-slow`; inside it, up and down swap a layer
@@ -1406,9 +1415,11 @@ restores the item's default build.
 - The badge writes `IsAvailable`; `Add` writes `Name`, `Price` and `Category`. Both need Menu write
   endpoints — API work, not a schema gap, since the fields are already there. `Category` is one
   string, so the major and minor levels share it: the artboard assigns minors client-side and the
-  chips filter a value nothing stores. Everything else is client state, lost on reload, and each
-  ingredient cost is derived from the item's own price — which makes `COGS $`, `COGS %` and `MARGIN`
-  circular: they restate the price rather than measure it.
+  chips filter a value nothing stores. Everything else is client state, lost on reload. Each recipe
+  also has exactly one costed line that scales with the item's own price — the patty at ×0.16, the
+  syrup at ×0.14, a plain item's components at ×0.30 — with the remaining lines flat constants, which
+  makes `COGS $`, `COGS %` and `MARGIN` partly circular: they restate the price rather than measure
+  it.
 
 **Gaps.**
 
@@ -1485,7 +1496,8 @@ the roadmap spec sets out.
 **Purpose.** You check the three numbers that move margin — what is running out, what food costs, and
 what labor costs.
 
-**Layout.** Panel padding 32px, 22px between blocks, under `Reports · Riverside Grill` at 800/24px.
+**Layout.** Panel padding 32px, `--upos-space-gap-section` between blocks (the artboard draws 22px),
+under `Reports · Riverside Grill` at 800/24px.
 
 - **Low stock**: a 700/13px title, then full-width rows 8px apart at `12px 16px`,
   `--upos-radius-inset`, `--upos-surface-inset`, 14px gaps — an 8px status dot at
@@ -1501,7 +1513,10 @@ what labor costs.
   `--upos-ink-subtle`; then a hairline and the footer — `Labor %` at 800/13px against
   `27% · target 24%` in `--upos-status-fired-text`.
 - Every bar here is colored by status, not by the palette: its fill is a status token and never
-  `--upos-grad-bar`. The dashboard's daypart chart is the reverse case, and the two do not swap.
+  `--upos-grad-bar`. §3 names reports as somewhere that gradient belongs, and this page overrides that
+  scope — a bar whose length already carries a number and whose color carries a problem is §4's, and a
+  gradient never carries status. The dashboard's daypart chart is where the gradient actually lands on
+  this surface, and the two do not swap.
 
 **States.**
 
@@ -1590,7 +1605,9 @@ and the detail rises with `fl-rise`.
 **Data.** Nothing. None of the three destinations has a model, a DTO, a controller or an endpoint:
 `MenuItem`, `Table`, `Order` and `OrderItem` are the whole schema, and none of them describes a
 person, a device or a preference. That is why one spec covers three screens — there is nothing to bind
-that would make them differ.
+that would make them differ. Devices is the one of the three that no gap ID covers, and none should:
+a registry of devices, their pairing and their last-seen time is a new table contradicting nothing in
+the current schema, so it is API work rather than a hole in an existing model.
 
 **Gaps.**
 
@@ -1598,9 +1615,6 @@ that would make them differ.
   manager approval elsewhere in the product has nobody to check it.
 - GAP-13 — no venue or organization entity, so Settings has no scope to attach a setting to, and a
   second location has nowhere to keep its own.
-- No gap ID covers a device registry, and none should: devices, pairing and last-seen are a new table
-  that contradicts nothing in the current schema. Record it as API work, not as a hole in an existing
-  model.
 
 ### Part II-C · Kitchen display
 
