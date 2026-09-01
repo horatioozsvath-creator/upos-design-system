@@ -1,0 +1,18 @@
+/* SecondBrain Fluid — shape. No square corners anywhere. Pills, bars and dots
+   are always 999px and clipped with overflow:hidden. */
+:root {
+  --radius-panel: 28px;
+  --radius-panel-sm: 26px;
+  --radius-card: 22px;
+  --radius-card-sm: 20px;
+  --radius-inset: 16px;
+  --radius-inset-sm: 14px;
+  --radius-control: 12px;
+  --radius-nav: 14px;
+  --radius-pill: 999px;
+
+  /* Mobile shifts down a notch; Android tighter than iOS */
+  --radius-panel-ios: 24px;
+  --radius-panel-android: 18px;
+  --radius-card-mobile: 16px;
+}

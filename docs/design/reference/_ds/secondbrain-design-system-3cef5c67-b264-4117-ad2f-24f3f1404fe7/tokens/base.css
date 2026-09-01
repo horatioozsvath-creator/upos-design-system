@@ -1,0 +1,29 @@
+/* Base — the minimum the shell needs. Everything else is a token or a
+   component. Keep this thin; SecondBrain Fluid styles inline, not by class. */
+* , *::before, *::after { box-sizing: border-box }
+body {
+  margin: 0;
+  font-family: var(--font-core);
+  font-size: var(--size-body);
+  line-height: var(--leading-body);
+  color: var(--text-body);
+  background: var(--ground);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-core); font-weight: var(--weight-display); margin: 0; line-height: 1.15 }
+h1 { font-size: var(--size-hero); letter-spacing: var(--track-hero); line-height: var(--leading-hero) }
+h2 { font-size: var(--size-page-title); letter-spacing: var(--track-page-title) }
+h3 { font-size: var(--size-card-headline-sm); letter-spacing: var(--track-card-headline) }
+h4 { font-size: var(--size-section-head); letter-spacing: var(--track-section-head) }
+h5 { font-size: var(--size-row-title); letter-spacing: var(--track-row-title) }
+h6 { font-size: var(--size-label); letter-spacing: var(--track-label-wide); text-transform: uppercase; color: var(--text-label) }
+p { margin: 0 }
+a { color: var(--link); text-decoration: none; transition: color var(--dur-fast) }
+a:hover { color: var(--link-hover) }
+::selection { background: var(--selection) }
+:focus-visible { outline: 2px solid var(--slate); outline-offset: 2px }
+img { display: block; max-width: 100% }
+code, .mono { font-family: var(--font-mono) }
+*::-webkit-scrollbar { width: 9px; height: 9px }
+*::-webkit-scrollbar-thumb { background: rgba(27, 31, 36, .18); border-radius: 99px }
+*::-webkit-scrollbar-track { background: transparent }

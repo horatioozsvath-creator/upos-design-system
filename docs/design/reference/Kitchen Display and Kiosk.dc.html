@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="_ds/modernist-4e25a758-7f64-4fe8-8429-8eb8d3fda468/styles.css">
+<script src="_ds/modernist-4e25a758-7f64-4fe8-8429-8eb8d3fda468/_ds_bundle.js"></script>
+<script src="./image-slot.js"></script>
+<style>
+body{margin:0;background:#e4e2df}
+a{color:var(--color-accent);text-decoration:none}
+a:hover{color:var(--color-accent-700)}
+@keyframes rushpulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes adcycle{0%{opacity:0;transform:translateY(14px)}7%{opacity:1;transform:none}93%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-10px)}}
+@keyframes adbar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes adzoom{0%{transform:scale(1.03)}100%{transform:scale(1.11)}}
+@keyframes tickrun{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes upflash{0%,100%{opacity:1}50%{opacity:.42}}
+@keyframes plateflash{0%,100%{box-shadow:0 0 0 0 rgba(236,48,19,0)}50%{box-shadow:0 0 10px 3px rgba(236,48,19,.55)}}
+@keyframes ilude{0%{opacity:1;clip-path:ellipse(90% 0% at 50% 104%)}2.2%{clip-path:ellipse(170% 140% at 50% 60%)}9%{clip-path:ellipse(170% 140% at 50% 60%)}11.6%{opacity:1;clip-path:ellipse(170% 140% at 50% -46%)}11.7%{opacity:0;clip-path:ellipse(90% 0% at 50% 104%)}100%{opacity:0;clip-path:ellipse(90% 0% at 50% 104%)}}
+@keyframes iludewave{0%{transform:translateY(120%)}8.4%{transform:translateY(120%)}10.2%{transform:translateY(-8%)}11.9%{transform:translateY(-195%)}100%{transform:translateY(-195%)}}
+@keyframes grilldrop{0%{transform:translate(-16%,-170%) rotate(-7deg)}5.4%{transform:translate(0,0) rotate(0deg)}100%{transform:translate(0,0) rotate(0deg)}}
+@keyframes flamelick{0%,100%{transform:scaleY(.55) scaleX(.9)}50%{transform:scaleY(1.3) scaleX(1.05)}}
+@keyframes smokerise{0%{opacity:.85;transform:translateY(10px) scaleX(1)}100%{opacity:0;transform:translateY(-120px) scaleX(1.7)}}
+@keyframes teafill{0%{height:0}7.6%{height:66%}100%{height:66%}}
+@keyframes pearldrop{0%{transform:translateY(-300px);opacity:0}12%{opacity:1}72%{transform:translateY(150px);opacity:1}100%{transform:translateY(190px);opacity:0}}
+</style>
+</helmet>
+
+<section id="t1" style="padding:40px 44px 34px;font-family:Archivo,system-ui,sans-serif">
+  <div style="display:flex;align-items:baseline;gap:10px;margin:0 0 6px">
+    <a href="#t1" style="font:800 10px/1 ui-monospace,Menlo,monospace;padding:4px 7px;background:var(--kios-chrome);color:#f8f4f4;letter-spacing:.06em">1</a>
+    <span style="font:800 13px/1.2 Archivo,system-ui,sans-serif;color:#201e1d;letter-spacing:-.01em">DELI COUNTER — kitchen display + ordering kiosk</span>
+  </div>
+  <p style="margin:0 0 26px;max-width:760px;font:400 12.5px/1.6 Archivo,system-ui,sans-serif;color:#605d5d">Everything below is live: timers run, station tabs filter, chits bump, the kiosk builds a real cart and auto-detects combos. The board in <a href="#1a">1a</a> carries plate view — arm PLATE VIEW, tap a chit — and takes any chit layout from <a href="#1b">1b</a>. The kiosk in <a href="#1d">1d</a> holds both concepts with a grid/list toggle. The menu board in <a href="#1e">1e</a> runs across three screens — deli on 1.5, tea bar on 1.5 — and picks its daypart off the clock. Photo frames are drop targets — drag a JPEG onto any of them.</p>
+
+  <div style="display:flex;flex-wrap:wrap;gap:34px;align-items:flex-start">
+
+    <div id="1a" style="display:flex;flex-direction:column;gap:9px">
+      <div style="display:flex;align-items:baseline;gap:8px;font:400 11.5px/1.3 Archivo,system-ui,sans-serif;color:#605d5d">
+        <a href="#1a" style="font:800 10.5px/1 ui-monospace,Menlo,monospace;padding:4px 7px;background:rgba(0,0,0,.08);color:#201e1d;letter-spacing:.06em">1A</a>
+        Station board — 1280×800 touchscreen: chits, and plate view for any item
+      </div>
+      <div style="width:1920px;height:800px;background:var(--kds-board);border:1px solid rgba(0,0,0,.14);box-shadow:0 14px 34px rgba(45,43,43,.24);display:flex;flex-direction:column;overflow:hidden;color:#f8f4f4">
+
+        <div style="height:60px;flex:none;display:flex;align-items:stretch;border-bottom:2px solid var(--kds-rule);background:var(--kds-bar)">
+          <div style="display:flex;align-items:center;gap:12px;padding:0 18px;border-right:2px solid var(--kds-rule)">
+            <div style="width:26px;height:26px;background:var(--color-accent)"></div>
+            <div style="font:900 15px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em">DELI COUNTER</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:26px;padding:0 20px;flex:1">
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <div style="font:700 9px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em;color:#9b9797">OPEN TICKETS</div>
+              <div style="font:900 20px/1 Archivo,system-ui,sans-serif">{{ openCount }}</div>
+            </div>
+            <div style="width:1px;height:30px;background:#3a3636"></div>
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <div style="font:700 9px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em;color:#9b9797">AVG TICKET</div>
+              <div style="font:900 20px/1 Archivo,system-ui,sans-serif">{{ avgLabel }}</div>
+            </div>
+            <div style="width:1px;height:30px;background:#3a3636"></div>
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <div style="font:700 9px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em;color:#9b9797">OVER TARGET</div>
+              <div style="font:900 20px/1 Archivo,system-ui,sans-serif;color:{{ lateColor }}">{{ lateCount }}</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:0 18px;border-left:2px solid var(--kds-rule)">
+            <div style="font:700 10px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em;color:#9b9797">CHIT</div>
+            <sc-for list="{{ layoutOptions }}" as="lo" hint-placeholder-count="3">
+              <button type="button" onClick="{{ lo.onClick }}" style="font:800 11px/1 Archivo,system-ui,sans-serif;padding:8px 11px;border:1px solid {{ lo.border }};background:{{ lo.bg }};color:{{ lo.color }};cursor:pointer">{{ lo.key }}</button>
+            </sc-for>
+            <div style="width:1px;height:30px;background:#3a3636"></div>
+            <button type="button" onClick="{{ togglePlateArm }}" style="font:900 11px/1 Archivo,system-ui,sans-serif;letter-spacing:.08em;padding:8px 11px;border:1px solid {{ plateArmBorder }};background:{{ plateArmBg }};color:{{ plateArmColor }};box-shadow:{{ plateArmGlow }};animation:{{ plateArmFlash }};cursor:pointer">PLATE VIEW</button>
+            <div style="width:1px;height:30px;background:#3a3636"></div>
+            <div style="font:800 15px/1 ui-monospace,Menlo,monospace;color:#f8f4f4">{{ clock }}</div>
+          </div>
+        </div>
+
+        <sc-if value="{{ isBoardView }}" hint-placeholder-val="{{ true }}">
+        <div style="height:78px;flex:none;display:flex;align-items:stretch;background:var(--kds-board);border-bottom:2px solid var(--kds-rule)">
+          <button type="button" onClick="{{ prevStation }}" style="width:56px;flex:none;background:var(--kds-bar);border:0;border-right:1px solid var(--kds-rule);color:#f8f4f4;font:900 20px/1 Archivo,system-ui,sans-serif;cursor:pointer">‹</button>
+          <div style="flex:1;display:flex;align-items:stretch">
+            <sc-for list="{{ stations }}" as="s" hint-placeholder-count="6">
+              <button type="button" onClick="{{ s.onClick }}" style="flex:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;padding:0 16px;border:0;border-right:1px solid var(--kds-rule);border-bottom:4px solid {{ s.underline }};background:{{ s.bg }};color:{{ s.color }};cursor:pointer;text-align:left">
+                <div style="font:900 17px/1 Archivo,system-ui,sans-serif;letter-spacing:.04em">{{ s.label }}</div>
+                <div style="display:flex;align-items:center;gap:7px">
+                  <div style="font:800 10px/1 Archivo,system-ui,sans-serif;letter-spacing:.1em;opacity:.72">{{ s.count }} ACTIVE</div>
+                  <sc-if value="{{ s.hasLate }}" hint-placeholder-val="{{ false }}">
+                    <div style="width:8px;height:8px;background:var(--color-accent);animation:rushpulse 1.1s infinite"></div>
+                  </sc-if>
+                </div>
+              </button>
+            </sc-for>
+          </div>
+          <button type="button" onClick="{{ nextStation }}" style="width:56px;flex:none;background:var(--kds-bar);border:0;border-left:1px solid var(--kds-rule);color:#f8f4f4;font:900 20px/1 Archivo,system-ui,sans-serif;cursor:pointer">›</button>
+        </div>
+
+        <div style="flex:1;min-height:0;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:1fr 1fr;gap:9px;padding:12px;background:var(--kds-board)">
+          <sc-for list="{{ chits }}" as="c" hint-placeholder-count="10">
+            <div onClick="{{ c.onChitTap }}" style="background:var(--kds-chit);border:1px solid var(--kds-rule);border-top:5px solid {{ c.tone }};outline:{{ c.armOutline }};display:flex;flex-direction:column;overflow:hidden;cursor:{{ c.chitCursor }}">
+
+              <sc-if value="{{ c.isA }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;flex-direction:column;height:100%">
+                  <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:7px 9px;background:#252222;border-bottom:1px solid var(--kds-rule)">
+                    <div style="display:flex;flex-direction:column;gap:2px">
+                      <div style="font:900 16px/1 Archivo,system-ui,sans-serif">{{ c.order }}</div>
+                      <div style="font:700 8.5px/1 Archivo,system-ui,sans-serif;letter-spacing:.12em;color:#9b9797">{{ c.channel }} · {{ c.bag }}</div>
+                    </div>
+                    <div style="font:900 19px/1 ui-monospace,Menlo,monospace;color:{{ c.tone }}">{{ c.timeLabel }}</div>
+                  </div>
+                  <div style="flex:none;padding:5px 9px;border-bottom:1px solid var(--kds-rule);display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                    <div style="font:700 11px/1.2 Archivo,system-ui,sans-serif;color:#d7d3d3">{{ c.name }}</div>
+                    <sc-if value="{{ c.isExpo }}" hint-placeholder-val="{{ false }}">
+                      <div style="font:900 9px/1 Archivo,system-ui,sans-serif;letter-spacing:.1em;padding:3px 5px;background:{{ c.upBg }};color:{{ c.upFg }}">{{ c.upLabel }}</div>
+                    </sc-if>
+                    <sc-if value="{{ c.rush }}" hint-placeholder-val="{{ false }}">
+                      <div style="font:900 9px/1 Archivo,system-ui,sans-serif;letter-spacing:.1em;padding:3px 5px;background:var(--color-accent);color:#fff;animation:rushpulse 1.1s infinite">RUSH</div>
+                    </sc-if>
+                    <sc-if value="{{ c.allergy }}" hint-placeholder-val="{{ false }}">
+                      <div style="font:900 9px/1 Archivo,system-ui,sans-serif;letter-spacing:.08em;padding:3px 5px;background:#ffb020;color:#201e1d">{{ c.allergy }}</div>
+                    </sc-if>
+                  </div>
+                  <div style="flex:1;min-height:0;overflow:hidden;padding:8px 9px;display:flex;flex-direction:column;gap:9px">
+                    <sc-for list="{{ c.lines }}" as="ln" hint-placeholder-count="1">
+                      <div style="display:flex;flex-direction:column;gap:4px">
+                        <div style="display:flex;gap:7px;align-items:baseline">
+                          <div style="font:900 15px/1 Archivo,system-ui,sans-serif;color:#9b9797">{{ ln.qty }}</div>
+                          <div style="font:800 16px/1.1 Archivo,system-ui,sans-serif;letter-spacing:-.01em;color:{{ ln.nameColor }};text-decoration:{{ ln.deco }}">{{ ln.name }}</div>
+                          <sc-if value="{{ ln.stationLabel }}" hint-placeholder-val="{{ false }}">
+                            <div style="margin-left:auto;font:900 8.5px/1 Archivo,system-ui,sans-serif;letter-spacing:.08em;padding:3px 4px;border:1px solid #605d5d;color:#9b9797">{{ ln.stationLabel }}</div>
+                          </sc-if>
+                          <sc-if value="{{ ln.done }}" hint-placeholder-val="{{ false }}">
+                            <div style="font:900 8.5px/1 Archivo,system-ui,sans-serif;letter-spacing:.08em;padding:3px 4px;background:#2fd07a;color:#131111">UP</div>
+                          </sc-if>
+                        </div>
+                        <div style="opacity:{{ ln.modsOpacity }};display:flex;flex-direction:column;gap:4px">
+                        <sc-for list="{{ ln.mods }}" as="m" hint-placeholder-count="2">
+                          <div style="display:flex;gap:5px;align-items:center">
+                            <div style="font:900 9px/1 Archivo,system-ui,sans-serif;letter-spacing:.06em;padding:3px 4px;background:{{ m.bg }};color:{{ m.fg }};min-width:26px;text-align:center">{{ m.kind }}</div>
+                            <div style="font:600 12.5px/1.25 Archivo,system-ui,sans-serif;color:#eae7e7">{{ m.text }}</div>
+                          </div>
+                        </sc-for>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="flex:none;display:flex;border-top:1px solid var(--kds-rule)">
+                    <button type="button" onClick="{{ c.recipe }}" style="width:46px;flex:none;background:#252222;border:0;border-right:1px solid var(--kds-rule);color:#d7d3d3;font:900 10px/1 Archivo,system-ui,sans-serif;letter-spacing:.06em;padding:12px 0;cursor:pointer">REC</button>
+                    <button type="button" onClick="{{ c.bump }}" style="flex:1;background:{{ c.bumpBg }};border:0;color:#fff;font:900 13px/1 Archivo,system-ui,sans-serif;letter-spacing:.1em;padding:12px 0;cursor:pointer">{{ c.bumpLabel }}</button>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ c.isB }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;height:100%">
+                  <div style="width:62px;flex:none;background:{{ c.tone }};color:#131111;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:9px 0">
+                    <div style="font:900 15px/1 ui-monospace,Menlo,monospace">{{ c.timeLabel }}</div>
+                    <div style="font:900 22px/1 Archivo,system-ui,sans-serif">{{ c.seat }}</div>
+                    <div style="font:900 8.5px/1 Archivo,system-ui,sans-serif;letter-spacing:.1em">{{ c.channel }}</div>
+                  </div>
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                    <div style="flex:1;min-height:0;overflow:hidden;padding:9px 10px;display:flex;flex-direction:column;gap:7px">
+                      <div style="display:flex;align-items:center;gap:6px">
+                        <div style="font:900 12px/1 Archivo,system-ui,sans-serif">{{ c.order }}</div>
+                        <div style="font:600 10.5px/1 Archivo,system-ui,sans-serif;color:#9b9797">{{ c.name }}</div>
+                      </div>
+                      <sc-for list="{{ c.lines }}" as="ln" hint-placeholder-count="1">
+                        <div style="display:flex;flex-direction:column;gap:3px;opacity:{{ ln.modsOpacity }}">
+                          <div style="font:800 17px/1.05 Archivo,system-ui,sans-serif;color:{{ ln.nameColor }};text-decoration:{{ ln.deco }}">{{ ln.qty }}× {{ ln.name }}</div>
+                          <sc-for list="{{ ln.mods }}" as="m" hint-placeholder-count="2">
+                            <div style="font:700 12px/1.3 Archivo,system-ui,sans-serif;color:{{ m.fg2 }}">{{ m.kind }} {{ m.text }}</div>
+                          </sc-for>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <button type="button" onClick="{{ c.bump }}" style="flex:none;background:#252222;border:0;border-top:1px solid var(--kds-rule);color:#f8f4f4;font:900 11px/1 Archivo,system-ui,sans-serif;letter-spacing:.1em;padding:10px 0;cursor:pointer">{{ c.bumpLabel }}</button>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ c.isC }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;height:100%">
+                  <div style="flex:none;height:6px;background:#3a3636">
+                    <div style="height:6px;width:{{ c.pct }};background:{{ c.tone }}"></div>
+                  </div>
+                  <div style="flex:none;padding:8px 10px 6px;display:flex;align-items:baseline;justify-content:space-between">
+                    <div style="font:900 15px/1 Archivo,system-ui,sans-serif">{{ c.order }}</div>
+                    <div style="font:800 12px/1 ui-monospace,Menlo,monospace;color:#9b9797">{{ c.timeLabel }}</div>
+                  </div>
+                  <div style="flex:1;min-height:0;overflow:hidden;padding:0 10px;display:flex;flex-direction:column;gap:6px">
+                    <sc-for list="{{ c.lines }}" as="ln" hint-placeholder-count="1">
+                      <div style="display:flex;flex-direction:column;gap:5px;opacity:{{ ln.modsOpacity }}">
+                        <div style="font:900 17px/1.05 Archivo,system-ui,sans-serif;letter-spacing:-.01em;color:{{ ln.nameColor }};text-decoration:{{ ln.deco }}">{{ ln.name }}</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:4px">
+                          <sc-for list="{{ ln.mods }}" as="m" hint-placeholder-count="2">
+                            <div style="font:800 11px/1 Archivo,system-ui,sans-serif;padding:5px 6px;border:1px solid {{ m.fg2 }};color:{{ m.fg2 }}">{{ m.kind }} {{ m.text }}</div>
+                          </sc-for>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="flex:none;padding:7px 10px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--kds-rule)">
+                    <div style="font:700 9.5px/1 Archivo,system-ui,sans-serif;letter-spacing:.1em;color:#9b9797">{{ c.channel }} · {{ c.bag }}</div>
+                    <button type="button" onClick="{{ c.bump }}" style="background:transparent;border:1px solid var(--color-accent);color:var(--color-accent);font:900 10px/1 Archivo,system-ui,sans-serif;letter-spacing:.1em;padding:7px 9px;cursor:pointer">{{ c.bumpLabel }}</button>
+                  </div>
+                </div>
+              </sc-if>
+
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ isPlateView }}" hint-placeholder-val="{{ false }}">
+        <div style="height:64px;flex:none;display:flex;align-items:stretch;border-bottom:2px solid var(--kds-rule);background:var(--kds-bar)">
+          <button type="button" onClick="{{ backToBoard }}" style="display:flex;align-items:center;gap:8px;padding:0 18px;border:0;border-right:2px solid var(--kds-rule);background:transparent;color:#f8f4f4;font:900 12px/1 Archivo,system-ui,sans-serif;letter-spacing:.12em;cursor:pointer">‹ BOARD</button>
+          <div style="display:flex;flex-direction:column;justify-content:center;gap:4px;padding:0 18px;border-right:2px solid var(--kds-rule)">
+            <div style="font:800 9px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em;color:#9b9797">PLATE VIEW</div>
+            <div style="font:900 13px/1 Archivo,system-ui,sans-serif">{{ plateContext }}</div>
+          </div>
+          <sc-for list="{{ recipeTabs }}" as="rt" hint-placeholder-count="2">
+            <button type="button" onClick="{{ rt.onClick }}" style="display:flex;align-items:center;padding:0 20px;border:0;border-right:1px solid var(--kds-rule);border-bottom:4px solid {{ rt.underline }};background:{{ rt.bg }};color:{{ rt.color }};font:900 15px/1 Archivo,system-ui,sans-serif;letter-spacing:.02em;cursor:pointer">{{ rt.name }}</button>
+          </sc-for>
+          <div style="flex:1"></div>
+          <div style="display:flex;align-items:center;gap:16px;padding:0 18px;border-left:2px solid var(--kds-rule)">
+            <div style="font:800 11px/1 Archivo,system-ui,sans-serif;letter-spacing:.1em;color:#9b9797">TARGET</div>
+            <div style="font:900 18px/1 ui-monospace,Menlo,monospace;color:#2fd07a">{{ recipe.target }}</div>
+          </div>
+        </div>
+        <div style="flex:1;min-height:0;display:grid;grid-template-columns:340px 1fr 400px">
+          <div style="border-right:2px solid var(--kds-rule);display:flex;flex-direction:column">
+            <div style="flex:none;padding:12px 14px 8px;font:800 10px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em;color:#9b9797">PLATED REFERENCE</div>
+            <div style="flex:1;min-height:0;padding:0 14px 14px;display:flex;flex-direction:column;gap:10px">
+              <div style="flex:1;min-height:0;border:1px solid var(--kds-rule)">
+                <image-slot id="{{ plateSlotA }}" shape="rect" placeholder="Finished plate, cut side up"></image-slot>
+              </div>
+              <div style="flex:1;min-height:0;border:1px solid var(--kds-rule)">
+                <image-slot id="{{ plateSlotB }}" shape="rect" placeholder="Cross-section — stack order visible"></image-slot>
+              </div>
+              <div style="flex:none;background:var(--kds-chit);border-left:4px solid var(--color-accent);padding:10px 12px">
+                <div style="font:800 9.5px/1 Archivo,system-ui,sans-serif;letter-spacing:.12em;color:var(--color-accent-400);margin-bottom:5px">CUT &amp; PRESENT</div>
+                <div style="font:500 12.5px/1.45 Archivo,system-ui,sans-serif;color:#eae7e7">{{ recipe.present }}</div>
+              </div>
+            </div>
+          </div>
+          <div style="border-right:2px solid var(--kds-rule);display:flex;flex-direction:column;min-width:0">
+            <div style="flex:none;display:flex;align-items:baseline;justify-content:space-between;padding:12px 18px 8px">
+              <div style="font:800 10px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em;color:#9b9797">STACK — TOP TO BOTTOM</div>
+              <div style="font:700 10px/1 Archivo,system-ui,sans-serif;letter-spacing:.08em;color:#605d5d">BUILD BOTTOM UP</div>
+            </div>
+            <div style="flex:1;min-height:0;padding:6px 18px 16px;display:flex;flex-direction:column;justify-content:center;gap:5px">
+              <sc-for list="{{ recipe.layers }}" as="l" hint-placeholder-count="9">
+                <div style="display:flex;align-items:center;gap:10px;transform:translateX({{ l.dx }})">
+                  <div style="width:26px;flex:none;font:900 13px/1 ui-monospace,Menlo,monospace;color:#605d5d;text-align:right">{{ l.n }}</div>
+                  <div style="flex:1;min-width:0;height:{{ l.h }};background:{{ l.bg }};color:{{ l.fg }};display:flex;align-items:center;justify-content:space-between;padding:0 12px;border:1px solid rgba(0,0,0,.2)">
+                    <div style="font:800 14px/1 Archivo,system-ui,sans-serif;letter-spacing:-.005em">{{ l.label }}</div>
+                    <div style="font:700 12px/1 ui-monospace,Menlo,monospace;opacity:.7">{{ l.qty }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;min-width:0">
+            <div style="flex:none;padding:12px 16px 6px;font:800 10px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em;color:#9b9797">ORDER OF INGREDIENTS</div>
+            <div style="flex:1;min-height:0;overflow:hidden;padding:0 16px">
+              <sc-for list="{{ recipe.steps }}" as="st" hint-placeholder-count="9">
+                <div style="display:flex;gap:11px;padding:7px 0;border-bottom:1px solid #252222">
+                  <div style="width:22px;flex:none;font:900 13px/1.2 ui-monospace,Menlo,monospace;color:var(--color-accent-400)">{{ st.n }}</div>
+                  <div style="flex:1;min-width:0;font:600 13.5px/1.3 Archivo,system-ui,sans-serif;color:#f8f4f4">{{ st.name }}</div>
+                  <div style="flex:none;font:700 12.5px/1.3 ui-monospace,Menlo,monospace;color:#9b9797">{{ st.qty }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="flex:none;border-top:2px solid var(--kds-rule);padding:12px 16px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;gap:12px">
+                <div style="flex:1;background:var(--kds-chit);padding:9px 11px">
+                  <div style="font:800 9px/1 Archivo,system-ui,sans-serif;letter-spacing:.12em;color:#9b9797;margin-bottom:4px">TIMING</div>
+                  <div style="font:800 13px/1.35 Archivo,system-ui,sans-serif">{{ recipe.timing }}</div>
+                </div>
+                <div style="flex:1;background:var(--kds-chit);padding:9px 11px">
+                  <div style="font:800 9px/1 Archivo,system-ui,sans-serif;letter-spacing:.12em;color:#9b9797;margin-bottom:4px">HOLD</div>
+                  <div style="font:800 13px/1.35 Archivo,system-ui,sans-serif">{{ recipe.hold }}</div>
+                </div>
+              </div>
+              <div style="background:#2a1512;border-left:4px solid var(--color-accent);padding:10px 12px">
+                <div style="font:800 9.5px/1 Archivo,system-ui,sans-serif;letter-spacing:.12em;color:var(--color-accent-400);margin-bottom:5px">GETS SENT BACK WHEN</div>
+                <div style="font:500 12.5px/1.45 Archivo,system-ui,sans-serif;color:#ffc4b8">{{ recipe.mistake }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <div id="1b" style="display:flex;flex-direction:column;gap:9px">
+      <div style="display:flex;align-items:baseline;gap:8px;font:400 11.5px/1.3 Archivo,system-ui,sans-serif;color:#605d5d">
+        <a href="#1b" style="font:800 10.5px/1 ui-monospace,Menlo,monospace;padding:4px 7px;background:rgba(0,0,0,.08);color:#201e1d;letter-spacing:.06em">1B</a>
+        Chit layouts — push one to the board
+      </div>
+      <div style="width:430px;background:var(--kds-board);border:1px solid rgba(0,0,0,.14);box-shadow:0 8px 22px rgba(45,43,43,.2);padding:16px;display:flex;flex-direction:column;gap:14px">
+        <sc-for list="{{ layoutCards }}" as="lc" hint-placeholder-count="3">
+          <div style="display:flex;gap:14px;align-items:stretch">
+            <div style="width:150px;flex:none;display:flex;flex-direction:column;gap:8px">
+              <div style="font:900 13px/1.1 Archivo,system-ui,sans-serif;color:#f8f4f4">{{ lc.title }}</div>
+              <div style="font:400 11px/1.45 Archivo,system-ui,sans-serif;color:#9b9797">{{ lc.blurb }}</div>
+              <button type="button" onClick="{{ lc.onClick }}" style="margin-top:auto;background:{{ lc.bg }};border:1px solid {{ lc.border }};color:{{ lc.color }};font:900 10px/1 Archivo,system-ui,sans-serif;letter-spacing:.09em;padding:9px 10px;cursor:pointer;text-align:left">{{ lc.cta }}</button>
+            </div>
+            <div style="flex:1;min-width:0;height:172px;border:1px dashed #3a3636;padding:8px;display:flex;align-items:center;justify-content:center">
+              <div style="font:800 44px/1 Archivo,system-ui,sans-serif;color:#252222">{{ lc.key }}</div>
+            </div>
+          </div>
+          <div style="height:1px;background:#3a3636"></div>
+        </sc-for>
+        <div style="font:400 10.5px/1.5 Archivo,system-ui,sans-serif;color:#605d5d">A is the default: full ticket context, dedicated bump. B trades detail for a giant timer column readable from the fry station. C uses a burn-down rail so cooks read remaining time, not elapsed.</div>
+      </div>
+    </div>
+
+    <div id="1d" style="display:flex;flex-direction:column;gap:9px">
+      <div style="display:flex;align-items:baseline;gap:8px;font:400 11.5px/1.3 Archivo,system-ui,sans-serif;color:#605d5d">
+        <a href="#1d" style="font:800 10.5px/1 ui-monospace,Menlo,monospace;padding:4px 7px;background:rgba(0,0,0,.08);color:#201e1d;letter-spacing:.06em">1D</a>
+        Kiosk — 1080×1920 floor unit, two concepts on one screen, grid/list layout toggle, one order to review
+      </div>
+      <div style="width:1080px;height:1920px;background:var(--color-bg);border:1px solid rgba(0,0,0,.14);box-shadow:0 14px 34px rgba(45,43,43,.24);display:flex;flex-direction:column;overflow:hidden;color:#201e1d">
+
+        <div style="flex:none;height:124px;display:flex;align-items:stretch;background:var(--kios-chrome);color:#f8f4f4">
+          <sc-for list="{{ brands }}" as="b" hint-placeholder-count="2">
+            <button type="button" onClick="{{ b.onClick }}" style="flex:1;display:flex;align-items:center;gap:16px;padding:0 32px;border:0;border-right:1px solid var(--kds-rule);border-bottom:7px solid {{ b.bar }};background:{{ b.bg }};color:{{ b.color }};cursor:pointer;text-align:left">
+              <span style="width:34px;height:34px;flex:none;background:{{ b.mark }};border:2px solid {{ b.markBorder }}"></span>
+              <span style="display:flex;flex-direction:column;gap:7px">
+                <span style="font:900 23px/1 Archivo,system-ui,sans-serif;letter-spacing:.13em">{{ b.name }}</span>
+                <span style="font:600 12px/1 Archivo,system-ui,sans-serif;letter-spacing:.1em;opacity:.72">{{ b.sub }}</span>
+              </span>
+            </button>
+          </sc-for>
+          <div style="width:280px;flex:none;display:flex;flex-direction:column;justify-content:center;gap:12px;padding:0 26px">
+            <div style="font:700 12px/1.35 Archivo,system-ui,sans-serif;letter-spacing:.1em;color:#9b9797">{{ kioskStepLabel }}</div>
+            <div style="display:flex;gap:0">
+              <sc-for list="{{ kioskLayouts }}" as="kl" hint-placeholder-count="2">
+                <button type="button" onClick="{{ kl.onClick }}" style="flex:1;padding:12px 12px;border:2px solid {{ kl.border }};background:{{ kl.bg }};color:{{ kl.color }};font:900 12px/1 Archivo,system-ui,sans-serif;letter-spacing:.09em;cursor:pointer;text-align:left">{{ kl.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <sc-if value="{{ isBrowse }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:none;height:190px;display:flex;background:var(--kios-chrome);color:#f8f4f4;border-bottom:2px solid var(--color-divider)">
+            <div style="flex:1;min-width:0;padding:30px 40px;display:flex;flex-direction:column;justify-content:center;gap:12px">
+              <div style="font:900 12px/1 Archivo,system-ui,sans-serif;letter-spacing:.16em;color:var(--color-accent)">{{ ad.kicker }}</div>
+              <div style="font:900 40px/1.02 Archivo,system-ui,sans-serif;letter-spacing:-.02em">{{ ad.headline }}</div>
+              <div style="font:500 17px/1.35 Archivo,system-ui,sans-serif;color:#bab6b6">{{ ad.body }}</div>
+            </div>
+            <div style="flex:none;width:120px;display:flex;flex-direction:column;justify-content:center;gap:10px;padding:0 8px">
+              <sc-for list="{{ adDots }}" as="d" hint-placeholder-count="3">
+                <button type="button" onClick="{{ d.onClick }}" style="width:100%;height:8px;border:0;padding:0;background:{{ d.bg }};cursor:pointer"></button>
+              </sc-for>
+            </div>
+            <div style="flex:none;width:300px;border-left:2px solid var(--kds-rule)">
+              <image-slot id="{{ ad.slotId }}" shape="rect" placeholder="{{ ad.slotHint }}"></image-slot>
+            </div>
+          </div>
+
+          <sc-if value="{{ isGridBrowse }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+            <div style="flex:none;padding:36px 40px 26px;border-bottom:2px solid var(--color-divider)">
+              <div style="font:900 62px/1 Archivo,system-ui,sans-serif;letter-spacing:-.02em;margin-bottom:10px">{{ browseTitle }}</div>
+              <div style="font:500 22px/1.4 Archivo,system-ui,sans-serif;color:#605d5d">{{ browseSub }}</div>
+            </div>
+            <div style="flex:none;display:flex;border-bottom:2px solid var(--color-divider)">
+              <sc-for list="{{ cats }}" as="ct" hint-placeholder-count="4">
+                <button type="button" onClick="{{ ct.onClick }}" style="flex:1;padding:24px 18px;border:0;border-right:1px solid var(--color-divider);border-bottom:6px solid {{ ct.underline }};background:{{ ct.bg }};color:{{ ct.color }};font:900 21px/1 Archivo,system-ui,sans-serif;letter-spacing:.03em;cursor:pointer;text-align:left">{{ ct.label }}</button>
+              </sc-for>
+            </div>
+            <div style="flex:1;min-height:0;overflow:hidden;padding:28px 40px;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:min-content;gap:24px;align-content:start">
+              <sc-for list="{{ menu }}" as="mi" hint-placeholder-count="6">
+                <button type="button" onClick="{{ mi.onClick }}" style="display:flex;flex-direction:column;align-items:stretch;text-align:left;background:#fff;border:1px solid var(--color-divider);padding:0;cursor:pointer">
+                  <div style="height:220px;border-bottom:1px solid var(--color-divider);position:relative">
+                    <image-slot id="{{ mi.slotId }}" shape="rect" placeholder="{{ mi.slotHint }}"></image-slot>
+                  </div>
+                  <div style="padding:20px 22px 22px;display:flex;flex-direction:column;gap:8px">
+                    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+                      <div style="font:900 27px/1.05 Archivo,system-ui,sans-serif;letter-spacing:-.015em">{{ mi.name }}</div>
+                      <div style="font:900 24px/1 ui-monospace,Menlo,monospace;color:var(--color-accent-700)">{{ mi.priceLabel }}</div>
+                    </div>
+                    <div style="font:500 16px/1.4 Archivo,system-ui,sans-serif;color:#605d5d;text-wrap:pretty">{{ mi.desc }}</div>
+                    <sc-if value="{{ mi.tag }}" hint-placeholder-val="{{ false }}">
+                      <div style="align-self:flex-start;margin-top:4px;font:900 12px/1 Archivo,system-ui,sans-serif;letter-spacing:.1em;padding:8px 10px;background:var(--color-accent);color:#fff">{{ mi.tag }}</div>
+                    </sc-if>
+                  </div>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          </sc-if>
+
+          <sc-if value="{{ isRailBrowse }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;min-height:0;display:flex">
+            <div style="width:280px;flex:none;background:var(--kios-chrome);color:#f8f4f4;display:flex;flex-direction:column">
+              <div style="padding:26px 24px;border-bottom:2px solid var(--kds-rule);font:900 14px/1 Archivo,system-ui,sans-serif;letter-spacing:.12em;color:#9b9797">MENU</div>
+              <sc-for list="{{ cats }}" as="ct" hint-placeholder-count="4">
+                <button type="button" onClick="{{ ct.onClick }}" style="padding:28px 24px;border:0;border-bottom:1px solid var(--kds-rule);border-left:8px solid {{ ct.railBar }};background:{{ ct.railBg }};color:{{ ct.railColor }};font:900 20px/1.15 Archivo,system-ui,sans-serif;letter-spacing:.02em;cursor:pointer;text-align:left">{{ ct.label }}</button>
+              </sc-for>
+              <div style="margin-top:auto;padding:24px;font:500 13px/1.5 Archivo,system-ui,sans-serif;color:#9b9797">{{ railFootnote }}</div>
+            </div>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+              <div style="flex:none;padding:40px 40px 20px;border-bottom:2px solid var(--color-divider);display:flex;align-items:flex-end;justify-content:space-between;gap:20px">
+                <div style="font:900 66px/.98 Archivo,system-ui,sans-serif;letter-spacing:-.03em">{{ catTitle }}</div>
+                <div style="font:800 14px/1 Archivo,system-ui,sans-serif;letter-spacing:.12em;color:#605d5d">{{ catCountLabel }}</div>
+              </div>
+              <div style="flex:1;min-height:0;overflow:hidden">
+                <sc-for list="{{ menu }}" as="mi" hint-placeholder-count="5">
+                  <button type="button" onClick="{{ mi.onClick }}" style="width:100%;display:flex;align-items:center;gap:24px;padding:24px 40px;border:0;border-bottom:1px solid var(--color-divider);background:transparent;cursor:pointer;text-align:left">
+                    <div style="width:104px;height:104px;flex:none;border:1px solid var(--color-divider)">
+                      <image-slot id="{{ mi.slotId }}" shape="rect" placeholder="—"></image-slot>
+                    </div>
+                    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:7px">
+                      <div style="display:flex;align-items:baseline;gap:12px">
+                        <div style="font:900 30px/1.02 Archivo,system-ui,sans-serif;letter-spacing:-.02em">{{ mi.name }}</div>
+                        <sc-if value="{{ mi.tag }}" hint-placeholder-val="{{ false }}">
+                          <div style="font:900 11px/1 Archivo,system-ui,sans-serif;letter-spacing:.1em;padding:7px 9px;background:var(--color-accent);color:#fff">{{ mi.tag }}</div>
+                        </sc-if>
+                      </div>
+                      <div style="font:500 16px/1.4 Archivo,system-ui,sans-serif;color:#605d5d;text-wrap:pretty">{{ mi.desc }}</div>
+                    </div>
+                    <div style="flex:none;font:900 28px/1 ui-monospace,Menlo,monospace;color:var(--color-accent-700)">{{ mi.priceLabel }}</div>
+                    <div style="flex:none;width:60px;height:60px;background:var(--color-accent);color:#fff;font:900 28px/1 Archivo,system-ui,sans-serif;display:flex;align-items:center;justify-content:center">+</div>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          </sc-if>
+
+          <div style="flex:none;border-top:2px solid var(--color-divider);background:#fff;padding:20px 40px 24px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:baseline;gap:14px">
+              <div style="font:900 14px/1 Archivo,system-ui,sans-serif;letter-spacing:.13em">SUGGESTED WITH YOUR ORDER</div>
+              <div style="font:600 13px/1 Archivo,system-ui,sans-serif;letter-spacing:.06em;color:#605d5d">{{ suggestNote }}</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+              <sc-for list="{{ suggestions }}" as="sg" hint-placeholder-count="3">
+                <button type="button" onClick="{{ sg.onClick }}" style="display:flex;align-items:center;gap:14px;padding:16px 16px;border:2px solid rgba(32,30,29,.28);background:var(--color-bg);cursor:pointer;text-align:left">
+                  <span style="width:56px;height:56px;flex:none;border:1px solid var(--color-divider);overflow:hidden">
+                    <image-slot id="{{ sg.slotId }}" shape="rect" placeholder="—"></image-slot>
+                  </span>
+                  <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+                    <span style="font:900 19px/1.1 Archivo,system-ui,sans-serif;letter-spacing:-.01em">{{ sg.name }}</span>
+                    <span style="font:700 12px/1 Archivo,system-ui,sans-serif;letter-spacing:.08em;color:#605d5d">{{ sg.from }}</span>
+                  </span>
+                  <span style="flex:none;display:flex;align-items:center;gap:10px">
+                    <span style="font:900 18px/1 ui-monospace,Menlo,monospace;color:var(--color-accent-700)">{{ sg.priceLabel }}</span>
+                    <span style="width:40px;height:40px;background:var(--color-accent);color:#fff;font:900 22px/1 Archivo,system-ui,sans-serif;display:flex;align-items:center;justify-content:center">+</span>
+                  </span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isItem }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+            <div style="flex:none;display:flex;gap:0;border-bottom:2px solid var(--color-divider)">
+              <div style="width:420px;flex:none;height:300px;border-right:2px solid var(--color-divider)">
+                <image-slot id="{{ itemSlotId }}" shape="rect" placeholder="{{ itemSlotHint }}"></image-slot>
+              </div>
+              <div style="flex:1;min-width:0;padding:30px 36px;display:flex;flex-direction:column;gap:10px">
+                <button type="button" onClick="{{ backToBrowse }}" style="align-self:flex-start;background:transparent;border:1px solid var(--color-divider);color:#201e1d;font:900 13px/1 Archivo,system-ui,sans-serif;letter-spacing:.1em;padding:11px 13px;cursor:pointer">‹ BACK</button>
+                <div style="font:900 48px/1.02 Archivo,system-ui,sans-serif;letter-spacing:-.02em;margin-top:6px">{{ item.name }}</div>
+                <div style="font:500 18px/1.4 Archivo,system-ui,sans-serif;color:#605d5d">{{ item.desc }}</div>
+                <div style="margin-top:auto;font:900 32px/1 ui-monospace,Menlo,monospace;color:var(--color-accent-700)">{{ runningLabel }}</div>
+              </div>
+            </div>
+            <div style="flex:1;min-height:0;overflow:hidden;padding:26px 40px;display:flex;flex-direction:column;gap:24px">
+              <sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+                <div style="display:flex;flex-direction:column;gap:12px">
+                  <div style="display:flex;align-items:baseline;gap:12px">
+                    <div style="font:900 22px/1 Archivo,system-ui,sans-serif;letter-spacing:.02em">{{ g.title }}</div>
+                    <div style="font:700 14px/1 Archivo,system-ui,sans-serif;letter-spacing:.06em;color:{{ g.noteColor }}">{{ g.note }}</div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+                    <sc-for list="{{ g.options }}" as="o" hint-placeholder-count="3">
+                      <button type="button" onClick="{{ o.onClick }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:20px 18px;border:2px solid {{ o.border }};background:{{ o.bg }};color:{{ o.color }};font:800 18px/1.1 Archivo,system-ui,sans-serif;cursor:pointer;text-align:left">
+                        <span>{{ o.label }}</span>
+                        <span style="font:700 15px/1 ui-monospace,Menlo,monospace;opacity:.75">{{ o.priceLabel }}</span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="flex:none;display:flex;border-top:2px solid var(--color-divider)">
+              <button type="button" onClick="{{ backToBrowse }}" style="width:280px;flex:none;padding:34px;border:0;border-right:2px solid var(--color-divider);background:var(--color-bg);color:#201e1d;font:900 20px/1 Archivo,system-ui,sans-serif;letter-spacing:.08em;cursor:pointer;text-align:left">CANCEL</button>
+              <button type="button" onClick="{{ addItem }}" style="flex:1;padding:34px 36px;border:0;background:var(--color-accent);color:#fff;font:900 26px/1 Archivo,system-ui,sans-serif;letter-spacing:.04em;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between">
+                <span>ADD TO ORDER</span><span style="font-family:ui-monospace,Menlo,monospace">{{ runningLabel }}</span>
+              </button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isCombo }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+            <div style="flex:none;background:var(--color-accent);color:#fff;padding:44px 40px 40px">
+              <div style="font:900 15px/1 Archivo,system-ui,sans-serif;letter-spacing:.16em;margin-bottom:16px">AUTO-COMBO FOUND</div>
+              <div style="font:900 66px/1 Archivo,system-ui,sans-serif;letter-spacing:-.025em;margin-bottom:14px">Make it a combo,<br>save {{ comboSaveLabel }}.</div>
+              <div style="font:600 22px/1.35 Archivo,system-ui,sans-serif;max-width:760px">A side and a drink with your {{ comboAnchor }} price out as a combo automatically. Pick your two — or keep it plain.</div>
+            </div>
+            <div style="flex:1;min-height:0;overflow:hidden;padding:32px 40px;display:flex;flex-direction:column;gap:26px">
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="font:900 24px/1 Archivo,system-ui,sans-serif;letter-spacing:.02em">1 — PICK A SIDE</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+                  <sc-for list="{{ comboSides }}" as="s" hint-placeholder-count="3">
+                    <button type="button" onClick="{{ s.onClick }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:22px;border:2px solid {{ s.border }};background:{{ s.bg }};color:{{ s.color }};cursor:pointer;text-align:left">
+                      <span style="font:900 22px/1.1 Archivo,system-ui,sans-serif">{{ s.name }}</span>
+                      <span style="font:700 15px/1 ui-monospace,Menlo,monospace;opacity:.75">{{ s.upLabel }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="font:900 24px/1 Archivo,system-ui,sans-serif;letter-spacing:.02em">2 — PICK A DRINK</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+                  <sc-for list="{{ comboDrinks }}" as="d" hint-placeholder-count="3">
+                    <button type="button" onClick="{{ d.onClick }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:22px;border:2px solid {{ d.border }};background:{{ d.bg }};color:{{ d.color }};cursor:pointer;text-align:left">
+                      <span style="font:900 22px/1.1 Archivo,system-ui,sans-serif">{{ d.name }}</span>
+                      <span style="font:700 15px/1 ui-monospace,Menlo,monospace;opacity:.75">{{ d.upLabel }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="margin-top:auto;background:#fff;border:1px solid var(--color-divider);padding:24px 26px;display:flex;align-items:center;justify-content:space-between">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="font:800 13px/1 Archivo,system-ui,sans-serif;letter-spacing:.12em;color:#605d5d">À LA CARTE {{ alaCarteLabel }}</div>
+                  <div style="font:900 30px/1 Archivo,system-ui,sans-serif">Combo {{ comboTotalLabel }}</div>
+                </div>
+                <div style="font:900 20px/1 Archivo,system-ui,sans-serif;letter-spacing:.06em;color:var(--color-accent-700)">YOU SAVE {{ comboSaveLabel }}</div>
+              </div>
+            </div>
+            <div style="flex:none;display:flex;border-top:2px solid var(--color-divider)">
+              <button type="button" onClick="{{ skipCombo }}" style="width:340px;flex:none;padding:34px;border:0;border-right:2px solid var(--color-divider);background:var(--color-bg);color:#201e1d;font:900 20px/1 Archivo,system-ui,sans-serif;letter-spacing:.06em;cursor:pointer;text-align:left">NO THANKS</button>
+              <button type="button" onClick="{{ acceptCombo }}" style="flex:1;padding:34px 36px;border:0;background:{{ comboCtaBg }};color:#fff;font:900 26px/1 Archivo,system-ui,sans-serif;letter-spacing:.04em;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between">
+                <span>{{ comboCtaLabel }}</span><span style="font-family:ui-monospace,Menlo,monospace">{{ comboAddLabel }}</span>
+              </button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isCart }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+            <div style="flex:none;padding:36px 40px 24px;border-bottom:2px solid var(--color-divider);display:flex;align-items:flex-end;justify-content:space-between">
+              <div>
+                <div style="font:900 56px/1 Archivo,system-ui,sans-serif;letter-spacing:-.02em">Review your order</div>
+                <div style="font:500 19px/1.4 Archivo,system-ui,sans-serif;color:#605d5d;margin-top:8px">{{ cartCountLabel }} · {{ counterSplitLabel }} · nothing is sent until you submit</div>
+              </div>
+              <button type="button" onClick="{{ backToBrowse }}" style="background:transparent;border:1px solid var(--color-divider);color:#201e1d;font:900 15px/1 Archivo,system-ui,sans-serif;letter-spacing:.08em;padding:16px 18px;cursor:pointer">+ ADD MORE</button>
+            </div>
+            <div style="flex:1;min-height:0;overflow:hidden;padding:0 40px">
+              <sc-for list="{{ cartGroups }}" as="cg" hint-placeholder-count="2">
+                <div style="display:flex;flex-direction:column;border-bottom:2px solid var(--color-divider)">
+                  <div style="display:flex;align-items:center;gap:14px;padding:22px 0 14px">
+                    <span style="width:22px;height:22px;flex:none;background:{{ cg.mark }};border:2px solid #201e1d"></span>
+                    <span style="font:900 20px/1 Archivo,system-ui,sans-serif;letter-spacing:.12em">{{ cg.label }}</span>
+                    <span style="font:700 14px/1 Archivo,system-ui,sans-serif;letter-spacing:.08em;color:#605d5d">{{ cg.note }}</span>
+                    <span style="flex:1;height:2px;background:var(--color-divider)"></span>
+                    <span style="font:900 18px/1 ui-monospace,Menlo,monospace">{{ cg.sumLabel }}</span>
+                  </div>
+                  <sc-for list="{{ cg.lines }}" as="cl" hint-placeholder-count="2">
+                    <div style="display:flex;gap:20px;padding:20px 0;border-top:1px solid var(--color-divider)">
+                      <div style="width:52px;flex:none;font:900 26px/1 ui-monospace,Menlo,monospace;color:#9b9797">{{ cl.qty }}×</div>
+                      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+                        <div style="font:900 28px/1.05 Archivo,system-ui,sans-serif;letter-spacing:-.015em">{{ cl.name }}</div>
+                        <sc-if value="{{ cl.modsLabel }}" hint-placeholder-val="{{ false }}">
+                          <div style="font:600 16px/1.4 Archivo,system-ui,sans-serif;color:#605d5d">{{ cl.modsLabel }}</div>
+                        </sc-if>
+                        <sc-if value="{{ cl.comboLabel }}" hint-placeholder-val="{{ false }}">
+                          <div style="align-self:flex-start;font:900 12px/1 Archivo,system-ui,sans-serif;letter-spacing:.1em;padding:8px 10px;background:var(--color-accent-200);color:var(--color-accent-800)">{{ cl.comboLabel }}</div>
+                        </sc-if>
+                      </div>
+                      <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:12px">
+                        <div style="font:900 26px/1 ui-monospace,Menlo,monospace">{{ cl.priceLabel }}</div>
+                        <button type="button" onClick="{{ cl.onRemove }}" style="background:transparent;border:1px solid var(--color-divider);color:#605d5d;font:800 12px/1 Archivo,system-ui,sans-serif;letter-spacing:.1em;padding:10px 12px;cursor:pointer">REMOVE</button>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+              <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:60px 0;font:600 22px/1.4 Archivo,system-ui,sans-serif;color:#9b9797">Nothing in the bag yet.</div>
+              </sc-if>
+            </div>
+            <div style="flex:none;border-top:2px solid var(--color-divider);padding:28px 40px 0;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;font:600 19px/1 Archivo,system-ui,sans-serif;color:#605d5d"><span>Subtotal</span><span style="font-family:ui-monospace,Menlo,monospace">{{ subtotalLabel }}</span></div>
+              <sc-if value="{{ hasSavings }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;justify-content:space-between;font:800 19px/1 Archivo,system-ui,sans-serif;color:var(--color-accent-700)"><span>Combo savings</span><span style="font-family:ui-monospace,Menlo,monospace">−{{ savingsLabel }}</span></div>
+              </sc-if>
+              <div style="display:flex;justify-content:space-between;font:600 19px/1 Archivo,system-ui,sans-serif;color:#605d5d"><span>Tax</span><span style="font-family:ui-monospace,Menlo,monospace">{{ taxLabel }}</span></div>
+              <div style="height:2px;background:var(--color-divider);margin:6px 0"></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;font:900 42px/1 Archivo,system-ui,sans-serif"><span>Total</span><span style="font-family:ui-monospace,Menlo,monospace">{{ totalLabel }}</span></div>
+              <div style="display:flex;gap:14px;margin:20px -40px 0">
+                <button type="button" onClick="{{ resetKiosk }}" style="width:300px;flex:none;padding:34px 40px;border:0;background:var(--color-bg);border-right:2px solid var(--color-divider);border-top:2px solid var(--color-divider);color:#605d5d;font:900 20px/1 Archivo,system-ui,sans-serif;letter-spacing:.06em;cursor:pointer;text-align:left">START OVER</button>
+                <button type="button" onClick="{{ pay }}" style="flex:1;padding:34px 36px;border:0;border-top:2px solid var(--color-divider);background:var(--kios-chrome);color:#fff;font:900 26px/1 Archivo,system-ui,sans-serif;letter-spacing:.04em;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between">
+                  <span>SUBMIT ORDER</span><span style="font-family:ui-monospace,Menlo,monospace">{{ totalLabel }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:34px;padding:0 40px;background:var(--color-accent);color:#fff">
+            <div style="font:900 17px/1 Archivo,system-ui,sans-serif;letter-spacing:.18em">ORDER SENT TO THE KITCHEN</div>
+            <div style="font:900 200px/.86 Archivo,system-ui,sans-serif;letter-spacing:-.04em">{{ orderNumber }}</div>
+            <div style="font:600 30px/1.3 Archivo,system-ui,sans-serif;max-width:820px">{{ doneNote }}</div>
+            <button type="button" onClick="{{ resetKiosk }}" style="align-self:flex-start;margin-top:20px;background:transparent;border:2px solid #fff;color:#fff;font:900 20px/1 Archivo,system-ui,sans-serif;letter-spacing:.08em;padding:24px 28px;cursor:pointer">NEW ORDER</button>
+          </div>
+        </sc-if>
+
+        <div style="flex:none;height:96px;display:flex;align-items:stretch;border-top:2px solid var(--color-divider);background:#fff">
+          <div style="flex:1;display:flex;align-items:center;gap:18px;padding:0 40px">
+            <div style="font:800 13px/1 Archivo,system-ui,sans-serif;letter-spacing:.12em;color:#605d5d">IN BAG</div>
+            <div style="font:900 30px/1 Archivo,system-ui,sans-serif">{{ cartCount }}</div>
+            <div style="font:900 30px/1 ui-monospace,Menlo,monospace;color:var(--color-accent-700)">{{ totalLabel }}</div>
+          </div>
+          <button type="button" onClick="{{ goCart }}" style="width:420px;flex:none;border:0;background:var(--color-accent);color:#fff;font:900 24px/1 Archivo,system-ui,sans-serif;letter-spacing:.06em;cursor:pointer;text-align:left;padding:0 32px;display:flex;align-items:center">REVIEW &amp; PAY ›</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="1e" style="display:flex;flex-direction:column;gap:9px">
+      <div style="display:flex;align-items:baseline;gap:8px;font:400 11.5px/1.3 Archivo,system-ui,sans-serif;color:#605d5d">
+        <a href="#1e" style="font:800 10.5px/1 ui-monospace,Menlo,monospace;padding:4px 7px;background:rgba(0,0,0,.08);color:#201e1d;letter-spacing:.06em">1E</a>
+        Menu board — 3 × 1920×1080 screens: deli over 1.5, tea bar over 1.5, dayparts switch on the clock
+      </div>
+
+      <div style="width:1920px;display:flex;flex-direction:column;gap:20px;font-family:Archivo,system-ui,sans-serif">
+
+        <div style="display:flex;align-items:stretch;height:74px;background:var(--kios-chrome);color:#f8f4f4;border:1px solid rgba(0,0,0,.14)">
+          <div style="display:flex;align-items:center;gap:14px;padding:0 26px;border-right:2px solid #3a3636">
+            <div style="font:900 15px/1 Archivo,system-ui,sans-serif;letter-spacing:.16em">DAYPART</div>
+            <div style="font:600 14px/1 Archivo,system-ui,sans-serif;color:#8d8888">switches on the clock · {{ boardClock }} · now serving {{ boardAuto }}</div>
+          </div>
+          <sc-for list="{{ boardTabs }}" as="d" hint-placeholder-count="3">
+            <button type="button" onClick="{{ d.onClick }}" style="border:0;border-right:1px solid #3a3636;background:{{ d.bg }};color:{{ d.color }};padding:0 30px;display:flex;align-items:center;gap:14px;cursor:pointer;font-family:Archivo,system-ui,sans-serif">
+              <span style="font:900 15px/1;letter-spacing:.12em">{{ d.label }}</span>
+              <span style="font:600 13px/1 ui-monospace,Menlo,monospace;opacity:.7">{{ d.hours }}</span>
+              <span style="font:900 11px/1;letter-spacing:.1em;opacity:.8">{{ d.auto }}</span>
+            </button>
+          </sc-for>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:16px;padding:0 26px;border-left:2px solid #3a3636">
+            <div style="font:900 13px/1 Archivo,system-ui,sans-serif;letter-spacing:.16em;color:#8d8888">ACCENT</div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <sc-for list="{{ accentSwatches }}" as="c" hint-placeholder-count="6">
+                <button type="button" onClick="{{ c.onClick }}" title="{{ c.hex }}" style="width:38px;height:38px;padding:0;border:2px solid {{ c.border }};background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center">
+                  <span style="width:{{ c.size }};height:{{ c.size }};background:{{ c.hex }};display:block"></span>
+                </button>
+              </sc-for>
+            </div>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+              <span style="font:700 13px/1 Archivo,system-ui,sans-serif;letter-spacing:.06em;color:#8d8888">CUSTOM</span>
+              <input type="color" value="{{ accentValue }}" onInput="{{ onAccentInput }}" style="width:44px;height:30px;padding:0;border:1px solid #3a3636;background:transparent;cursor:pointer">
+            </label>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:60px">
+
+          <div style="font:900 15px/1 ui-monospace,Menlo,monospace;letter-spacing:.1em;color:#605d5d">
+            <span style="padding:5px 10px;background:#201e1d;color:#f8f4f4;margin-right:10px">SCREEN 1</span>DELI SIDE · MAIN COUNTER
+          </div>
+
+          <div style="width:1920px;height:1080px;flex:none;background:var(--color-bg);color:#201e1d;border:1px solid rgba(0,0,0,.14);box-shadow:0 14px 34px rgba(45,43,43,.24);overflow:hidden;display:flex;flex-direction:column;position:relative">
+            <div style="flex:none;height:112px;display:flex;align-items:center;justify-content:space-between;padding:0 56px;background:var(--kios-chrome);color:#f8f4f4">
+              <div style="display:flex;align-items:center;gap:18px">
+                <div style="width:34px;height:34px;background:var(--color-accent)"></div>
+                <div style="font:900 30px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em">DELI COUNTER</div>
+              </div>
+              <div style="display:flex;align-items:baseline;gap:20px">
+                <div style="font:900 26px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em;color:var(--color-accent)">{{ boardDaypart }}</div>
+                <div style="font:700 22px/1 ui-monospace,Menlo,monospace;color:#bab6b6">{{ boardHours }}</div>
+              </div>
+            </div>
+            <div style="flex:none;padding:44px 56px 34px;border-bottom:2px solid var(--color-divider);display:flex;flex-direction:column;gap:14px">
+              <div style="font:900 78px/1 Archivo,system-ui,sans-serif;letter-spacing:-.03em">{{ boardHead }}</div>
+              <div style="font:500 28px/1.35 Archivo,system-ui,sans-serif;color:#605d5d;max-width:1400px;text-wrap:pretty">{{ boardBlurb }}</div>
+            </div>
+            <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+              <sc-for list="{{ deliMains }}" as="m" hint-placeholder-count="5">
+                <div style="flex:1;display:flex;align-items:center;gap:34px;padding:0 56px;border-bottom:1px solid rgba(32,30,29,.14)">
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:9px">
+                    <div style="display:flex;align-items:center;gap:16px">
+                      <div style="font:900 50px/1 Archivo,system-ui,sans-serif;letter-spacing:-.02em">{{ m.name }}</div>
+                      <sc-if value="{{ m.tag }}" hint-placeholder-val="{{ false }}">
+                        <div style="font:900 16px/1 Archivo,system-ui,sans-serif;letter-spacing:.12em;padding:9px 11px;background:var(--color-accent);color:#fff">{{ m.tag }}</div>
+                      </sc-if>
+                    </div>
+                    <div style="font:500 27px/1.3 Archivo,system-ui,sans-serif;color:#605d5d">{{ m.desc }}</div>
+                  </div>
+                  <div style="flex:none;font:900 50px/1 ui-monospace,Menlo,monospace;color:var(--color-accent-700)">{{ m.priceLabel }}</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="position:absolute;inset:0;background:var(--color-accent);overflow:hidden;pointer-events:none;animation:ilude 30s ease-in-out infinite">
+              <div style="position:absolute;left:56px;top:70px;font:900 130px/.92 Archivo,system-ui,sans-serif;letter-spacing:-.04em;color:#0e0d0d">Off the<br>grill.</div>
+              <div style="position:absolute;left:60px;bottom:52px;font:900 26px/1 Archivo,system-ui,sans-serif;letter-spacing:.16em;color:#0e0d0d">DELI COUNTER · {{ boardHours }}</div>
+              <div style="position:absolute;right:70px;top:180px;width:1000px;height:740px">
+                <div style="position:absolute;left:250px;bottom:346px;width:56px;height:120px;background:#0e0d0d;clip-path:polygon(30% 100%,70% 100%,100% 34%,52% 0%,4% 40%);transform-origin:bottom;animation:smokerise 1.7s linear infinite"></div>
+                <div style="position:absolute;left:470px;bottom:346px;width:64px;height:150px;background:#0e0d0d;clip-path:polygon(32% 100%,68% 100%,96% 40%,46% 0%,0% 46%);transform-origin:bottom;animation:smokerise 2.1s linear infinite;animation-delay:.5s"></div>
+                <div style="position:absolute;left:680px;bottom:346px;width:52px;height:110px;background:#0e0d0d;clip-path:polygon(30% 100%,70% 100%,100% 38%,50% 0%,6% 44%);transform-origin:bottom;animation:smokerise 1.9s linear infinite;animation-delay:.9s"></div>
+                <div style="position:absolute;left:90px;bottom:250px;width:130px;height:170px;background:#0e0d0d;clip-path:polygon(50% 0%,100% 100%,0% 100%);transform-origin:bottom;animation:flamelick .7s ease-in-out infinite"></div>
+                <div style="position:absolute;left:330px;bottom:250px;width:160px;height:210px;background:#0e0d0d;clip-path:polygon(50% 0%,100% 100%,0% 100%);transform-origin:bottom;animation:flamelick .82s ease-in-out infinite;animation-delay:.2s"></div>
+                <div style="position:absolute;left:600px;bottom:250px;width:140px;height:180px;background:#0e0d0d;clip-path:polygon(50% 0%,100% 100%,0% 100%);transform-origin:bottom;animation:flamelick .64s ease-in-out infinite;animation-delay:.4s"></div>
+                <div style="position:absolute;left:790px;bottom:250px;width:120px;height:150px;background:#0e0d0d;clip-path:polygon(50% 0%,100% 100%,0% 100%);transform-origin:bottom;animation:flamelick .76s ease-in-out infinite;animation-delay:.1s"></div>
+                <div style="position:absolute;left:180px;bottom:236px;width:640px;height:120px;background:#0e0d0d;clip-path:polygon(6% 26%,26% 4%,58% 0%,88% 12%,100% 44%,94% 78%,68% 100%,32% 96%,8% 74%,0% 48%);animation:grilldrop 30s cubic-bezier(.2,.9,.2,1) infinite"></div>
+                <div style="position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;gap:26px">
+                  <div style="height:24px;background:#0e0d0d"></div>
+                  <div style="height:24px;background:#0e0d0d"></div>
+                  <div style="height:24px;background:#0e0d0d"></div>
+                  <div style="height:24px;background:#0e0d0d"></div>
+                  <div style="height:24px;background:#0e0d0d"></div>
+                </div>
+              </div>
+              <div style="position:absolute;left:-10%;right:-10%;bottom:0;height:150%;background:#0e0d0d;border-radius:46% 54% 0 0 / 90px 110px 0 0;animation:iludewave 30s cubic-bezier(.5,0,.4,1) infinite"></div>
+            </div>
+          </div>
+
+          <div style="font:900 15px/1 ui-monospace,Menlo,monospace;letter-spacing:.1em;color:#605d5d">
+            <span style="padding:5px 10px;background:#201e1d;color:#f8f4f4;margin-right:10px">SCREEN 2</span>DELI SIDES + TEA BAR SPLIT
+          </div>
+
+          <div style="width:1920px;height:1080px;flex:none;background:var(--color-bg);color:#201e1d;border:1px solid rgba(0,0,0,.14);box-shadow:0 14px 34px rgba(45,43,43,.24);overflow:hidden;display:flex">
+            <div style="width:958px;flex:none;border-right:2px solid var(--color-divider);display:flex;flex-direction:column;position:relative">
+              <div style="flex:none;height:112px;display:flex;align-items:center;padding:0 44px;background:var(--kios-chrome);color:#f8f4f4">
+                <div style="font:900 26px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em">SIDES &amp; EXTRAS</div>
+              </div>
+              <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+                <sc-for list="{{ deliSides }}" as="m" hint-placeholder-count="4">
+                  <div style="flex:1;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 44px;border-bottom:1px solid rgba(32,30,29,.14)">
+                    <div style="font:800 38px/1 Archivo,system-ui,sans-serif;letter-spacing:-.015em">{{ m.name }}</div>
+                    <div style="font:900 38px/1 ui-monospace,Menlo,monospace;color:var(--color-accent-700)">{{ m.priceLabel }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="flex:none;height:470px;position:relative;overflow:hidden;background:var(--kios-chrome);color:#f8f4f4">
+                <div style="position:absolute;inset:0;opacity:.4;animation:adzoom 14s ease-in-out infinite alternate">
+                  <image-slot id="{{ deliAd.slot }}" shape="rect" placeholder="{{ deliAd.hint }}"></image-slot>
+                </div>
+                <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,18,18,.92) 0%,rgba(20,18,18,.66) 62%,rgba(20,18,18,.3) 100%)"></div>
+                <div style="position:absolute;inset:0;padding:44px;display:flex;flex-direction:column;justify-content:flex-end;gap:16px;animation:adcycle 8s ease-in-out infinite">
+                  <div style="font:900 18px/1 Archivo,system-ui,sans-serif;letter-spacing:.18em;color:var(--color-accent)">{{ deliAd.kicker }}</div>
+                  <div style="font:900 56px/1.02 Archivo,system-ui,sans-serif;letter-spacing:-.025em">{{ deliAd.headline }}</div>
+                  <div style="font:500 24px/1.35 Archivo,system-ui,sans-serif;color:#bab6b6;max-width:760px;text-wrap:pretty">{{ deliAd.body }}</div>
+                </div>
+                <div style="position:absolute;left:0;right:0;bottom:0;height:6px;background:var(--color-accent);transform-origin:left;animation:adbar 8s linear infinite"></div>
+              </div>
+
+              <div style="position:absolute;inset:0;background:var(--color-accent);overflow:hidden;pointer-events:none;animation:ilude 30s ease-in-out infinite">
+                <div style="position:absolute;left:44px;top:70px;font:900 84px/.94 Archivo,system-ui,sans-serif;letter-spacing:-.035em;color:#0e0d0d">Sides<br>on the<br>fire.</div>
+                <div style="position:absolute;left:46px;bottom:44px;font:900 20px/1 Archivo,system-ui,sans-serif;letter-spacing:.16em;color:#0e0d0d">FRIED &amp; SALTED TO ORDER</div>
+                <div style="position:absolute;left:0;right:0;bottom:0;height:520px">
+                  <div style="position:absolute;left:150px;bottom:300px;width:44px;height:96px;background:#0e0d0d;clip-path:polygon(30% 100%,70% 100%,100% 34%,52% 0%,4% 40%);animation:smokerise 1.8s linear infinite"></div>
+                  <div style="position:absolute;left:520px;bottom:300px;width:50px;height:120px;background:#0e0d0d;clip-path:polygon(32% 100%,68% 100%,96% 40%,46% 0%,0% 46%);animation:smokerise 2.2s linear infinite;animation-delay:.6s"></div>
+                  <div style="position:absolute;left:80px;bottom:196px;width:110px;height:150px;background:#0e0d0d;clip-path:polygon(50% 0%,100% 100%,0% 100%);transform-origin:bottom;animation:flamelick .74s ease-in-out infinite"></div>
+                  <div style="position:absolute;left:330px;bottom:196px;width:130px;height:180px;background:#0e0d0d;clip-path:polygon(50% 0%,100% 100%,0% 100%);transform-origin:bottom;animation:flamelick .86s ease-in-out infinite;animation-delay:.2s"></div>
+                  <div style="position:absolute;left:610px;bottom:196px;width:118px;height:158px;background:#0e0d0d;clip-path:polygon(50% 0%,100% 100%,0% 100%);transform-origin:bottom;animation:flamelick .66s ease-in-out infinite;animation-delay:.4s"></div>
+                  <div style="position:absolute;left:250px;bottom:182px;width:460px;height:96px;background:#0e0d0d;clip-path:polygon(6% 26%,26% 4%,58% 0%,88% 12%,100% 44%,94% 78%,68% 100%,32% 96%,8% 74%,0% 48%);animation:grilldrop 30s cubic-bezier(.2,.9,.2,1) infinite"></div>
+                  <div style="position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;gap:22px">
+                    <div style="height:20px;background:#0e0d0d"></div>
+                    <div style="height:20px;background:#0e0d0d"></div>
+                    <div style="height:20px;background:#0e0d0d"></div>
+                    <div style="height:20px;background:#0e0d0d"></div>
+                  </div>
+                </div>
+                <div style="position:absolute;left:-10%;right:-10%;bottom:0;height:150%;background:#0e0d0d;border-radius:46% 54% 0 0 / 80px 100px 0 0;animation:iludewave 30s cubic-bezier(.5,0,.4,1) infinite"></div>
+              </div>
+            </div>
+
+            <div style="width:958px;flex:none;display:flex;flex-direction:column;position:relative">
+              <div style="flex:none;height:112px;display:flex;align-items:center;justify-content:space-between;padding:0 44px;background:#f8f4f4;border-bottom:2px solid var(--color-divider)">
+                <div style="display:flex;align-items:center;gap:16px">
+                  <div style="width:34px;height:34px;background:#201e1d"></div>
+                  <div style="font:900 30px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em">LEAF &amp; PEARL</div>
+                </div>
+                <div style="font:800 20px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em;color:#605d5d">BUBBLE TEA BAR</div>
+              </div>
+              <div style="flex:none;padding:34px 44px 26px;border-bottom:2px solid var(--color-divider)">
+                <div style="font:900 44px/1.05 Archivo,system-ui,sans-serif;letter-spacing:-.025em">Shaken to order.</div>
+                <div style="margin-top:10px;font:500 24px/1.3 Archivo,system-ui,sans-serif;color:#605d5d">Sugar and ice to your level. Same order number as the counter.</div>
+              </div>
+              <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+                <sc-for list="{{ teaHero }}" as="m" hint-placeholder-count="3">
+                  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:11px;padding:0 44px;border-bottom:1px solid rgba(32,30,29,.14)">
+                    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:20px">
+                      <div style="font:900 46px/1 Archivo,system-ui,sans-serif;letter-spacing:-.02em">{{ m.name }}</div>
+                      <div style="font:900 46px/1 ui-monospace,Menlo,monospace;color:var(--color-accent-700)">{{ m.priceLabel }}</div>
+                    </div>
+                    <div style="font:500 26px/1.3 Archivo,system-ui,sans-serif;color:#605d5d">{{ m.desc }}</div>
+                    <sc-if value="{{ m.tag }}" hint-placeholder-val="{{ false }}">
+                      <div style="align-self:flex-start;font:900 16px/1 Archivo,system-ui,sans-serif;letter-spacing:.12em;padding:9px 11px;background:var(--color-accent);color:#fff">{{ m.tag }}</div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="position:absolute;inset:0;background:#0e0d0d;overflow:hidden;pointer-events:none;animation:ilude 30s ease-in-out infinite">
+                <div style="position:absolute;left:44px;top:74px;font:900 82px/.94 Archivo,system-ui,sans-serif;letter-spacing:-.035em;color:var(--color-accent)">Sugar<br>and ice,<br>your call.</div>
+                <div style="position:absolute;left:46px;bottom:46px;font:900 20px/1 Archivo,system-ui,sans-serif;letter-spacing:.16em;color:#f8f4f4">LEAF &amp; PEARL</div>
+                <div style="position:absolute;right:70px;bottom:110px;width:330px;height:520px">
+                  <div style="position:absolute;left:96px;top:-110px;width:52px;height:400px;background:#f8f4f4;transform:rotate(-13deg);transform-origin:bottom center"></div>
+                  <div style="position:absolute;inset:0;background:#f8f4f4;clip-path:polygon(4% 0%,96% 0%,82% 100%,18% 100%)"></div>
+                  <div style="position:absolute;left:10px;top:12px;right:10px;bottom:10px;background:#0e0d0d;clip-path:polygon(4% 0%,96% 0%,82% 100%,18% 100%);overflow:hidden">
+                    <div style="position:absolute;left:86px;top:-40px;width:52px;height:340px;background:#f8f4f4;transform:rotate(-13deg);transform-origin:bottom center"></div>
+                    <div style="position:absolute;left:0;right:0;bottom:0;background:var(--color-accent);animation:teafill 30s cubic-bezier(.3,.8,.2,1) infinite"></div>
+                    <div style="position:absolute;left:70px;top:0;width:44px;height:44px;border-radius:50%;background:var(--color-accent);animation:pearldrop 1.9s linear infinite"></div>
+                    <div style="position:absolute;left:150px;top:0;width:44px;height:44px;border-radius:50%;background:var(--color-accent);animation:pearldrop 1.9s linear infinite;animation-delay:.5s"></div>
+                    <div style="position:absolute;left:210px;top:0;width:44px;height:44px;border-radius:50%;background:var(--color-accent);animation:pearldrop 1.9s linear infinite;animation-delay:1s"></div>
+                  </div>
+                </div>
+                <div style="position:absolute;left:-10%;right:-10%;bottom:0;height:150%;background:var(--color-accent);border-radius:54% 46% 0 0 / 100px 80px 0 0;animation:iludewave 30s cubic-bezier(.5,0,.4,1) infinite"></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="font:900 15px/1 ui-monospace,Menlo,monospace;letter-spacing:.1em;color:#605d5d">
+            <span style="padding:5px 10px;background:#201e1d;color:#f8f4f4;margin-right:10px">SCREEN 3</span>TEA, SODA &amp; SNACKS BAR
+          </div>
+
+          <div style="width:1920px;height:1080px;flex:none;background:var(--color-bg);color:#201e1d;border:1px solid rgba(0,0,0,.14);box-shadow:0 14px 34px rgba(45,43,43,.24);overflow:hidden;display:flex;flex-direction:column;position:relative">
+            <div style="flex:none;height:112px;display:flex;align-items:center;justify-content:space-between;padding:0 56px;background:#f8f4f4;border-bottom:2px solid var(--color-divider)">
+              <div style="font:900 30px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em">TEA, SODA &amp; SNACKS</div>
+              <div style="font:800 20px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em;color:#605d5d">{{ boardDaypart }} MENU · ALL SIZES 20 OZ</div>
+            </div>
+            <div style="flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr">
+              <sc-for list="{{ teaList }}" as="m" hint-placeholder-count="6">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 44px;border-bottom:1px solid rgba(32,30,29,.14);border-right:1px solid rgba(32,30,29,.14)">
+                  <div style="font:800 40px/1.05 Archivo,system-ui,sans-serif;letter-spacing:-.015em">{{ m.name }}</div>
+                  <div style="font:900 40px/1 ui-monospace,Menlo,monospace;color:var(--color-accent-700)">{{ m.priceLabel }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="flex:none;height:470px;position:relative;overflow:hidden;background:var(--color-accent);color:#fff">
+              <div style="position:absolute;inset:0;opacity:.28;animation:adzoom 16s ease-in-out infinite alternate">
+                <image-slot id="{{ teaAd.slot }}" shape="rect" placeholder="{{ teaAd.hint }}"></image-slot>
+              </div>
+              <div style="position:absolute;inset:0;padding:52px 56px;display:flex;flex-direction:column;justify-content:flex-end;gap:18px;animation:adcycle 8s ease-in-out infinite">
+                <div style="font:900 18px/1 Archivo,system-ui,sans-serif;letter-spacing:.18em">{{ teaAd.kicker }}</div>
+                <div style="font:900 68px/1.02 Archivo,system-ui,sans-serif;letter-spacing:-.03em">{{ teaAd.headline }}</div>
+                <div style="font:500 26px/1.35 Archivo,system-ui,sans-serif;max-width:1100px;text-wrap:pretty">{{ teaAd.body }}</div>
+              </div>
+              <div style="position:absolute;left:0;right:0;bottom:0;height:6px;background:#fff;transform-origin:left;animation:adbar 8s linear infinite"></div>
+            </div>
+
+            <div style="position:absolute;inset:0;background:#0e0d0d;overflow:hidden;pointer-events:none;animation:ilude 30s ease-in-out infinite">
+              <div style="position:absolute;left:64px;top:80px;font:900 122px/.92 Archivo,system-ui,sans-serif;letter-spacing:-.04em;color:var(--color-accent)">Pearls,<br>dropped<br>to order.</div>
+              <div style="position:absolute;left:66px;bottom:56px;font:900 26px/1 Archivo,system-ui,sans-serif;letter-spacing:.16em;color:#f8f4f4">LEAF &amp; PEARL · SHAKEN AT THE BAR</div>
+              <div style="position:absolute;right:150px;top:150px;width:520px;height:800px">
+                <div style="position:absolute;left:150px;top:-150px;width:74px;height:600px;background:#f8f4f4;transform:rotate(-13deg);transform-origin:bottom center"></div>
+                <div style="position:absolute;inset:0;background:#f8f4f4;clip-path:polygon(4% 0%,96% 0%,82% 100%,18% 100%)"></div>
+                <div style="position:absolute;left:14px;top:16px;right:14px;bottom:14px;background:#0e0d0d;clip-path:polygon(4% 0%,96% 0%,82% 100%,18% 100%);overflow:hidden">
+                  <div style="position:absolute;left:136px;top:-60px;width:74px;height:520px;background:#f8f4f4;transform:rotate(-13deg);transform-origin:bottom center"></div>
+                  <div style="position:absolute;left:0;right:0;bottom:0;background:var(--color-accent);animation:teafill 30s cubic-bezier(.3,.8,.2,1) infinite"></div>
+                  <div style="position:absolute;left:120px;top:0;width:64px;height:64px;border-radius:50%;background:var(--color-accent);animation:pearldrop 1.9s linear infinite"></div>
+                  <div style="position:absolute;left:230px;top:0;width:64px;height:64px;border-radius:50%;background:var(--color-accent);animation:pearldrop 1.9s linear infinite;animation-delay:.42s"></div>
+                  <div style="position:absolute;left:330px;top:0;width:64px;height:64px;border-radius:50%;background:var(--color-accent);animation:pearldrop 1.9s linear infinite;animation-delay:.84s"></div>
+                  <div style="position:absolute;left:180px;top:0;width:64px;height:64px;border-radius:50%;background:var(--color-accent);animation:pearldrop 1.9s linear infinite;animation-delay:1.26s"></div>
+                </div>
+              </div>
+              <div style="position:absolute;left:-10%;right:-10%;bottom:0;height:150%;background:var(--color-accent);border-radius:54% 46% 0 0 / 110px 90px 0 0;animation:iludewave 30s cubic-bezier(.5,0,.4,1) infinite"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div style="display:flex;align-items:stretch;height:150px;background:var(--kios-chrome);color:#f8f4f4;border:1px solid rgba(0,0,0,.14)">
+          <div style="flex:none;width:820px;display:flex;align-items:center;gap:30px;padding:0 40px;background:var(--color-accent);color:#fff">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="font:900 17px/1 Archivo,system-ui,sans-serif;letter-spacing:.18em">ORDER UP</div>
+              <div style="font:600 15px/1 Archivo,system-ui,sans-serif;opacity:.85">COLLECT AT THE PASS</div>
+            </div>
+            <div style="font:900 92px/1 ui-monospace,Menlo,monospace;letter-spacing:-.03em;animation:upflash 2.4s ease-in-out infinite">{{ orderUpNo }}</div>
+            <div style="margin-left:auto;text-align:right;display:flex;flex-direction:column;gap:8px">
+              <div style="font:900 14px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em;opacity:.85">ALSO READY</div>
+              <div style="font:700 22px/1 ui-monospace,Menlo,monospace">{{ orderUpNext }}</div>
+            </div>
+          </div>
+          <div style="flex:1;min-width:0;overflow:hidden;display:flex;align-items:center">
+            <div style="display:flex;width:max-content;animation:tickrun 46s linear infinite">
+              <sc-for list="{{ boardTicker }}" as="x" hint-placeholder-count="6">
+                <div style="display:flex;align-items:center;gap:18px;padding:0 40px;border-right:1px solid #3a3636">
+                  <div style="width:10px;height:10px;flex:none;background:{{ x.color }}"></div>
+                  <div style="font:700 28px/1 ui-monospace,Menlo,monospace;white-space:nowrap">{{ x.label }}</div>
+                  <div style="font:900 15px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em;white-space:nowrap;color:{{ x.color }}">{{ x.state }}</div>
+                </div>
+              </sc-for>
+              <sc-for list="{{ boardTicker }}" as="x" hint-placeholder-count="6">
+                <div style="display:flex;align-items:center;gap:18px;padding:0 40px;border-right:1px solid #3a3636">
+                  <div style="width:10px;height:10px;flex:none;background:{{ x.color }}"></div>
+                  <div style="font:700 28px/1 ui-monospace,Menlo,monospace;white-space:nowrap">{{ x.label }}</div>
+                  <div style="font:900 15px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em;white-space:nowrap;color:{{ x.color }}">{{ x.state }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="1f" style="display:flex;flex-direction:column;gap:9px">
+      <div style="display:flex;align-items:baseline;gap:8px;font:400 11.5px/1.3 Archivo,system-ui,sans-serif;color:#605d5d">
+        <a href="#1f" style="font:800 10.5px/1 ui-monospace,Menlo,monospace;padding:4px 7px;background:rgba(0,0,0,.08);color:#201e1d;letter-spacing:.06em">1F</a>
+        Smoothie bar kiosk — portrait unit, item grid + two-column category rail, current order builds as you tap
+      </div>
+      <div style="width:1080px;height:1920px;background:var(--color-bg);border:1px solid rgba(0,0,0,.14);box-shadow:0 14px 34px rgba(45,43,43,.24);display:flex;flex-direction:column;overflow:hidden;color:#201e1d">
+
+        <div style="flex:none;height:84px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:var(--kios-chrome);color:#f8f4f4">
+          <div style="display:flex;align-items:center;gap:14px">
+            <span style="width:34px;height:34px;background:var(--color-accent);flex:none"></span>
+            <span style="font:900 20px/1 Archivo,system-ui,sans-serif;letter-spacing:.1em">PEARL FEVER</span>
+          </div>
+          <div style="font:800 13px/1 Archivo,system-ui,sans-serif;letter-spacing:.16em;color:#bab6b6">PLACE YOUR ORDER</div>
+        </div>
+
+        <div style="flex:1;min-height:0;display:flex">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+            <div style="flex:none;padding:26px 32px 16px;border-bottom:2px solid var(--color-divider);display:flex;align-items:baseline;justify-content:space-between">
+              <div style="font:900 17px/1 Archivo,system-ui,sans-serif;letter-spacing:.12em">ITEM</div>
+              <div style="font:600 13px/1 Archivo,system-ui,sans-serif;color:#605d5d">{{ pearlCatLabel }}</div>
+            </div>
+            <div style="flex:1;min-height:0;overflow:hidden;padding:26px 28px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,1fr);gap:14px">
+              <sc-for list="{{ pearlMenu }}" as="pi" hint-placeholder-count="8">
+                <button type="button" onClick="{{ pi.onClick }}" style="display:flex;flex-direction:column;align-items:stretch;min-width:0;overflow:hidden;text-align:left;background:#fff;border:1px solid var(--color-divider);padding:0;cursor:pointer">
+                  <div style="flex:1;min-height:0;border-bottom:1px solid var(--color-divider);position:relative">
+                    <image-slot id="{{ pi.slotId }}" shape="rect" placeholder="{{ pi.slotHint }}"></image-slot>
+                    <div style="position:absolute;top:8px;left:8px;background:#201e1d;color:#f8f4f4;font:900 12px/1 ui-monospace,Menlo,monospace;padding:5px 7px">{{ pi.priceLabel }}</div>
+                  </div>
+                  <div style="padding:10px 10px 12px">
+                    <div style="font:700 13px/1.25 Archivo,system-ui,sans-serif">{{ pi.name }}</div>
+                  </div>
+                </button>
+              </sc-for>
+              <sc-if value="{{ pearlEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="grid-column:1/-1;padding:40px 0;font:600 15px/1.4 Archivo,system-ui,sans-serif;color:#9b9797">Nothing under this category in the demo menu yet — try Fruity Smoothies, Milk Smoothies, Milk Tea, Green &amp; Black Tea or Specialty Drinks.</div>
+              </sc-if>
+            </div>
+          </div>
+
+          <div style="width:320px;flex:none;border-left:2px solid var(--color-divider);display:flex;flex-direction:column;background:#fff">
+            <div style="flex:none;padding:26px 22px 16px;border-bottom:2px solid var(--color-divider);font:900 17px/1 Archivo,system-ui,sans-serif;letter-spacing:.12em">CATEGORY</div>
+            <div style="flex:1;min-height:0;display:flex;flex-direction:column;border-bottom:2px solid var(--color-divider)">
+              <div style="flex:1;display:flex;flex-direction:column;gap:8px;padding:12px;border-bottom:1px solid var(--color-divider)">
+                <sc-for list="{{ pearlCatsBlack }}" as="pc" hint-placeholder-count="5">
+                  <button type="button" onClick="{{ pc.onClick }}" style="flex:{{ pc.grow }};padding:8px 14px;border:0;outline:{{ pc.outline }};outline-offset:-3px;background:{{ pc.bg }};color:#ffffff;font:{{ pc.font }};letter-spacing:{{ pc.letterSpacing }};cursor:pointer;text-align:left">{{ pc.label }}</button>
+                </sc-for>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:8px;padding:12px">
+                <sc-for list="{{ pearlCatsBlue }}" as="pc" hint-placeholder-count="5">
+                  <button type="button" onClick="{{ pc.onClick }}" style="flex:{{ pc.grow }};padding:8px 14px;border:0;outline:{{ pc.outline }};outline-offset:-3px;background:{{ pc.bg }};color:#ffffff;font:{{ pc.font }};letter-spacing:{{ pc.letterSpacing }};cursor:pointer;text-align:left">{{ pc.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+            <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;padding:22px;background:var(--kios-chrome);color:#f8f4f4;overflow:auto">
+              <div style="font:900 13px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em">CURRENT ORDER</div>
+              <div style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ pearlCartLines }}" as="cl" hint-placeholder-count="1">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+                    <span style="font:700 14px/1.2 Archivo,system-ui,sans-serif">{{ cl.qty }}× {{ cl.name }}</span>
+                    <span style="font:700 13px/1 ui-monospace,Menlo,monospace;color:#8fc9ff;white-space:nowrap">{{ cl.priceLabel }}</span>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ pearlCartEmpty }}" hint-placeholder-val="{{ true }}">
+                  <div style="font:600 13px/1.4 Archivo,system-ui,sans-serif;color:#8d8888">Tap an item to add it to the order.</div>
+                </sc-if>
+              </div>
+              <div style="flex:none;padding-top:12px;border-top:1px solid #3a3636;font:900 24px/1 ui-monospace,Menlo,monospace">{{ pearlTotalLabel }}</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <p style="margin:26px 0 0;font:400 12px/1.6 Archivo,system-ui,sans-serif;color:#605d5d">Try next: "put layout <a href="#1b">1B</a> on the board permanently" · "add an expo pass view that bags by course"</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;warnAtMin&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:4,&quot;tsType&quot;:&quot;number&quot;,&quot;min&quot;:1,&quot;max&quot;:15,&quot;unit&quot;:&quot;min&quot;,&quot;section&quot;:&quot;Kitchen timing&quot;,&quot;label&quot;:&quot;Amber at&quot;},&quot;lateAtMin&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:7,&quot;tsType&quot;:&quot;number&quot;,&quot;min&quot;:2,&quot;max&quot;:25,&quot;unit&quot;:&quot;min&quot;,&quot;section&quot;:&quot;Kitchen timing&quot;,&quot;label&quot;:&quot;Red at&quot;},&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#3a6ea5&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Colour scheme&quot;,&quot;label&quot;:&quot;Accent&quot;,&quot;options&quot;:[&quot;#ec3013&quot;,&quot;#ff8a00&quot;,&quot;#00a37a&quot;,&quot;#3a6ea5&quot;]},&quot;boardTone&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Graphite&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Colour scheme&quot;,&quot;label&quot;:&quot;Board tone&quot;,&quot;options&quot;:[&quot;Carbon&quot;,&quot;Espresso&quot;,&quot;Graphite&quot;]},&quot;okColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#2fd07a&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Colour scheme&quot;,&quot;label&quot;:&quot;On time&quot;,&quot;options&quot;:[&quot;#2fd07a&quot;,&quot;#8ad14f&quot;,&quot;#7c8b93&quot;]},&quot;warnColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#ffb020&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Colour scheme&quot;,&quot;label&quot;:&quot;Warning&quot;,&quot;options&quot;:[&quot;#ffb020&quot;,&quot;#ffd166&quot;,&quot;#e08a1e&quot;]},&quot;lateColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#ff5c3d&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Colour scheme&quot;,&quot;label&quot;:&quot;Late&quot;,&quot;options&quot;:[&quot;#ec3013&quot;,&quot;#ff5c3d&quot;,&quot;#b81800&quot;]}}">
+class Component extends DCLogic {
+  state = {
+    station: 'SAND', layout: 'A', tick: 0, bumped: {},
+    recipe: 'club', kdsScreen: 'BOARD', plateArmed: false, plateFrom: '',
+    screen: 'browse', concept: 'DELI', kioskLayout: 'GRID', cat: 'SANDWICHES', itemId: null, sel: {},
+    cart: [], comboSide: null, comboDrink: null, orderNo: 'B-214', adPin: null,
+    daypart: null, accentPick: null,
+    pearlCat: null, pearlCart: []
+  };
+
+  PEARL_CATS_BLACK = [
+    { label: 'Dim Sum', heading: true },
+    { label: 'Bakery & Grab-And-Go' },
+    { label: 'Cold Drinks' },
+    { label: 'Beverages' },
+    { label: 'Hot Drinks' }
+  ];
+  PEARL_CATS_BLUE = [
+    { label: 'Pearl Fever', heading: true },
+    { label: 'Fruity Smoothies' },
+    { label: 'Milk Smoothies' },
+    { label: 'Milk Tea & Green Tea' },
+    { label: 'Specialty & Add-Ons' }
+  ];
+
+  PEARL_MENU = [
+    { id: 'pf1', name: 'Coconut Smoothie', price: 790, cat: 'Milk Smoothies' },
+    { id: 'pf2', name: 'Mango Ice Cream Smoothie', price: 790, cat: 'Fruity Smoothies' },
+    { id: 'pf3', name: 'Matcha Ice Cream Smoothie', price: 790, cat: 'Milk Tea & Green Tea' },
+    { id: 'pf4', name: 'Milk Tea Ice Cream Smoothie', price: 755, cat: 'Milk Tea & Green Tea' },
+    { id: 'pf5', name: 'Royal Rocher Smoothie', price: 810, cat: 'Specialty & Add-Ons' },
+    { id: 'pf6', name: 'Strawberry Taro Smoothie', price: 790, cat: 'Fruity Smoothies' },
+    { id: 'pf7', name: 'Taro Smoothie', price: 755, cat: 'Milk Tea & Green Tea' },
+    { id: 'pf8', name: 'Oreo Twist Smoothie', price: 790, cat: 'Specialty & Add-Ons' }
+  ];
+
+  pearlAdd = (id) => {
+    const it = this.PEARL_MENU.find((m) => m.id === id);
+    const cart = this.state.pearlCart.slice();
+    const line = cart.find((l) => l.id === id);
+    if (line) line.qty += 1; else cart.push({ id: it.id, name: it.name, price: it.price, qty: 1 });
+    this.setState({ pearlCart: cart });
+  };
+
+  ACCENTS = ['#ec3013', '#ff8a00', '#00a37a', '#3a6ea5', '#7a4dd6', '#201e1d'];
+
+  ADS = [
+    { kicker: 'COMBO OF THE WEEK', headline: 'Any sandwich + Classic Milk Tea', body: '$16.95 together — the counter and the bar ring up as one order.', slot: 'ad-combo', hint: 'Sandwich and boba cup, side by side' },
+    { kicker: 'HAPPY HOUR 2–5', headline: '$1 off every large fruit tea', body: 'Passionfruit green, lychee oolong, mango yakult. Weekdays only.', slot: 'ad-happy', hint: 'Fruit tea cups on the bar' },
+    { kicker: 'TRAYS & CATERING', headline: 'Party trays, 24 hours notice', body: 'Sandwich platters by the dozen, tea by the gallon. Ask at the register.', slot: 'ad-catering', hint: 'Sandwich platter overhead' }
+  ];
+
+  DAYPARTS = [
+    { key: 'BREAKFAST', from: 7, hours: '7:00 — 11:00 AM', head: 'Morning counter.',
+      blurb: 'Rolls off the flat-top, tea steeped to order. Everything under ten minutes.',
+      deliMains: [
+        { name: 'Egg & Bacon Roll', desc: 'Two eggs, thick bacon, American, seeded roll', price: 7.5, tag: 'BEST SELLER' },
+        { name: 'Turkey Sausage Muffin', desc: 'Sage patty, egg, cheddar, English muffin', price: 6.75, tag: '' },
+        { name: 'Smoked Salmon Bagel', desc: 'Scallion cream cheese, red onion, capers', price: 9.5, tag: '' },
+        { name: 'Breakfast BLT', desc: 'Bacon, lettuce, tomato, fried egg, mayo, sourdough', price: 8.25, tag: '' },
+        { name: 'Steel-Cut Oats', desc: 'Brown sugar, toasted almond, seasonal fruit', price: 5.25, tag: 'VEG' }
+      ],
+      deliSides: [
+        { name: 'Hash Brick', price: 2.75 }, { name: 'Two Eggs, Any Style', price: 3.5 },
+        { name: 'Fruit Cup', price: 4.25 }, { name: 'Yogurt & Granola', price: 4.5 }
+      ],
+      teaHero: [
+        { name: 'Hojicha Oat Latte', desc: 'Roasted green tea, oat milk, light honey', price: 6.25, tag: 'NEW' },
+        { name: 'Jasmine Milk Tea', desc: 'Silver needle jasmine, whole milk, tapioca', price: 5.5, tag: '' },
+        { name: 'Matcha Cream Boba', desc: 'Ceremonial matcha, salted cream cap', price: 6.75, tag: '' }
+      ],
+      teaList: [
+        { name: 'Cold Brew', price: 4.25 }, { name: 'Black Sesame Latte', price: 6.5 },
+        { name: 'Hot Oolong Pot', price: 4.0 }, { name: 'Egg Tart', price: 3.25 },
+        { name: 'Pineapple Bun', price: 3.5 }, { name: 'Soy Milk, Hot or Iced', price: 3.75 }
+      ],
+      deliAd: { kicker: 'BEFORE 10 AM', headline: 'Roll + drip coffee, $9', body: 'Any breakfast roll with a 12 oz drip. Ends when the pot does.', slot: 'board-ad-deli-b', hint: 'Egg roll and coffee cup on paper' },
+      teaAd: { kicker: 'OPENING HOUR', headline: 'Free oat milk swap', body: 'First fifty lattes each morning. No code, just ask at the bar.', slot: 'board-ad-tea-b', hint: 'Latte being poured at the tea bar' } },
+    { key: 'LUNCH', from: 11, hours: '11:00 AM — 4:00 PM', head: 'Lunch, sliced to order.',
+      blurb: 'Sandwiches built at the counter, tea shaken at the bar. One order, one bag.',
+      deliMains: [
+        { name: 'Turkey Club', desc: 'Roast turkey, bacon, Swiss, lettuce, tomato, mayo', price: 12.5, tag: 'BEST SELLER' },
+        { name: 'Hot Honey Cutlet', desc: 'Fried chicken, provolone, hot honey, pickles', price: 13.25, tag: 'SPICY' },
+        { name: 'Italian Sub', desc: 'Mortadella, salami, prov, hots, oil and vinegar', price: 12.75, tag: '' },
+        { name: 'Roast Beef & Horseradish', desc: 'Rare roast beef, horseradish cream, arugula', price: 13.75, tag: '' },
+        { name: 'Chopped Antipasto', desc: 'Salami, chickpeas, pepperoncini, red wine vin', price: 11.0, tag: '' }
+      ],
+      deliSides: [
+        { name: 'Kettle Chips', price: 2.5 }, { name: 'Cup of Soup', price: 4.75 },
+        { name: 'Potato Salad', price: 3.75 }, { name: 'Pickle Spear', price: 1.5 }
+      ],
+      teaHero: [
+        { name: 'Brown Sugar Boba', desc: 'Fresh milk, torched brown sugar, warm pearls', price: 6.25, tag: 'BEST SELLER' },
+        { name: 'Passionfruit Green Tea', desc: 'Jasmine green, passionfruit, lime, no dairy', price: 5.75, tag: '' },
+        { name: 'Taro Milk Tea', desc: 'Steamed taro, black tea, tapioca', price: 6.0, tag: '' }
+      ],
+      teaList: [
+        { name: 'Classic Milk Tea', price: 5.5 }, { name: 'Mango Yakult', price: 6.25 },
+        { name: 'Lychee Oolong', price: 5.75 }, { name: 'Popcorn Chicken', price: 6.5 },
+        { name: 'Salt & Pepper Fries', price: 4.5 }, { name: 'Sesame Balls (4)', price: 4.5 }
+      ],
+      deliAd: { kicker: 'COMBO OF THE WEEK', headline: 'Sandwich + milk tea, $16.95', body: 'Any sandwich with a classic milk tea. The counter and the bar ring up as one.', slot: 'board-ad-deli-l', hint: 'Sandwich half and boba cup side by side' },
+      teaAd: { kicker: 'HAPPY HOUR 2 — 5', headline: '$1 off every large fruit tea', body: 'Passionfruit green, lychee oolong, mango yakult. Weekdays only.', slot: 'board-ad-tea-l', hint: 'Row of fruit teas on the bar' } },
+    { key: 'DINNER', from: 16, hours: '4:00 PM — CLOSE', head: 'Dinner off the grill.',
+      blurb: 'Hot heroes, trays for the table, and the late boba menu until we lock up.',
+      deliMains: [
+        { name: 'Porchetta Hero', desc: 'Slow-roast pork, broccoli rabe, sharp prov', price: 15.5, tag: '' },
+        { name: 'Meatball Parm', desc: 'Beef and pork balls, sunday gravy, mozzarella', price: 14.25, tag: 'HOUSE FAVORITE' },
+        { name: 'Steak & Onion', desc: 'Shaved ribeye, charred onion, provolone, au jus', price: 16.75, tag: '' },
+        { name: 'Eggplant Milanese', desc: 'Breaded eggplant, tomato, basil, pecorino', price: 13.5, tag: 'VEG' },
+        { name: 'Family Salad Tray', desc: 'Chopped house salad, feeds four, dressing on side', price: 18.0, tag: '' }
+      ],
+      deliSides: [
+        { name: 'Garlic Knots (6)', price: 4.5 }, { name: 'Broccoli Rabe', price: 5.25 },
+        { name: 'Arancini (3)', price: 6.0 }, { name: 'Cup of Soup', price: 4.75 }
+      ],
+      teaHero: [
+        { name: 'Oolong Cream Boba', desc: 'Charcoal oolong, salted cream, brown pearls', price: 6.5, tag: '' },
+        { name: 'Lychee Sparkler', desc: 'Lychee, soda, mint, crushed ice, caffeine free', price: 6.0, tag: 'NEW' },
+        { name: 'Roasted Barley Milk', desc: 'Toasted barley, oat milk, no sugar option', price: 5.75, tag: '' }
+      ],
+      teaList: [
+        { name: 'Thai Tea Float', price: 6.75 }, { name: 'Yuzu Soda', price: 6.0 },
+        { name: 'Hot Ginger Honey', price: 5.25 }, { name: 'Taro Puffs', price: 4.25 },
+        { name: 'Fried Sesame Balls', price: 4.5 }, { name: 'Mochi, Two Pieces', price: 3.75 }
+      ],
+      deliAd: { kicker: 'TRAYS & CATERING', headline: 'Party tray feeds four, $42', body: 'Twelve sandwich halves, two sides, 24 hours notice at the register.', slot: 'board-ad-deli-d', hint: 'Sandwich platter shot from overhead' },
+      teaAd: { kicker: 'AFTER 8 PM', headline: 'Half-price toppings', body: 'Extra pearls, grass jelly, pudding, cream cap. Every topping, half off.', slot: 'board-ad-tea-d', hint: 'Toppings in bar containers' } }
+  ];
+
+  BOARD_TICKER = [
+    { no: 'B-214', name: 'Turkey Club + Brown Sugar Boba', state: 'READY' },
+    { no: 'B-215', name: 'Hot Honey Cutlet, no pickles', state: 'READY' },
+    { no: 'B-216', name: 'Two Italian Subs, Taro Milk Tea', state: 'BAGGING' },
+    { no: 'B-217', name: 'Chopped Antipasto, Passionfruit Green', state: 'ON THE LINE' },
+    { no: 'B-218', name: 'Roast Beef, Mango Yakult, chips', state: 'ON THE LINE' },
+    { no: 'B-219', name: 'Popcorn chicken, Classic Milk Tea', state: 'QUEUED' }
+  ];
+
+  boardVals() {
+    const t = this.state.tick;
+    const auto = this.DAYPARTS.slice().reverse().find((d) => new Date().getHours() >= d.from) || this.DAYPARTS[0];
+    const dp = this.DAYPARTS.find((d) => d.key === this.state.daypart) || auto;
+    const price = (n) => this.fmt(Math.round(n * 100));
+    const now = new Date();
+    const clock = ((now.getHours() + 11) % 12 + 1) + ':' + String(now.getMinutes()).padStart(2, '0') + ' ' + (now.getHours() < 12 ? 'AM' : 'PM');
+    const readyList = this.BOARD_TICKER.filter((x) => x.state === 'READY');
+    const upIdx = Math.floor(t / 8) % readyList.length;
+    return {
+      boardTabs: this.DAYPARTS.map((d) => {
+        const on = d.key === dp.key;
+        return {
+          label: d.key, hours: d.hours,
+          auto: d.key === auto.key ? 'NOW' : '',
+          bg: on ? 'var(--color-accent)' : 'transparent', color: on ? '#ffffff' : '#8d8888',
+          onClick: () => this.setState({ daypart: this.state.daypart === d.key ? null : d.key })
+        };
+      }),
+      accentSwatches: this.ACCENTS.map((c) => {
+        const on = (this.state.accentPick || this.props.accentColor || '#ec3013').toLowerCase() === c;
+        return { hex: c, onClick: () => this.setState({ accentPick: c }), border: on ? '#f8f4f4' : 'transparent', size: on ? '30px' : '22px' };
+      }),
+      accentValue: this.state.accentPick || this.props.accentColor || '#ec3013',
+      onAccentInput: (e) => this.setState({ accentPick: e.target.value }),
+      boardAuto: auto.key, boardClock: clock,
+      boardDaypart: dp.key, boardHours: dp.hours, boardHead: dp.head, boardBlurb: dp.blurb,
+      deliMains: dp.deliMains.map((m) => ({ name: m.name, desc: m.desc, tag: m.tag, priceLabel: price(m.price) })),
+      deliSides: dp.deliSides.map((m) => ({ name: m.name, priceLabel: price(m.price) })),
+      teaHero: dp.teaHero.map((m) => ({ name: m.name, desc: m.desc, tag: m.tag, priceLabel: price(m.price) })),
+      teaList: dp.teaList.map((m) => ({ name: m.name, priceLabel: price(m.price) })),
+      deliAd: dp.deliAd, teaAd: dp.teaAd,
+      boardTicker: this.BOARD_TICKER.map((x) => ({
+        label: x.no + ' · ' + x.name, state: x.state,
+        color: x.state === 'READY' ? 'var(--color-accent)' : '#8d8888'
+      })),
+      orderUpNo: readyList[upIdx].no,
+      orderUpNext: readyList.filter((x, i) => i !== upIdx).map((x) => x.no).join('  ·  ') || '—'
+    };
+  }
+
+  t0 = Date.now();
+
+  componentDidMount() {
+    this.applyTheme();
+    this.timer = setInterval(() => this.setState({ tick: this.state.tick + 1 }), 1000);
+  }
+  componentWillUnmount() { clearInterval(this.timer); }
+
+  STATIONS = [
+    { key: 'COLD', label: 'COLD / PREP' }, { key: 'FRYER', label: 'FRYER' },
+    { key: 'SAND', label: 'SANDWICHES' }, { key: 'GRILL', label: 'GRILL' },
+    { key: 'EXPO', label: 'EXPO / PASS' }, { key: 'DRINKS', label: 'DRINKS' }
+  ];
+
+  TICKETS = [
+    { order: '#B-118', ch: 'KIOSK 2', name: 'MARTA G.', bag: 'BAG 1', rush: false, allergy: '', age: 48, items: [
+      { st: 'SAND', qty: 1, name: 'Turkey Club', mods: [['NO', 'tomato'], ['ADD', 'avocado']] },
+      { st: 'FRYER', qty: 1, name: 'Fries', mods: [['SUB', 'sweet potato']] } ] },
+    { order: '#B-119', ch: 'APP', name: 'DEV P.', bag: 'BAG 2', rush: false, allergy: 'NO GLUTEN', age: 96, items: [
+      { st: 'SAND', qty: 2, name: 'Italian Sub', mods: [['NO', 'hots'], ['ADD', 'extra prov']] },
+      { st: 'COLD', qty: 1, name: 'Chopped Antipasto', mods: [['NO', 'croutons']] } ] },
+    { order: '#B-120', ch: 'COUNTER', name: 'WALK-IN', bag: 'TRAY', rush: true, allergy: '', age: 322, items: [
+      { st: 'SAND', qty: 1, name: 'Reuben', mods: [['ADD', 'kraut, heavy'], ['NO', 'dressing']] },
+      { st: 'FRYER', qty: 1, name: 'Mozz Sticks', mods: [] },
+      { st: 'DRINKS', qty: 1, name: 'Cold Brew', mods: [['ADD', 'oat milk']] } ] },
+    { order: '#B-121', ch: 'DELIVERY', name: 'RIDER 4', bag: 'BAG 3', rush: false, allergy: 'DAIRY', age: 512, items: [
+      { st: 'SAND', qty: 1, name: 'Chicken Cutlet', mods: [['NO', 'provolone'], ['ADD', 'hot honey']] },
+      { st: 'GRILL', qty: 1, name: 'Patty Melt', mods: [['SUB', 'no cheese']] } ] },
+    { order: '#B-122', ch: 'KIOSK 1', name: 'JULES', bag: 'BAG 4', rush: false, allergy: '', age: 22, items: [
+      { st: 'SAND', qty: 1, name: 'Turkey Club', mods: [['ADD', 'bacon, double']] },
+      { st: 'DRINKS', qty: 2, name: 'Fountain — Lg', mods: [['NO', 'ice']] } ] },
+    { order: '#B-123', ch: 'KIOSK 2', name: 'OMAR S.', bag: 'BAG 5', rush: false, allergy: '', age: 140, items: [
+      { st: 'COLD', qty: 1, name: 'Caesar, Chicken', mods: [['SUB', 'dressing on side']] },
+      { st: 'FRYER', qty: 1, name: 'Onion Rings', mods: [] } ] },
+    { order: '#B-124', ch: 'APP', name: 'PRIYA R.', bag: 'BAG 6', rush: true, allergy: 'NUT', age: 205, items: [
+      { st: 'SAND', qty: 1, name: 'Italian Sub', mods: [['SUB', 'seeded roll'], ['NO', 'onion']] },
+      { st: 'GRILL', qty: 1, name: 'Patty Melt', mods: [['ADD', 'grilled onion']] } ] },
+    { order: '#B-125', ch: 'COUNTER', name: 'TABLE 3', bag: 'TRAY', rush: false, allergy: '', age: 64, items: [
+      { st: 'FRYER', qty: 2, name: 'Fries', mods: [['ADD', 'deli salt']] },
+      { st: 'DRINKS', qty: 1, name: 'Lemonade', mods: [] },
+      { st: 'COLD', qty: 1, name: 'Potato Salad', mods: [] } ] },
+    { order: '#B-126', ch: 'KIOSK 1', name: 'LENA W.', bag: 'BAG 7', rush: false, allergy: '', age: 388, items: [
+      { st: 'SAND', qty: 1, name: 'Reuben', mods: [['SUB', 'turkey'], ['ADD', 'extra pickle']] },
+      { st: 'FRYER', qty: 1, name: 'Fries', mods: [] } ] },
+    { order: '#B-127', ch: 'DELIVERY', name: 'RIDER 7', bag: 'BAG 8', rush: false, allergy: '', age: 30, items: [
+      { st: 'GRILL', qty: 2, name: 'Patty Melt', mods: [['NO', 'sauce']] },
+      { st: 'DRINKS', qty: 2, name: 'Fountain — Md', mods: [] } ] },
+    { order: '#B-128', ch: 'KIOSK 2', name: 'THEO', bag: 'BAG 9', rush: false, allergy: '', age: 8, items: [
+      { st: 'SAND', qty: 1, name: 'Chicken Cutlet', mods: [['ADD', 'spicy mayo']] },
+      { st: 'COLD', qty: 1, name: 'Slaw', mods: [] } ] },
+    { order: '#B-129', ch: 'COUNTER', name: 'WALK-IN', bag: 'TRAY', rush: false, allergy: '', age: 176, items: [
+      { st: 'COLD', qty: 2, name: 'Caesar Salad', mods: [['NO', 'anchovy']] },
+      { st: 'DRINKS', qty: 1, name: 'Iced Tea', mods: [] } ] }
+  ];
+
+  RECIPE_FOR = { 'Turkey Club': 'club', 'Chicken Cutlet': 'cutlet' };
+
+  openPlate = (recipeKey, fromLabel) => this.setState({ recipe: recipeKey, plateFrom: fromLabel || '', kdsScreen: 'PLATE' });
+
+  RECIPES = {
+    club: {
+      name: 'TURKEY CLUB', target: '2:30',
+      present: 'Quarter on the bias, four points up. Pick through the center. Deli paper, seam down, then basket.',
+      timing: 'Toast 45s · assemble 1:10',
+      hold: '4 min max, unwrapped',
+      mistake: 'Bacon laid cold, or tomato under the lettuce — bread goes soggy before it reaches the pass.',
+      layers: [
+        { n: 9, label: 'Top slice', qty: 'mayo side down', h: '30px', bg: '#d7d3d3', fg: '#201e1d', dx: '0px' },
+        { n: 8, label: 'Swiss', qty: '2 slices', h: '24px', bg: '#ffe0d9', fg: '#201e1d', dx: '10px' },
+        { n: 7, label: 'Roast turkey', qty: '120 g', h: '40px', bg: 'var(--color-accent)', fg: '#ffffff', dx: '18px' },
+        { n: 6, label: 'Bacon', qty: '3 strips', h: '24px', bg: '#7c1405', fg: '#ffc4b8', dx: '24px' },
+        { n: 5, label: 'Middle slice', qty: 'toasted', h: '28px', bg: '#d7d3d3', fg: '#201e1d', dx: '18px' },
+        { n: 4, label: 'Tomato', qty: '3 slices', h: '24px', bg: '#ff9783', fg: '#201e1d', dx: '12px' },
+        { n: 3, label: 'Bibb lettuce', qty: '20 g', h: '26px', bg: '#bab6b6', fg: '#201e1d', dx: '6px' },
+        { n: 2, label: 'Mayo', qty: '15 g', h: '18px', bg: '#f8f4f4', fg: '#201e1d', dx: '2px' },
+        { n: 1, label: 'Bottom slice', qty: 'toasted', h: '30px', bg: '#d7d3d3', fg: '#201e1d', dx: '0px' }
+      ],
+      steps: [
+        { n: 1, name: 'Sourdough — bottom slice, toasted', qty: '1' },
+        { n: 2, name: 'Mayo, edge to edge', qty: '15 g' },
+        { n: 3, name: 'Bibb lettuce, torn', qty: '20 g' },
+        { n: 4, name: 'Tomato, 1/4" slices, salted', qty: '3 sl' },
+        { n: 5, name: 'Middle slice, toasted', qty: '1' },
+        { n: 6, name: 'Bacon, hot off the flat', qty: '3 str' },
+        { n: 7, name: 'Roast turkey, ruffled not flat', qty: '120 g' },
+        { n: 8, name: 'Swiss, shingled', qty: '2 sl' },
+        { n: 9, name: 'Top slice, mayo side down', qty: '1' }
+      ]
+    },
+    cutlet: {
+      name: 'CHICKEN CUTLET', target: '4:15',
+      present: 'Halve straight across. Cut face toward the guest. Wrap tight in foil paper, hot side up.',
+      timing: 'Fry 3:30 @ 350°F · melt 20s',
+      hold: '2 min — crust goes soft fast',
+      mistake: 'Cutlet dropped into a cold roll, or hot honey under the cheese so it slides out the back.',
+      layers: [
+        { n: 8, label: 'Top roll', qty: 'pressed', h: '30px', bg: '#d7d3d3', fg: '#201e1d', dx: '0px' },
+        { n: 7, label: 'Hot honey', qty: '10 g', h: '16px', bg: '#ffb020', fg: '#201e1d', dx: '10px' },
+        { n: 6, label: 'Provolone', qty: '2 slices', h: '24px', bg: '#ffe0d9', fg: '#201e1d', dx: '18px' },
+        { n: 5, label: 'Fried cutlet', qty: '160 g', h: '46px', bg: 'var(--color-accent)', fg: '#ffffff', dx: '24px' },
+        { n: 4, label: 'Pickle chips', qty: '5', h: '22px', bg: '#bab6b6', fg: '#201e1d', dx: '16px' },
+        { n: 3, label: 'Shredded lettuce', qty: '25 g', h: '26px', bg: '#9b9797', fg: '#201e1d', dx: '8px' },
+        { n: 2, label: 'Spicy mayo', qty: '20 g', h: '18px', bg: '#ffc4b8', fg: '#201e1d', dx: '2px' },
+        { n: 1, label: 'Bottom roll', qty: 'toasted', h: '30px', bg: '#d7d3d3', fg: '#201e1d', dx: '0px' }
+      ],
+      steps: [
+        { n: 1, name: 'Seeded roll — bottom, toasted cut side', qty: '1' },
+        { n: 2, name: 'Spicy mayo, corner to corner', qty: '20 g' },
+        { n: 3, name: 'Shredded lettuce, dressed', qty: '25 g' },
+        { n: 4, name: 'Pickle chips, single layer', qty: '5' },
+        { n: 5, name: 'Cutlet, rested 30s, then cut to fit', qty: '160 g' },
+        { n: 6, name: 'Provolone on the hot cutlet', qty: '2 sl' },
+        { n: 7, name: 'Hot honey over the cheese', qty: '10 g' },
+        { n: 8, name: 'Top roll, press once', qty: '1' }
+      ]
+    }
+  };
+
+  CONCEPTS = [
+    { key: 'DELI', name: 'DELI COUNTER', sub: 'SLICED TO ORDER', mark: 'var(--color-accent)', cats: ['SANDWICHES', 'SALADS', 'SIDES', 'DRINKS'],
+      title: 'Order up.', blurb: "Built to order at the counter. Tap anything, we'll ask the questions.", note: 'HOT LINE, OUT BACK' },
+    { key: 'TEA', name: 'LEAF & PEARL', sub: 'BUBBLE TEA BAR', mark: '#f8f4f4', cats: ['MILK TEA', 'FRUIT TEA', 'SNACKS'],
+      title: 'Shaken to order.', blurb: 'Pick your sweetness, ice and toppings. Every cup sealed at the bar.', note: 'TEA BAR, FRONT WINDOW' }
+  ];
+
+  conceptOf(key) { return this.CONCEPTS.find((c) => c.key === key) || this.CONCEPTS[0]; }
+
+  MENU = [
+    { id: 'club', concept: 'DELI', cat: 'SANDWICHES', name: 'Turkey Club', price: 1395, desc: 'Roast turkey, bacon, Swiss, bibb, tomato on toasted sourdough. Three slices, quartered.', tag: 'MOST ORDERED', combo: true },
+    { id: 'cutlet', cat: 'SANDWICHES', name: 'Chicken Cutlet', price: 1450, desc: 'Fried cutlet, provolone, spicy mayo, pickles, hot honey on a seeded roll.', tag: '', combo: true },
+    { id: 'sub', cat: 'SANDWICHES', name: 'Italian Sub', price: 1325, desc: 'Capicola, salami, mortadella, prov, hots, oil and vinegar.', tag: '', combo: true },
+    { id: 'reuben', cat: 'SANDWICHES', name: 'Reuben', price: 1495, desc: 'Corned beef, kraut, Swiss, russian on griddled rye.', tag: '', combo: true },
+    { id: 'caesar', cat: 'SALADS', name: 'Caesar, Chicken', price: 1250, desc: 'Chopped romaine, parm crisp, garlic croutons, grilled chicken.', tag: '', combo: true },
+    { id: 'antipasto', cat: 'SALADS', name: 'Chopped Antipasto', price: 1295, desc: 'Salami, provolone, chickpeas, peppers, red wine vinaigrette.', tag: '', combo: true },
+    { id: 'fries', cat: 'SIDES', name: 'Fries', price: 425, desc: 'Cut daily, deli salt.', tag: '', combo: false },
+    { id: 'rings', cat: 'SIDES', name: 'Onion Rings', price: 495, desc: 'Beer batter, thick cut.', tag: '', combo: false },
+    { id: 'mozz', cat: 'SIDES', name: 'Mozz Sticks', price: 550, desc: 'Six, with marinara.', tag: '', combo: false },
+    { id: 'slaw', cat: 'SIDES', name: 'Slaw', price: 350, desc: 'Vinegar-based, no mayo.', tag: '', combo: false },
+    { id: 'fountain', cat: 'DRINKS', name: 'Fountain Soda', price: 295, desc: 'Free refills before you leave.', tag: '', combo: false },
+    { id: 'coldbrew', cat: 'DRINKS', name: 'Cold Brew', price: 425, desc: 'Sixteen-hour steep, unsweetened.', tag: '', combo: false },
+    { id: 'lemonade', cat: 'DRINKS', name: 'Lemonade', price: 375, desc: 'Pressed this morning.', tag: '', combo: false },
+    { id: 'tea', cat: 'DRINKS', name: 'Iced Tea', price: 325, desc: 'Black, sweet or plain.', tag: '', combo: false },
+    { id: 'classicmt', concept: 'TEA', cat: 'MILK TEA', name: 'Classic Milk Tea', price: 550, desc: 'Assam black tea, whole milk, tapioca pearls cooked every two hours.', tag: 'BAR FAVORITE', combo: false },
+    { id: 'brownsugar', concept: 'TEA', cat: 'MILK TEA', name: 'Brown Sugar Boba', price: 675, desc: 'Striped cup, torched brown sugar syrup, fresh milk, warm pearls.', tag: '', combo: false },
+    { id: 'hojicha', concept: 'TEA', cat: 'MILK TEA', name: 'Hojicha Latte', price: 625, desc: 'Roasted green tea, oat milk, lightly sweet.', tag: '', combo: false },
+    { id: 'taro', concept: 'TEA', cat: 'MILK TEA', name: 'Taro Milk Tea', price: 625, desc: 'Steamed taro, jasmine base, pudding recommended.', tag: '', combo: false },
+    { id: 'passion', concept: 'TEA', cat: 'FRUIT TEA', name: 'Passionfruit Green', price: 595, desc: 'Jasmine green, real passionfruit, orange wheel.', tag: '', combo: false },
+    { id: 'mango', concept: 'TEA', cat: 'FRUIT TEA', name: 'Mango Yakult', price: 650, desc: 'Mango pur\u00e9e, cultured milk soda, popping boba.', tag: '', combo: false },
+    { id: 'lychee', concept: 'TEA', cat: 'FRUIT TEA', name: 'Lychee Oolong', price: 595, desc: 'Cold-brew oolong, lychee, aloe cubes.', tag: '', combo: false },
+    { id: 'strawmatcha', concept: 'TEA', cat: 'FRUIT TEA', name: 'Strawberry Matcha', price: 695, desc: 'Layered strawberry pur\u00e9e under ceremonial matcha.', tag: 'NEW', combo: false },
+    { id: 'eggwaffle', concept: 'TEA', cat: 'SNACKS', name: 'Egg Waffle', price: 550, desc: 'Pressed to order, crisp at the edges.', tag: '', combo: false },
+    { id: 'popcornchx', concept: 'TEA', cat: 'SNACKS', name: 'Popcorn Chicken', price: 675, desc: 'Salt and pepper, fried basil.', tag: '', combo: false },
+    { id: 'mochidonut', concept: 'TEA', cat: 'SNACKS', name: 'Mochi Donut', price: 375, desc: 'Chewy ring, glazed daily.', tag: '', combo: false }
+  ];
+
+  GROUPS = {
+    SANDWICHES: [
+      { key: 'bread', title: 'BREAD', note: 'PICK ONE', multi: false, opts: [
+        { key: 'sourdough', label: 'Sourdough', up: 0 }, { key: 'rye', label: 'Griddled rye', up: 0 },
+        { key: 'seeded', label: 'Seeded roll', up: 50 }, { key: 'wrap', label: 'Wrap', up: 0 },
+        { key: 'gf', label: 'Gluten-free', up: 150 }, { key: 'bowl', label: 'No bread, bowl it', up: 0 } ] },
+      { key: 'add', title: 'PILE IT ON', note: 'ANY', multi: true, opts: [
+        { key: 'bacon', label: 'Bacon', up: 250 }, { key: 'avo', label: 'Avocado', up: 200 },
+        { key: 'egg', label: 'Fried egg', up: 175 }, { key: 'cheese', label: 'Extra cheese', up: 125 },
+        { key: 'hots', label: 'Hot peppers', up: 0 }, { key: 'honey', label: 'Hot honey', up: 75 } ] },
+      { key: 'hold', title: 'LEAVE IT OFF', note: 'ANY', multi: true, opts: [
+        { key: 'tomato', label: 'No tomato', up: 0 }, { key: 'onion', label: 'No onion', up: 0 },
+        { key: 'mayo', label: 'No mayo', up: 0 } ] }
+    ],
+    SALADS: [
+      { key: 'protein', title: 'PROTEIN', note: 'PICK ONE', multi: false, opts: [
+        { key: 'chicken', label: 'Grilled chicken', up: 0 }, { key: 'cutlet', label: 'Fried cutlet', up: 200 },
+        { key: 'none', label: 'Keep it green', up: -150 } ] },
+      { key: 'dress', title: 'DRESSING', note: 'PICK ONE', multi: false, opts: [
+        { key: 'caesar', label: 'Caesar', up: 0 }, { key: 'vin', label: 'Red wine vin', up: 0 },
+        { key: 'side', label: 'On the side', up: 0 } ] }
+    ],
+    SIDES: [
+      { key: 'size', title: 'SIZE', note: 'PICK ONE', multi: false, opts: [
+        { key: 'reg', label: 'Regular', up: 0 }, { key: 'large', label: 'Large', up: 175 } ] },
+      { key: 'dip', title: 'DIP', note: 'ANY', multi: true, opts: [
+        { key: 'ranch', label: 'Ranch', up: 75 }, { key: 'marinara', label: 'Marinara', up: 75 },
+        { key: 'spicy', label: 'Spicy mayo', up: 75 } ] }
+    ],
+    DRINKS: [
+      { key: 'size', title: 'SIZE', note: 'PICK ONE', multi: false, opts: [
+        { key: 'md', label: 'Medium', up: 0 }, { key: 'lg', label: 'Large', up: 90 } ] },
+      { key: 'ice', title: 'ICE', note: 'ANY', multi: true, opts: [
+        { key: 'light', label: 'Light ice', up: 0 }, { key: 'none', label: 'No ice', up: 0 } ] }
+    ],
+    'MILK TEA': [
+      { key: 'size', title: 'SIZE', note: 'PICK ONE', multi: false, opts: [
+        { key: 'reg', label: 'Regular 16 oz', up: 0 }, { key: 'lg', label: 'Large 24 oz', up: 90 } ] },
+      { key: 'sugar', title: 'SUGAR', note: 'PICK ONE', multi: false, opts: [
+        { key: '100', label: '100%', up: 0 }, { key: '75', label: '75%', up: 0 }, { key: '50', label: '50%', up: 0 },
+        { key: '25', label: '25%', up: 0 }, { key: '0', label: 'No sugar', up: 0 } ] },
+      { key: 'ice', title: 'ICE', note: 'PICK ONE', multi: false, opts: [
+        { key: 'reg', label: 'Regular ice', up: 0 }, { key: 'less', label: 'Less ice', up: 0 },
+        { key: 'none', label: 'No ice', up: 0 }, { key: 'hot', label: 'Serve hot', up: 0 } ] },
+      { key: 'top', title: 'TOPPINGS', note: 'ANY', multi: true, opts: [
+        { key: 'pearl', label: 'Tapioca pearls', up: 85 }, { key: 'popping', label: 'Popping boba', up: 85 },
+        { key: 'jelly', label: 'Grass jelly', up: 75 }, { key: 'pudding', label: 'Egg pudding', up: 85 },
+        { key: 'foam', label: 'Cheese foam', up: 125 }, { key: 'aloe', label: 'Aloe cubes', up: 75 } ] }
+    ],
+    'FRUIT TEA': [
+      { key: 'size', title: 'SIZE', note: 'PICK ONE', multi: false, opts: [
+        { key: 'reg', label: 'Regular 16 oz', up: 0 }, { key: 'lg', label: 'Large 24 oz', up: 90 } ] },
+      { key: 'sugar', title: 'SUGAR', note: 'PICK ONE', multi: false, opts: [
+        { key: '100', label: '100%', up: 0 }, { key: '75', label: '75%', up: 0 }, { key: '50', label: '50%', up: 0 },
+        { key: '25', label: '25%', up: 0 }, { key: '0', label: 'No sugar', up: 0 } ] },
+      { key: 'ice', title: 'ICE', note: 'PICK ONE', multi: false, opts: [
+        { key: 'reg', label: 'Regular ice', up: 0 }, { key: 'less', label: 'Less ice', up: 0 }, { key: 'none', label: 'No ice', up: 0 } ] },
+      { key: 'top', title: 'TOPPINGS', note: 'ANY', multi: true, opts: [
+        { key: 'popping', label: 'Popping boba', up: 85 }, { key: 'aloe', label: 'Aloe cubes', up: 75 },
+        { key: 'jelly', label: 'Lychee jelly', up: 75 }, { key: 'foam', label: 'Cheese foam', up: 125 } ] }
+    ],
+    SNACKS: [
+      { key: 'sauce', title: 'SAUCE', note: 'ANY', multi: true, opts: [
+        { key: 'plum', label: 'Plum salt', up: 0 }, { key: 'condensed', label: 'Condensed milk', up: 50 },
+        { key: 'chili', label: 'Chili crisp', up: 50 } ] }
+    ]
+  };
+
+  COMBO_SIDES = ['fries', 'rings', 'mozz'];
+  COMBO_DRINKS = ['fountain', 'coldbrew', 'classicmt'];
+  COMBO_PRICE = 450;
+
+  fmt(c) { return '$' + (c / 100).toFixed(2); }
+
+  warnAt() { return (this.props.warnAtMin ?? 4) * 60; }
+  lateAt() { return (this.props.lateAtMin ?? 7) * 60; }
+
+  okHex() { return this.props.okColor || '#2fd07a'; }
+  warnHex() { return this.props.warnColor || '#ffb020'; }
+  lateHex() { return this.props.lateColor || 'var(--color-accent)'; }
+
+  themeVars() {
+    const a = this.state.accentPick || this.props.accentColor || '#ec3013';
+    const tones = {
+      Carbon: ['#131111', '#1c1a1a', '#1e1c1c', '#3a3636', '#201e1d'],
+      Espresso: ['#191210', '#241a17', '#271d1a', '#463733', '#241a17'],
+      Graphite: ['#101314', '#191d1f', '#1c2123', '#343b3d', '#1a1f21']
+    };
+    const t = tones[this.props.boardTone] || tones.Carbon;
+    return {
+      '--color-accent': a,
+      '--color-accent-200': 'color-mix(in oklch, ' + a + ' 22%, #ffffff)',
+      '--color-accent-700': 'color-mix(in oklch, ' + a + ' 78%, #000000)',
+      '--color-accent-800': 'color-mix(in oklch, ' + a + ' 62%, #000000)',
+      '--kds-board': t[0], '--kds-bar': t[1], '--kds-chit': t[2], '--kds-rule': t[3], '--kios-chrome': t[4]
+    };
+  }
+
+  applyTheme() {
+    const r = document.documentElement, v = this.themeVars();
+    Object.keys(v).forEach((k) => r.style.setProperty(k, v[k]));
+  }
+
+  componentDidUpdate() { this.applyTheme(); }
+
+  toneFor(sec) {
+    if (sec >= this.lateAt()) return this.lateHex();
+    if (sec >= this.warnAt()) return this.warnHex();
+    return this.okHex();
+  }
+
+  mmss(sec) {
+    const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
+    return m + ':' + String(s).padStart(2, '0');
+  }
+
+  elapsedOf(t) { return t.age + Math.floor((Date.now() - this.t0) / 1000); }
+
+  liveChits() {
+    const st = this.state.station, out = [];
+    this.TICKETS.forEach((t) => {
+      if (st === 'EXPO') {
+        const key = t.order + '-all';
+        const lines = t.items.map((it, i) => Object.assign({}, it, { done: !!this.state.bumped[t.order + '-' + i] }));
+        if (!this.state.bumped[key]) out.push({ t, key, lines, expo: true });
+      } else {
+        t.items.forEach((it, i) => {
+          const key = t.order + '-' + i;
+          if (it.st === st && !this.state.bumped[key]) out.push({ t, key, lines: [it] });
+        });
+      }
+    });
+    return out.sort((a, b) => this.elapsedOf(b.t) - this.elapsedOf(a.t)).slice(0, 10);
+  }
+
+  modStyle(kind) {
+    if (kind === 'NO') return { bg: this.lateHex(), fg: '#ffffff', fg2: this.lateHex() };
+    if (kind === 'SUB') return { bg: this.warnHex(), fg: '#201e1d', fg2: this.warnHex() };
+    return { bg: this.okHex(), fg: '#131111', fg2: this.okHex() };
+  }
+
+  bump = (key) => this.setState({ bumped: Object.assign({}, this.state.bumped, { [key]: true }) });
+
+  cartTotals() {
+    const sub = this.state.cart.reduce((n, l) => n + l.price, 0);
+    const sav = this.state.cart.reduce((n, l) => n + (l.saved || 0), 0);
+    const tax = Math.round(sub * 0.0875);
+    return { sub, sav, tax, total: sub + tax };
+  }
+
+  itemOf(id) { return this.MENU.find((m) => m.id === id); }
+
+  runningPrice() {
+    const it = this.itemOf(this.state.itemId);
+    if (!it) return 0;
+    let p = it.price;
+    const groups = this.GROUPS[it.cat] || [];
+    groups.forEach((g) => {
+      const sel = this.state.sel[g.key];
+      g.opts.forEach((o) => {
+        const on = g.multi ? (sel || []).indexOf(o.key) > -1 : sel === o.key;
+        if (on) p += o.up;
+      });
+    });
+    return p;
+  }
+
+  modsLabel() {
+    const it = this.itemOf(this.state.itemId);
+    if (!it) return '';
+    const parts = [];
+    (this.GROUPS[it.cat] || []).forEach((g) => {
+      const sel = this.state.sel[g.key];
+      g.opts.forEach((o) => {
+        const on = g.multi ? (sel || []).indexOf(o.key) > -1 : sel === o.key;
+        if (on) parts.push(o.label);
+      });
+    });
+    return parts.join(' · ');
+  }
+
+  openItem = (id) => {
+    const it = this.itemOf(id);
+    const sel = {};
+    (this.GROUPS[it.cat] || []).forEach((g) => { if (!g.multi) sel[g.key] = g.opts[0].key; else sel[g.key] = []; });
+    this.setState({ screen: 'item', itemId: id, sel });
+  };
+
+  toggle = (gk, ok, multi) => {
+    const cur = this.state.sel[gk];
+    let next;
+    if (multi) {
+      const arr = cur || [];
+      next = arr.indexOf(ok) > -1 ? arr.filter((x) => x !== ok) : arr.concat([ok]);
+    } else next = ok;
+    this.setState({ sel: Object.assign({}, this.state.sel, { [gk]: next }) });
+  };
+
+  quickAdd = (id) => {
+    const it = this.itemOf(id);
+    const line = { id: it.id, concept: it.concept || 'DELI', name: it.name, qty: 1, price: it.price, mods: 'as it comes', saved: 0, combo: '' };
+    this.setState({ cart: this.state.cart.concat([line]) });
+  };
+
+  addItem = () => {
+    const it = this.itemOf(this.state.itemId);
+    const line = { id: it.id, concept: it.concept || 'DELI', name: it.name, qty: 1, price: this.runningPrice(), mods: this.modsLabel(), saved: 0, combo: '' };
+    const cart = this.state.cart.concat([line]);
+    if (it.combo) this.setState({ cart, screen: 'combo', comboSide: null, comboDrink: null });
+    else this.setState({ cart, screen: 'browse' });
+  };
+
+  acceptCombo = () => {
+    if (!this.state.comboSide || !this.state.comboDrink) return;
+    const s = this.itemOf(this.state.comboSide), d = this.itemOf(this.state.comboDrink);
+    const ala = s.price + d.price;
+    const cart = this.state.cart.slice();
+    const anchor = cart[cart.length - 1];
+    cart[cart.length - 1] = Object.assign({}, anchor, {
+      price: anchor.price + this.COMBO_PRICE,
+      saved: ala - this.COMBO_PRICE,
+      combo: 'COMBO · ' + s.name + ' + ' + d.name
+    });
+    this.setState({ cart, screen: 'browse', comboSide: null, comboDrink: null });
+  };
+
+  renderVals() {
+    const s = this.state, L = s.layout;
+    const SHORT = { COLD: 'COLD', FRYER: 'FRY', SAND: 'SAND', GRILL: 'GRILL', DRINKS: 'BAR' };
+    const chits = this.liveChits().map((c) => {
+      const el = this.elapsedOf(c.t);
+      const pctLeft = Math.max(0, Math.min(100, 100 - (el / this.lateAt()) * 100));
+      const upCount = c.lines.filter((ln) => ln.done).length;
+      const allUp = c.expo && upCount === c.lines.length;
+      return {
+        isExpo: !!c.expo,
+        upLabel: upCount + '/' + c.lines.length + ' UP',
+        upBg: allUp ? '#2fd07a' : (upCount ? '#ffb020' : '#3a3636'),
+        upFg: upCount ? '#131111' : '#9b9797',
+        allUp,
+        bumpLabel: c.expo ? (allUp ? 'BAG IT' : 'WAITING') : 'BUMP',
+        bumpBg: c.expo && !allUp ? '#3a3636' : 'var(--color-accent)',
+        onChitTap: () => { if (!s.plateArmed) return; const ln = c.t.items[0]; this.openPlate(this.RECIPE_FOR[ln.name] || 'club', c.t.order + ' · ' + ln.name); },
+        chitCursor: s.plateArmed ? 'pointer' : 'default',
+        armOutline: s.plateArmed ? '2px solid var(--color-accent)' : 'none',
+        key: c.key, order: c.t.order, channel: c.t.ch, name: c.t.name, bag: c.t.bag,
+        rush: c.t.rush, allergy: c.t.allergy || false,
+        seat: c.t.order.slice(-2),
+        timeLabel: this.mmss(el), tone: this.toneFor(el), pct: pctLeft.toFixed(0) + '%',
+        isA: L === 'A', isB: L === 'B', isC: L === 'C',
+        bump: () => { if (c.expo && !allUp) return; this.bump(c.key); },
+        recipe: () => { const n = c.lines[0] ? c.lines[0].name : ''; this.openPlate(this.RECIPE_FOR[n] || (n.indexOf('Cutlet') > -1 ? 'cutlet' : 'club'), c.t.order + (n ? ' · ' + n : '')); },
+        lines: c.lines.map((ln) => ({
+          qty: ln.qty, name: ln.name,
+          done: !!ln.done,
+          stationLabel: c.expo ? (SHORT[ln.st] || ln.st) : false,
+          nameColor: ln.done ? '#605d5d' : '#f8f4f4',
+          deco: ln.done ? 'line-through' : 'none',
+          modsOpacity: ln.done ? '.35' : '1',
+          mods: ln.mods.map((m) => Object.assign({ kind: m[0], text: m[1] }, this.modStyle(m[0])))
+        }))
+      };
+    });
+
+    const allOpen = this.TICKETS.filter((t) => !t.items.every((it, i) => s.bumped[t.order + '-' + i]));
+    const ages = allOpen.map((t) => this.elapsedOf(t));
+    const lateCount = ages.filter((a) => a >= this.lateAt()).length;
+
+    const stations = this.STATIONS.map((st) => {
+      const items = [];
+      this.TICKETS.forEach((t) => t.items.forEach((it, i) => {
+        const key = st.key === 'EXPO' ? t.order + '-all' : t.order + '-' + i;
+        if ((st.key === 'EXPO' || it.st === st.key) && !s.bumped[key]) items.push(this.elapsedOf(t));
+      }));
+      const on = s.station === st.key;
+      return {
+        label: st.label, count: st.key === 'EXPO' ? allOpen.length : items.length,
+        hasLate: items.some((a) => a >= this.lateAt()),
+        bg: on ? 'var(--color-accent)' : '#1c1a1a', color: on ? '#ffffff' : '#bab6b6',
+        underline: on ? '#ffffff' : 'transparent',
+        onClick: () => this.setState({ station: st.key })
+      };
+    });
+
+    const layoutMeta = {
+      A: { title: 'A — Full ticket', blurb: 'Order, channel, name, allergen band, then the build. Dedicated bump bar so nothing gets fired by a wet glove.', cta: 'ON THE BOARD' },
+      B: { title: 'B — Timer column', blurb: 'Timer and order number in a solid colour block, legible across the fry line. Tap-anywhere done.', cta: 'PUSH TO BOARD' },
+      C: { title: 'C — Burn-down rail', blurb: 'The rail drains toward zero, so cooks read time remaining instead of time spent. Mods as chips.', cta: 'PUSH TO BOARD' }
+    };
+
+    const layoutOptions = ['A', 'B', 'C'].map((k) => ({
+      key: k, onClick: () => this.setState({ layout: k }),
+      bg: L === k ? 'var(--color-accent)' : 'transparent', border: L === k ? 'var(--color-accent)' : '#3a3636',
+      color: L === k ? '#ffffff' : '#bab6b6'
+    }));
+
+    const layoutCards = ['A', 'B', 'C'].map((k) => ({
+      key: k, title: layoutMeta[k].title, blurb: layoutMeta[k].blurb,
+      cta: L === k ? layoutMeta[k].cta.replace('PUSH TO BOARD', 'ON THE BOARD') : layoutMeta[k].cta,
+      bg: L === k ? 'var(--color-accent)' : 'transparent', border: L === k ? 'var(--color-accent)' : '#3a3636',
+      color: L === k ? '#ffffff' : '#f8f4f4',
+      onClick: () => this.setState({ layout: k })
+    }));
+
+    const recipe = this.RECIPES[s.recipe];
+    const recipeTabs = Object.keys(this.RECIPES).map((k) => {
+      const on = s.recipe === k;
+      return {
+        name: this.RECIPES[k].name, onClick: () => this.setState({ recipe: k }),
+        bg: on ? 'var(--color-accent)' : 'transparent', color: on ? '#ffffff' : '#9b9797',
+        underline: on ? '#ffffff' : 'transparent'
+      };
+    });
+
+    const conc = this.conceptOf(s.concept);
+    const brands = this.CONCEPTS.map((c) => {
+      const on = s.concept === c.key;
+      return {
+        name: c.name, sub: c.sub,
+        bg: on ? '#2d2a29' : 'transparent', color: on ? '#f8f4f4' : '#8d8888',
+        bar: on ? 'var(--color-accent)' : 'transparent',
+        mark: on ? c.mark : 'transparent', markBorder: on ? c.mark : '#5a5555',
+        onClick: () => this.setState({ concept: c.key, cat: c.cats[0], screen: 'browse' })
+      };
+    });
+
+    const kioskLayouts = [{ key: 'GRID', label: 'GRID' }, { key: 'LIST', label: 'LIST' }].map((k) => {
+      const on = s.kioskLayout === k.key;
+      return {
+        label: k.label,
+        bg: on ? 'var(--color-accent)' : 'transparent', border: on ? 'var(--color-accent)' : '#5a5555',
+        color: on ? '#ffffff' : '#bab6b6',
+        onClick: () => this.setState({ kioskLayout: k.key })
+      };
+    });
+
+    const cats = conc.cats.map((c) => {
+      const on = s.cat === c;
+      return {
+        label: c, onClick: () => this.setState({ cat: c, screen: 'browse' }),
+        bg: on ? '#201e1d' : 'transparent', color: on ? '#f8f4f4' : '#605d5d',
+        underline: on ? 'var(--color-accent)' : 'transparent',
+        railBg: on ? 'var(--color-accent)' : 'transparent', railColor: on ? '#ffffff' : '#bab6b6',
+        railBar: on ? '#ffffff' : 'transparent'
+      };
+    });
+
+    const menu = this.MENU.filter((m) => (m.concept || 'DELI') === s.concept && m.cat === s.cat).map((m) => ({
+      name: m.name, desc: m.desc, priceLabel: this.fmt(m.price), tag: m.tag || false,
+      slotId: 'kiosk-' + m.id,
+      slotHint: m.name + ' — plated',
+      onClick: () => this.openItem(m.id)
+    }));
+
+    const item = this.itemOf(s.itemId) || { name: '', desc: '' };
+    const groups = (this.GROUPS[item.cat] || []).map((g) => ({
+      title: g.title, note: g.note, noteColor: g.multi ? '#9b9797' : '#ae1800',
+      options: g.opts.map((o) => {
+        const sel = s.sel[g.key];
+        const on = g.multi ? (sel || []).indexOf(o.key) > -1 : sel === o.key;
+        return {
+          label: o.label,
+          priceLabel: o.up === 0 ? '' : (o.up > 0 ? '+' + this.fmt(o.up) : '−' + this.fmt(-o.up)),
+          border: on ? 'var(--color-accent)' : 'rgba(32,30,29,.28)',
+          bg: on ? 'var(--color-accent)' : '#ffffff', color: on ? '#ffffff' : '#201e1d',
+          onClick: () => this.toggle(g.key, o.key, g.multi)
+        };
+      })
+    }));
+
+    const side = s.comboSide ? this.itemOf(s.comboSide) : null;
+    const drink = s.comboDrink ? this.itemOf(s.comboDrink) : null;
+    const ala = (side ? side.price : 0) + (drink ? drink.price : 0);
+    const ready = !!(side && drink);
+    const anchorLine = s.cart[s.cart.length - 1];
+
+    const comboSides = this.COMBO_SIDES.map((id) => {
+      const m = this.itemOf(id), on = s.comboSide === id;
+      return {
+        name: m.name, upLabel: 'à la carte ' + this.fmt(m.price),
+        border: on ? 'var(--color-accent)' : 'rgba(32,30,29,.28)', bg: on ? 'var(--color-accent)' : '#ffffff',
+        color: on ? '#ffffff' : '#201e1d', onClick: () => this.setState({ comboSide: id })
+      };
+    });
+    const comboDrinks = this.COMBO_DRINKS.map((id) => {
+      const m = this.itemOf(id), on = s.comboDrink === id;
+      return {
+        name: m.name, upLabel: 'à la carte ' + this.fmt(m.price),
+        border: on ? 'var(--color-accent)' : 'rgba(32,30,29,.28)', bg: on ? 'var(--color-accent)' : '#ffffff',
+        color: on ? '#ffffff' : '#201e1d', onClick: () => this.setState({ comboDrink: id })
+      };
+    });
+
+    const adIndex = s.adPin === null ? Math.floor(s.tick / 6) % this.ADS.length : s.adPin;
+    const adRaw = this.ADS[adIndex];
+    const ad = { kicker: adRaw.kicker, headline: adRaw.headline, body: adRaw.body, slotId: adRaw.slot, slotHint: adRaw.hint };
+    const adDots = this.ADS.map((a, i) => ({
+      bg: i === adIndex ? 'var(--color-accent)' : '#4a4545',
+      onClick: () => this.setState({ adPin: i })
+    }));
+
+    const hasTea = s.cart.some((l) => (l.concept || 'DELI') === 'TEA');
+    const hasDeli = s.cart.some((l) => (l.concept || 'DELI') === 'DELI');
+    let suggestIds;
+    if (hasDeli && !hasTea) suggestIds = ['classicmt', 'passion', 'mochidonut'];
+    else if (hasTea && !hasDeli) suggestIds = ['club', 'fries', 'popcornchx'];
+    else suggestIds = ['brownsugar', 'fries', 'eggwaffle'];
+    const suggestions = suggestIds.map((id) => {
+      const m = this.itemOf(id);
+      return {
+        name: m.name, priceLabel: this.fmt(m.price), slotId: 'kiosk-' + m.id,
+        from: (m.concept || 'DELI') === 'TEA' ? 'LEAF & PEARL' : 'DELI COUNTER',
+        onClick: () => this.quickAdd(id)
+      };
+    });
+    const suggestNote = hasDeli && !hasTea ? 'people who ordered this added a tea'
+      : hasTea && !hasDeli ? 'something from the deli side'
+      : 'popular right now, one tap to add';
+
+    const tot = this.cartTotals();
+    const stepLabels = { browse: 'STEP 1 — BROWSE BOTH MENUS', item: 'STEP 2 — BUILD IT', combo: 'STEP 3 — COMBO', cart: 'STEP 4 — REVIEW BEFORE SUBMIT', done: 'SENT' };
+
+    const cartGroups = this.CONCEPTS.map((c) => {
+      const lines = s.cart.map((l, i) => ({ l: l, i: i })).filter((x) => (x.l.concept || 'DELI') === c.key);
+      return {
+        label: c.name, note: c.note, mark: c.mark,
+        sumLabel: this.fmt(lines.reduce((n, x) => n + x.l.price, 0)),
+        lines: lines.map((x) => ({
+          qty: x.l.qty, name: x.l.name, priceLabel: this.fmt(x.l.price),
+          modsLabel: x.l.mods || false, comboLabel: x.l.combo || false,
+          onRemove: () => this.setState({ cart: this.state.cart.filter((y, j) => j !== x.i) })
+        }))
+      };
+    }).filter((g) => g.lines.length > 0);
+
+    const deliCount = s.cart.filter((l) => (l.concept || 'DELI') === 'DELI').length;
+    const teaCount = s.cart.length - deliCount;
+    const splitParts = [];
+    if (deliCount) splitParts.push(deliCount + ' from the deli');
+    if (teaCount) splitParts.push(teaCount + ' from the tea bar');
+
+    const board = this.boardVals();
+    return Object.assign({}, board, {
+      chits, stations, layoutOptions, layoutCards,
+      openCount: allOpen.length, lateCount,
+      lateColor: lateCount ? this.lateHex() : this.okHex(),
+      avgLabel: ages.length ? this.mmss(ages.reduce((a, b) => a + b, 0) / ages.length) : '0:00',
+      clock: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+      prevStation: () => {
+        const i = this.STATIONS.findIndex((x) => x.key === s.station);
+        this.setState({ station: this.STATIONS[(i + this.STATIONS.length - 1) % this.STATIONS.length].key });
+      },
+      nextStation: () => {
+        const i = this.STATIONS.findIndex((x) => x.key === s.station);
+        this.setState({ station: this.STATIONS[(i + 1) % this.STATIONS.length].key });
+      },
+
+      recipe, recipeTabs,
+      isBoardView: s.kdsScreen === 'BOARD', isPlateView: s.kdsScreen === 'PLATE',
+      backToBoard: () => this.setState({ kdsScreen: 'BOARD', plateArmed: false }),
+      togglePlateArm: () => this.setState({ plateArmed: !s.plateArmed }),
+      plateArmBg: s.plateArmed ? '#1fae4a' : 'transparent',
+      plateArmBorder: s.plateArmed ? '#3fe07a' : '#3a3636',
+      plateArmColor: s.plateArmed ? '#ffffff' : '#bab6b6',
+      plateArmGlow: s.plateArmed ? '0 0 12px 3px rgba(63,224,122,.75)' : 'none',
+      plateArmFlash: s.plateArmed ? 'none' : 'plateflash 1.4s ease-in-out infinite',
+      plateContext: s.plateFrom || recipe.name,
+      plateSlotA: 'plate-' + s.recipe + '-a', plateSlotB: 'plate-' + s.recipe + '-b',
+
+      isBrowse: s.screen === 'browse', isItem: s.screen === 'item',
+      isCombo: s.screen === 'combo', isCart: s.screen === 'cart', isDone: s.screen === 'done',
+      kioskStepLabel: stepLabels[s.screen],
+      cats, menu, item, groups,
+      ad, adDots, suggestions, suggestNote,
+      itemSlotId: s.itemId ? 'kiosk-' + s.itemId : 'kiosk-detail-photo',
+      itemSlotHint: (this.itemOf(s.itemId) ? this.itemOf(s.itemId).name + ' — plated' : 'Plated shot'),
+      kioskLayouts,
+      isGridBrowse: s.screen === 'browse' && s.kioskLayout === 'GRID',
+      isRailBrowse: s.screen === 'browse' && s.kioskLayout === 'LIST',
+      railFootnote: s.concept === 'TEA' ? 'Sealed at the bar. Toppings scooped to order.' : 'Allergen sheet at the register. Everything sliced to order.',
+      brands,
+      browseTitle: conc.title, browseSub: conc.blurb,
+      cartGroups, counterSplitLabel: splitParts.join(' · ') || 'empty',
+      doneNote: teaCount && deliCount
+        ? 'Deli goes to the back board, tea to the bar. Both under the same number — about ' + (s.cart.length > 2 ? '9 minutes' : '6 minutes') + '.'
+        : "Watch the board. We'll call the number when it's up — about " + (s.cart.length > 2 ? '9 minutes' : '6 minutes') + '.',
+      runningLabel: this.fmt(this.runningPrice()),
+      backToBrowse: () => this.setState({ screen: 'browse' }),
+      addItem: this.addItem,
+      comboSides, comboDrinks,
+      comboAnchor: anchorLine ? anchorLine.name : 'sandwich',
+      comboSaveLabel: this.fmt(ready ? ala - this.COMBO_PRICE : 275),
+      alaCarteLabel: this.fmt(ready ? (anchorLine ? anchorLine.price : 0) + ala : 0),
+      comboTotalLabel: this.fmt(ready ? (anchorLine ? anchorLine.price : 0) + this.COMBO_PRICE : 0),
+      comboCtaLabel: ready ? 'ADD THE COMBO' : 'PICK A SIDE AND A DRINK',
+      comboCtaBg: ready ? 'var(--color-accent)' : '#9b9797',
+      comboAddLabel: ready ? '+' + this.fmt(this.COMBO_PRICE) : '',
+      acceptCombo: this.acceptCombo,
+      skipCombo: () => this.setState({ screen: 'browse', comboSide: null, comboDrink: null }),
+
+      cartEmpty: s.cart.length === 0,
+      cartCount: s.cart.length,
+      cartCountLabel: s.cart.length === 1 ? '1 item' : s.cart.length + ' items',
+      subtotalLabel: this.fmt(tot.sub), taxLabel: this.fmt(tot.tax),
+      totalLabel: this.fmt(tot.total), savingsLabel: this.fmt(tot.sav), hasSavings: tot.sav > 0,
+      pearlCatsBlack: this.PEARL_CATS_BLACK.map((c) => {
+        const on = s.pearlCat === c.label;
+        return {
+          label: c.label,
+          onClick: () => this.setState({ pearlCat: on ? null : c.label }),
+          bg: c.heading ? '#ec3013' : '#201e1d',
+          grow: c.heading ? 'none' : '1',
+          font: c.heading ? '900 16px/1.2 Archivo,system-ui,sans-serif' : '800 15px/1.25 Archivo,system-ui,sans-serif',
+          letterSpacing: c.heading ? '.08em' : 'normal',
+          outline: on ? '3px solid #ffffff' : 'none'
+        };
+      }),
+      pearlCatsBlue: this.PEARL_CATS_BLUE.map((c) => {
+        const on = s.pearlCat === c.label;
+        return {
+          label: c.label,
+          onClick: () => this.setState({ pearlCat: on ? null : c.label }),
+          bg: c.heading ? '#ec3013' : 'var(--color-accent)',
+          grow: c.heading ? 'none' : '1',
+          font: c.heading ? '900 16px/1.2 Archivo,system-ui,sans-serif' : '800 15px/1.25 Archivo,system-ui,sans-serif',
+          letterSpacing: c.heading ? '.08em' : 'normal',
+          outline: on ? '3px solid #ffffff' : 'none'
+        };
+      }),
+      pearlCatLabel: s.pearlCat || 'All items',
+      pearlMenu: this.PEARL_MENU.filter((m) => !s.pearlCat || m.cat === s.pearlCat).map((m) => ({
+        name: m.name, priceLabel: this.fmt(m.price), slotId: 'pearl-' + m.id, slotHint: m.name,
+        onClick: () => this.pearlAdd(m.id)
+      })),
+      pearlEmpty: !this.PEARL_MENU.some((m) => !s.pearlCat || m.cat === s.pearlCat),
+      pearlCartLines: s.pearlCart.map((l) => ({ qty: l.qty, name: l.name, priceLabel: this.fmt(l.price * l.qty) })),
+      pearlCartEmpty: s.pearlCart.length === 0,
+      pearlTotalLabel: this.fmt(s.pearlCart.reduce((n, l) => n + l.price * l.qty, 0)),
+      goCart: () => this.setState({ screen: 'cart' }),
+      pay: () => this.setState({ screen: 'done' }),
+      resetKiosk: () => this.setState({ screen: 'browse', cart: [], concept: 'DELI', cat: 'SANDWICHES' }),
+      orderNumber: s.orderNo,
+      etaLabel: s.cart.length > 2 ? '9 minutes' : '6 minutes',
+
+      catTitle: s.cat.charAt(0) + s.cat.slice(1).toLowerCase(),
+      catCountLabel: this.MENU.filter((m) => (m.concept || 'DELI') === s.concept && m.cat === s.cat).length + ' ITEMS'
+    });
+  }
+}
+</script>
+</body>
+</html>
