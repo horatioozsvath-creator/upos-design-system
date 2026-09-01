@@ -30,7 +30,10 @@ and §8 answers most styling questions without a second file open.
 Part II is per screen and follows one template, so the same six questions are answered in the same
 order every time. Copy that template for any screen the handoff does not cover.
 
-Part I is complete. Parts II, III and IV carry a written-in marker naming the task that fills them.
+Part III is the lookup between the two: find the component a region needs, then read its props,
+states and consumers.
+
+Parts I, II and III are complete. Part IV carries a written-in marker naming the task that fills it.
 
 ## Contents
 
@@ -76,6 +79,30 @@ Part I is complete. Parts II, III and IV carry a written-in marker naming the ta
     - [Guest-facing rules](#guest-facing-rules)
     - [Kiosk data contract](#kiosk-data-contract)
 - [Part III · Component inventory](#part-iii--component-inventory)
+  - [MenuItemCard](#menuitemcard)
+  - [OrderCard](#ordercard)
+  - [OrderStatusBadge](#orderstatusbadge)
+  - [UposButton](#uposbutton)
+  - [UposIconButton](#uposiconbutton)
+  - [StatusChip](#statuschip)
+  - [AllergenChip](#allergenchip)
+  - [Pill](#pill)
+  - [SegmentedControl](#segmentedcontrol)
+  - [StatCard](#statcard)
+  - [DataRow](#datarow)
+  - [UposModal](#uposmodal)
+  - [UposDrawer](#uposdrawer)
+  - [Toast](#toast)
+  - [BottomNav](#bottomnav)
+  - [SideNav](#sidenav)
+  - [FloorTable](#floortable)
+  - [CartLine](#cartline)
+  - [QtyStepper](#qtystepper)
+  - [TipPad](#tippad)
+  - [TenderTile](#tendertile)
+  - [ChitCard](#chitcard)
+  - [ChannelBadge](#channelbadge)
+  - [OfflinePill](#offlinepill)
 - [Part IV · Data-model gaps](#part-iv--data-model-gaps)
 
 ## The screen-spec template
@@ -2296,10 +2323,449 @@ status.
 
 ## Part III · Component inventory
 
-*Written in Task 9.* One summary table (component · CSS classes · consuming screens · existing or
-new), then one block per component covering classes, props, states, consumers and notes — for the
-three components `Restaurant.UI.Shared` already has (`MenuItemCard`, `OrderCard`,
-`OrderStatusBadge`) and the new set named in §12.
+Part I is the language and Part II is the screens. This is what sits between them: the Razor
+components `Restaurant.UI.Shared` ships so that a screen is assembled rather than styled. All four
+surfaces read the same library — the terminal in `Restaurant.Mobile`, the back office in
+`Restaurant.Blazor`, and the kitchen display and kiosk when they are built.
+
+Twenty-four components. Three exist in the POC and are restyled onto the kit; twenty-one are new,
+and between them they consume every class in `upos-components.css`. **Nothing else in Part II is a
+component.** The AI insight banner, the promo band, the concept and bag bars, the KDS station strip,
+the report bars and the plate-stack builder are screen-level markup over the same tokens, and their
+screen specs are their whole definition.
+
+**Naming follows §12.** Four primitives take the `Upos*` prefix, because their bare names collide
+with framework and library types — `UposButton`, `UposIconButton`, `UposModal`, `UposDrawer`.
+Everything else is a plain domain noun.
+
+**Prop types are the POC's wherever the POC has one**: `MenuItemDto`, `OrderDto`, `OrderItemDto`,
+`Table`, `OrderStatus`, `decimal` for money, `EventCallback` and `EventCallback<T>` for events,
+`RenderFragment` for a slot. An enum or record named in a props line that is not one of those —
+`ButtonVariant`, `StatusTone`, `TypeScale`, `NavItem` — ships with the component and describes
+rendering, not data. No component invents a DTO, and none takes a model the schema does not have.
+
+**Lateness is a parameter, never a field.** Every component that can show late takes an elapsed
+value or a timestamp plus the threshold to measure it against, and derives the state on render.
+Nothing takes an `IsLate` bool, because nothing upstream stores one and no endpoint returns one
+(§4).
+
+**No component takes a touch flag.** The kit's `:hover` transforms are pointer-surface behavior, and
+`Restaurant.Mobile`, the board and the kiosk suppress them at the host with one `@media (hover:hover)`
+guard. The same component ships to all four surfaces, and press feedback stays the ripple tint (§8).
+
+**One control the kit does not ship, specified here.** Part II-B's Integrations spec routes it to
+this part: a 50×28 track at `--upos-radius-pill` carrying a 22px white knob that slides `3px → 25px`,
+`--upos-grad-primary` on and `--upos-border` off, moving at `--upos-dur-fast` on `--upos-ease` (§8).
+It is the same switch the terminal's Modifier modal uses for its combo control, so it has two
+consumers already and belongs in `upos-components.css` as `.u-switch` under a `Switch` component.
+Until the kit carries the recipe, both call sites write those five values and neither invents a sixth.
+
+| Component | CSS classes | Screens that consume it | Status |
+| --- | --- | --- | --- |
+| `MenuItemCard` | composes `.u-chip-allergen`, `.u-chip-status--late` | Order entry · Kiosk flow | Existing · restyle |
+| `OrderCard` | `.u-data-row`, `.is-late` | Channels queue | Existing · restyle |
+| `OrderStatusBadge` | `.u-chip-status`, `.u-chip-status--new`, `.u-chip-status--fired`, `.u-chip-status--late`, `.u-chip-status--ready` | Channels queue | Existing · restyle |
+| `UposButton` | `.u-btn`, `.u-btn--primary`, `.u-btn--secondary`, `.u-btn--ghost` | Order entry · Modifier modal · Floor plan · Table drawer · Payment · Employees, Devices, Settings (roadmap) · Kiosk flow · Guest-facing rules | New |
+| `UposIconButton` | `.u-icon-btn` | Order entry · Modifier modal · Item info modal · Floor plan · Table drawer · Payment · Menu manager | New |
+| `StatusChip` | `.u-chip-status`, `.u-chip-status--new`, `.u-chip-status--fired`, `.u-chip-status--late`, `.u-chip-status--ready` | Order entry · Table drawer · Channels queue | New |
+| `AllergenChip` | `.u-chip-allergen` | Order entry · Modifier modal · Item info modal · Menu manager · Chit anatomy · Kiosk flow | New |
+| `Pill` | `.u-pill` | Order entry · Modifier modal · Table drawer · Menu manager · Kiosk flow | New |
+| `SegmentedControl` | `.u-segmented`, `.u-segmented__opt`, `.is-active` | Item info modal · Table drawer · Payment · Menu manager · Kiosk flow | New |
+| `StatCard` | `.u-stat-card` | Dashboard | New |
+| `DataRow` | `.u-data-row`, `.is-late` | Channels queue · Employees, Devices, Settings (roadmap) | New |
+| `UposModal` | `.u-modal`, `.u-scrim` | Modifier modal · Item info modal · Floor plan · Payment · Menu manager · Kiosk flow · Guest-facing rules | New |
+| `UposDrawer` | `.u-drawer` | Table drawer · Payment | New |
+| `Toast` | `.u-toast` | None today — Order entry, Channels queue and Offline behavior each rule one out | New |
+| `BottomNav` | `.u-nav-bottom`, `.u-nav-item`, `.is-active` | Order entry (the shell every terminal destination inherits) | New |
+| `SideNav` | `.u-nav-item` restyled at the call site | Dashboard · Menu manager · Integrations · Reports · Employees, Devices, Settings (roadmap) | New |
+| `FloorTable` | none of its own — status border, `--upos-shadow-card`, `--upos-radius-card` or `--upos-radius-pill` | Floor plan | New |
+| `CartLine` | composes `.u-qty-stepper`, `.u-icon-btn`, `.u-chip-allergen` | Order entry · Offline behavior · Kiosk flow | New |
+| `QtyStepper` | `.u-qty-stepper` | Order entry · Modifier modal · Floor plan · Payment | New |
+| `TipPad` | `.u-tip-btn`, `.is-selected` | Payment | New |
+| `TenderTile` | `.u-tender-tile`, `.is-selected` | Payment · Offline behavior | New |
+| `ChitCard` | `.u-chit`, `.u-chit__timer`, `.u-chit__timer--late`; composes `.u-badge-channel`, `.u-chip-allergen` | Station board · Chit anatomy · Chit actions · KDS data contract | New |
+| `ChannelBadge` | `.u-badge-channel` | Channels queue · Chit anatomy · Integrations | New |
+| `OfflinePill` | `.u-pill-offline` | Order entry · Offline behavior | New |
+
+#### MenuItemCard
+
+**Classes:** none of its own; composes `.u-chip-allergen` and a `StatusChip` at `.u-chip-status--late`
+for the `86'D` pill.
+**Props:** `Item` (MenuItemDto), `Layout` (CardLayout: `Tile` · `GridCard` · `ListRow`), `Scale`
+(TypeScale: `Terminal` · `Kiosk`), `Tag` (string?, the kiosk merchandising word), `OnTap`
+(EventCallback<MenuItemDto>).
+**States:** available; 86'd — opacity `.5`, the name struck, the price replaced by the red `86'D` pill,
+and no response to a tap; info mode armed, where a tap opens the Item info modal instead of adding.
+**Consumed by:** Order entry, Kiosk flow (the grid card and the list row).
+**Notes:** the POC card is a Bootstrap `card`; the restyle is `--upos-surface` at `--upos-radius-card`
+with 1px `--upos-border` and `--upos-shadow-card`. `Kiosk` scale is Part I's roles at ×1.4 and lifts
+the whole element to `--upos-touch-kiosk` (Guest-facing rules). **The kiosk never renders the 86'd
+state** — an unavailable item is filtered out of the menu, not marked in it, because `86'D` is staff
+jargon before it is a label. Allergen chips are design-only until `MenuItem` carries allergens (GAP-05).
+
+#### OrderCard
+
+**Classes:** `.u-data-row`, `.is-late`; composes `ChannelBadge` and `OrderStatusBadge`.
+**Props:** `Order` (OrderDto), `Now` (DateTime, the parent's ticking clock), `LateAfter` (TimeSpan, the
+channel's SLA), `OnSelect` (EventCallback<int>).
+**States:** the row's status through its chip; late, which sets `.is-late` on the border and overrides
+the chip; hover lifts `translateY(-3px)` onto `--upos-shadow-card` on pointer surfaces only.
+**Consumed by:** Channels queue.
+**Notes:** the POC card renders an order and its lines as a panel; the restyle is **one order, one
+line** — the badge, `Counter · #482` over the item summary, the price and the chip. Late is derived
+here from `Order.CreatedAt` against `LateAfter` and written back nowhere (§4). The channel name, its
+two-letter code and its color have no field behind them (GAP-04). A status change restyles the row in
+place; nothing announces itself.
+
+#### OrderStatusBadge
+
+**Classes:** `.u-chip-status`, `.u-chip-status--new`, `.u-chip-status--fired`, `.u-chip-status--late`,
+`.u-chip-status--ready`.
+**Props:** `Status` (OrderStatus).
+**States:** one per `OrderStatus`, mapped through §4 — `Pending` `PENDING` and `Confirmed` `SENT` in
+new-blue, `Preparing` `FIRED` in fired-orange, `Ready` `READY`, `Served` `SERVED` and `Completed`
+`PAID` in ready-green, `Cancelled` `VOID` in late-red.
+**Consumed by:** Channels queue, through `OrderCard`.
+**Notes:** the POC badge is a Bootstrap `badge bg-*`; the restyle points it at the kit chip and nothing
+else changes, so existing call sites keep compiling. **It is a one-parameter wrapper over `StatusChip`**
+— it has no late derivation and no label override, because an `OrderStatus` is all it is given. A
+screen that needs either of those uses `StatusChip` directly.
+
+#### UposButton
+
+**Classes:** `.u-btn` with `.u-btn--primary`, `.u-btn--secondary` or `.u-btn--ghost`.
+**Props:** `Variant` (ButtonVariant: `Primary` · `Secondary` · `Ghost`), `Label` (string), `Icon`
+(RenderFragment?), `MinHeight` (int?, px), `Disabled` (bool), `OnClick` (EventCallback).
+**States:** rest; hover `translateY(-2px)` on pointer surfaces; pressed, which is the ripple tint on
+touch; disabled; and the two-second confirmed label some call sites hold — `SENT TO KITCHEN`,
+`RE-FIRED` — whose check is an inline SVG, never a `✓` character (§9).
+**Consumed by:** Order entry, Modifier modal, Floor plan, Table drawer, Payment, Kiosk flow,
+Guest-facing rules, and the Employees, Devices, Settings (roadmap) spec.
+**Notes:** `.u-btn` sets `--upos-touch-terminal` 48px, so `MinHeight` is how a call site reaches the
+kiosk's `--upos-touch-kiosk` 60px and the 96px commit bands (Part II-D). **A destructive control is
+`Ghost` with its label forced to `--upos-ink`**, never a red variant: there is none in the kit, and the
+red arrives on the confirming step (§11). The kit implements the hover lift, not the hover fills — set
+those from §8's table at the call site.
+
+#### UposIconButton
+
+**Classes:** `.u-icon-btn`; `.u-modal .u-icon-btn` when it closes a modal.
+**Props:** `Icon` (RenderFragment), `Label` (string, the accessible name), `HitArea` (int, px),
+`OnClick` (EventCallback).
+**States:** rest; hover — `translateY(-2px)` with ink to `--upos-ink`, or `rotate(90deg)` on a modal
+close, which does not lift (§8); pressed; disabled.
+**Consumed by:** Order entry (send-one), Modifier modal, Item info modal, Floor plan, Table drawer,
+Payment (close and guest mirror), Menu manager (the plate-view close).
+**Notes:** **the glyph is 34px on every surface and only the hit area moves.** The terminal centres it
+in at least `--upos-touch-terminal` 48px, against the artboard's 30px and the payment mirror's 36px,
+because §11's minimum outranks the artboard's pixels (Part II-A). The back office is pointer input, so
+it takes the bare 34px with no enlargement and is sized by density (Part II-B). 34px is a literal
+rather than a token (§12). Icons are inline SVG at `stroke-width:2`, `1.7` in the sidebar (§9).
+
+#### StatusChip
+
+**Classes:** `.u-chip-status`, `.u-chip-status--new`, `.u-chip-status--fired`, `.u-chip-status--late`,
+`.u-chip-status--ready`.
+**Props:** `Status` (OrderStatus?), `Tone` (StatusTone?: `New` · `Fired` · `Late` · `Ready`, for a state
+that is not an `OrderStatus`), `Label` (string?, overriding §4's word), `Elapsed` (TimeSpan?),
+`LateAfter` (TimeSpan?, the station or channel threshold).
+**States:** the four hues, with §4's map supplying the word from `Status`. **Late is derived when
+`Elapsed > LateAfter`**, takes `.u-chip-status--late`, and overrides the mapped color while it holds.
+**Consumed by:** Order entry (the `86'D` pill on a tile), Table drawer (`COURSE 1 · FIRED`), Channels
+queue (the row chip).
+**Notes:** late is computed from those two parameters and never passed as a stored status — no endpoint
+returns one (§4). `Tone` is what the 86'd pill uses: an unavailable item is a menu-item state, not an
+order state, and it still belongs in late-red. `Label` carries the words the map has no entry for, and
+a held course is not one of them — it sits on `--upos-surface-inset` in `--upos-ink-subtle`, because a
+hold is not a status (Table drawer). `fl-pulse` belongs to a timer and a live dot, not to a chip (§8).
+
+#### AllergenChip
+
+**Classes:** `.u-chip-allergen`.
+**Props:** `Allergen` (string, rendered uppercase), `OnDark` (bool), `Interactive` (bool), `IsOn`
+(bool), `OnToggle` (EventCallback<string>).
+**States:** on light, `--upos-allergen-bg` under `--upos-allergen-text`; on dark, inverted — fill
+`--upos-allergen-text`, ink `--upos-kds-ink`, because the light pairing does not hold contrast on a
+board; toggled off in the menu manager, `--upos-surface-inset` in `--upos-ink-subtle`.
+**Consumed by:** Order entry (grid tile and cart line), Modifier modal, Item info modal, Menu manager,
+Chit anatomy, Kiosk flow (grid card, list row, item detail and cart line).
+**Notes:** **the label is the allergen word alone, uppercase** — a chit reading `NO GLUTEN` in the
+source renders `GLUTEN`, and the violet says the rest (§5, Chit anatomy). Never an icon alone, never an
+emoji, never a color-only signal. Violet means allergen and nothing else in UPOS. On a chit the row
+sits under the header and above the build, so a cook reads it first. No field backs any of it (GAP-05).
+
+#### Pill
+
+**Classes:** `.u-pill`.
+**Props:** `Label` (string), `Leading` (RenderFragment?, a dot or an icon), `Selected` (bool),
+`Bordered` (bool), `OnClick` (EventCallback?, null renders a static tag).
+**States:** static tag; selectable, selected — `--upos-grad-primary` in white — or not; bordered-quiet,
+the transparent fill under 1px `--upos-border` that the re-fire and `VIEW PLATING` controls take.
+**Consumed by:** Order entry (the `ITEM INFO` mode pill and the loyalty pill), Modifier modal (the
+option pills), Table drawer (re-fire), Menu manager (minor filter chips, `VIEW PLATING`, a group's type
+chip and its options), Kiosk flow (the merchandising tag and the combo chip).
+**Notes:** `.u-pill` is the neutral tag. Anything carrying a status word is a `StatusChip` and anything
+carrying an allergen is an `AllergenChip`, because the four hues and the violet are reserved (§4, §5).
+Padding is `--upos-space-pad-pill` at the call site; a tappable pill clears `--upos-touch-terminal` on
+the terminal and `--upos-touch-kiosk` on the kiosk. The loyalty pill has nothing to bind to (GAP-12).
+
+#### SegmentedControl
+
+**Classes:** `.u-segmented`, `.u-segmented__opt`, `.is-active`.
+**Props:** `Options` (IReadOnlyList<string>), `Selected` (string), `OnSelect` (EventCallback<string>),
+`MinHeight` (int?, px).
+**States:** exactly one option active, on `--upos-surface` with `--upos-shadow-card`; the inactive
+options in `--upos-ink-subtle`; hover on an inactive option, pointer surfaces only.
+**Consumed by:** Item info modal (`PLATING` · `STACK`), Table drawer (`NOW` · `+5M` · `+10M`), Payment
+(`EVENLY` · `BY SEAT`), Menu manager (the plate-view tabs and the `REQUIRED` · `OPTIONAL` ·
+`NO / REMOVE` row), Kiosk flow (the grid and list toggle).
+**Notes:** terminal call sites pass `MinHeight` 48 to reach `--upos-touch-terminal`, against the
+artboard's 25–33px (Table drawer). The track is the literal `rgba(255,255,255,.75)`; there is no
+translucent-white token yet, and §12 says to add `--upos-surface-veil` when a second consumer needs one.
+**The KDS station strip is not this component** — it pages with paddles and carries per-station counts
+and a late dot, and Station board specs it whole. The 50×28 switch is its two-state cousin, above.
+
+#### StatCard
+
+**Classes:** `.u-stat-card`.
+**Props:** `Label` (string), `Value` (string, formatted upstream), `Comparison` (string?),
+`ComparisonTone` (StatusTone?, null for `--upos-ink-subtle`), `Fill` (SurfaceFill: `Ground` · `Panel`).
+**States:** with or without a comparison line; ready-green when the figure beats its comparison,
+fired-orange when it misses a target, `--upos-ink-subtle` when it is neither; the empty day, where the
+value reads `$0` or `0`.
+**Consumed by:** Dashboard.
+**Notes:** **`Fill` is the ruling Part II-B's preamble makes.** The kit ships `--upos-surface` plus
+`--upos-shadow-card`, which is right for a card on the ground and wrong for one inside the white panel,
+where §2's ladder puts blocks on `--upos-surface-inset` with no shadow. `Ground` is the kit recipe
+unchanged; `Panel` overrides the fill and drops the shadow, and it is what the dashboard passes. The
+comparison line is the only colored thing on the card and takes the text tokens, never the fills; the
+value never takes a status color (§4). Nothing on this card is interactive.
+
+#### DataRow
+
+**Classes:** `.u-data-row`, `.is-late`.
+**Props:** `Leading` (RenderFragment?), `ChildContent` (RenderFragment), `Trailing` (RenderFragment?),
+`BorderTone` (StatusTone?, null keeps `--upos-border`), `OnClick` (EventCallback?).
+**States:** rest — white fill, 1px border, no shadow; hover `translateY(-3px)` onto `--upos-shadow-card`
+on pointer surfaces; status-bordered where the record has a status; selected, where a list drives a
+detail pane.
+**Consumed by:** Channels queue, and the Employees, Devices, Settings (roadmap) spec.
+**Notes:** the one exception to "no borders as elevation" in the whole kit (§7), and one of §4's five
+named places where status shows. An offline device takes `--upos-status-late` on the border and every
+other record `--upos-border` (roadmap spec). **Rows never share a table border** — a list of these
+replaces `<table>` in the Bootstrap migration (§12). On the channels queue the rows are a monitor and
+`OnClick` is null: the artboard gives them no tap.
+
+#### UposModal
+
+**Classes:** `.u-modal`, `.u-scrim`; the close control is `.u-modal .u-icon-btn`.
+**Props:** `Title` (string), `Width` (int, px — 380 through 940 across the specs), `MaxHeight` (int?),
+`ChildContent` (RenderFragment), `Footer` (RenderFragment?), `Scrim` (ScrimWeight: `Standard` ·
+`Light`), `OnClose` (EventCallback).
+**States:** open or closed; scrolling its own body past `MaxHeight`; the `Light` scrim the floor plan's
+guest-count dialog takes against `--upos-scrim`'s weight under every other modal.
+**Consumed by:** Modifier modal, Item info modal, Floor plan (the guest-count dialog), Payment (the
+split modal), Menu manager (plate view), Kiosk flow (the combo sheet), Guest-facing rules (the idle
+warning).
+**Notes:** it rises with `fl-rise` at `--upos-dur-slow` over `--upos-scrim` at `--upos-blur-scrim`, and
+while it is up the terminal's top bar drops its blur (§7). In the back office it scrims the main panel
+and leaves the sidebar lit, which is what `position:relative` on the panel is for. `Light` is the
+literal `rgba(20,25,31,.45)` today, and §12's rule is that a value with no token gets one, so **add
+`--upos-scrim-light`** rather than writing it in the component. Prefer a modal over navigation, and
+yield where the content does not fit —
+the kiosk builds an item on a screen rather than over one (§11, Kiosk flow).
+
+#### UposDrawer
+
+**Classes:** `.u-drawer`.
+**Props:** `Width` (int, px), `Edge` (DrawerEdge: `Right` · `Left`), `Flush` (bool), `ChildContent`
+(RenderFragment), `Footer` (RenderFragment?), `OnClose` (EventCallback).
+**States:** open or closed; inset, the kit's floating 16px default; flush, full height against the shell
+edge.
+**Consumed by:** Table drawer, Payment (the guest-mirror sheet).
+**Notes:** **`Flush` is the variant Part II-A routes here.** The kit floats the drawer inset 16px so all
+four corners stay rounded; a full-height drawer flush to the shell edge instead rounds its two inboard
+corners at `--upos-radius-panel` and lets the outboard edge meet the shell's own rounded clip. No square
+corner is exposed either way, which is what §7 asks for. The table drawer is 420px with a left-cast
+shadow; the mirror sheet is the same variant at 520px, and its tip labels take `--upos-touch-kiosk`
+because that surface is guest-facing (§11). It rises with `fl-rise` at `--upos-dur-slow`.
+
+#### Toast
+
+**Classes:** `.u-toast`.
+**Props:** `Message` (string), `Action` (RenderFragment?), `Duration` (TimeSpan, 4s), `OnDismiss`
+(EventCallback).
+**States:** rising, holding, leaving by a fade over `--upos-dur-fast`; a toast carrying an action holds
+until it is dismissed or acted on (§8).
+**Consumed by:** None today. Order entry, Channels queue and Offline behavior each name a toast to rule
+one out — the send-all confirmation is the button's own label for two seconds, a status change restyles
+a row in place, and the offline queue is one pill rather than a toast per queued write.
+**Notes:** the component ships because the kit does, and because a screen outside this handoff will
+raise one; it stays off all four surfaces specced here. Toasts stack upward from one corner and never
+cover the primary action underneath (§8). Its chrome is dark whatever the theme, so it takes the on-dark
+status set (§4). `.u-toast` currently reuses `--upos-shadow-modal` — transcribe the parent's
+`--shadow-toast` as `--upos-shadow-toast` and point the recipe at it (§12).
+
+#### BottomNav
+
+**Classes:** `.u-nav-bottom`, `.u-nav-item`, `.is-active`.
+**Props:** `Items` (IReadOnlyList<NavItem>), `Active` (string), `OnNavigate` (EventCallback<string>).
+**States:** exactly one destination active, filled `--upos-grad-primary` with white ink; the rest
+`--upos-ink-subtle` on transparent. `MORE` is a placeholder in this handoff and renders one statement
+line.
+**Consumed by:** Order entry — the shell's 78px bottom nav, which every terminal destination inherits.
+**Notes:** five items, each `flex:1` capped at 150px at `--upos-radius-inset`, a 17px icon over a
+700/10.5px label. **The kit's `.is-active` tints the ink `--upos-accent` and both consumers fill
+instead** — the terminal here, the sidebar in `SideNav` — so the active fill is a call-site override on
+both and the tint has no consumer in this handoff. Leave the recipe as it is; set the fill where it is
+used. This nav is the only full-screen transition in the order flow: everything else opens over the
+check (§11). The strip is touch, so it ships no `:hover` transform.
+
+#### SideNav
+
+**Classes:** `.u-nav-item` restyled at the call site; the rail itself is a `--upos-grad-dark` panel at
+`--upos-radius-panel`, not `.u-nav-bottom`.
+**Props:** `Items` (IReadOnlyList<NavItem>), `Active` (string), `Brand` (RenderFragment), `Kicker`
+(string), `OnNavigate` (EventCallback<string>).
+**States:** one destination active, filled `--upos-grad-primary` in white; the rest `--upos-ink-subtle`
+on transparent; hover slides `translateX(3px)` and inks `--upos-ink`, this being a pointer surface.
+**Consumed by:** Dashboard, Menu manager, Integrations, Reports and the Employees, Devices, Settings
+(roadmap) spec — the rail is the back office's shared chrome and all five inherit it.
+**Notes:** **this is the five-override variant Part II-B's preamble declares and routes here.** The kit
+item is the terminal's bottom-nav item, and the sidebar changes exactly five things: the row runs
+horizontal rather than as a column, padding goes `12px 14px`, the gap goes 12px, the label goes 700/13px
+from 700/10px, and the active state fills rather than tints. Everything else is `.u-nav-item` unchanged.
+The rail is 224px, sticky at `top:14px` with `max-height:calc(100vh - 28px)` (§2), and its icons run
+`stroke-width:1.7` (§9). The kiosk's list-layout category rail makes the same dark-panel move at guest
+scale and is a candidate second consumer, at `--upos-touch-kiosk` and the 14px label class (Kiosk flow).
+
+#### FloorTable
+
+**Classes:** none of its own — a composite on `--upos-surface`, `--upos-shadow-card`, a 2px
+status-colored border, and `--upos-radius-card` or `--upos-radius-pill` for shape.
+**Props:** `Table` (Table), `Order` (OrderDto?, the open check), `Now` (DateTime), `LateAfter`
+(TimeSpan), `Shape` (TableShape: `Square` · `Round`), `Width` (int, px — 150 or 230), `Guests` (int?),
+`Selected` (bool), `OnTap` (EventCallback<int>).
+**States:** open, with no status hue and no guest line; seated; ordered; late; check presented; selected,
+where the border goes `--upos-accent` while its dialog or drawer is up.
+**Consumed by:** Floor plan.
+**Notes:** **shape carries seating** — square tables take `--upos-radius-card` and rounds take
+`--upos-radius-pill` — and width is the room's geometry rather than the cover count. Late is derived from
+`Order.CreatedAt` against `LateAfter`, overrides the underlying status while it holds, and is written
+back nowhere (§4). Status shows on the 2px border, one of §4's five named places. Position, width and
+shape have no fields, and `Table` carries an `IsOccupied` bool rather than a status enum with timestamps,
+so `SEATED · 4m` and `CHECK PRESENTED` are literals (GAP-07); the guest count has no field either.
+
+#### CartLine
+
+**Classes:** none of its own; composes `.u-qty-stepper`, `.u-icon-btn` and `.u-chip-allergen`.
+**Props:** `Item` (OrderItemDto), `Mods` (string, the middot-joined selection), `Allergens`
+(IReadOnlyList<string>), `LineTotal` (decimal), `Sent` (bool), `Queued` (bool), `Scale` (TypeScale),
+`OnQuantityChange` (EventCallback<int>), `OnSend` (EventCallback), `OnRemove` (EventCallback).
+**States:** not sent, a paper-plane glyph on the inset; sent, a check on `--upos-grad-primary`; queued,
+where an offline line reads `QUEUED` in place of `SENT`; quantity at zero, which drops the line.
+**Consumed by:** Order entry, Offline behavior, Kiosk flow (the cart's concept-grouped lines).
+**Notes:** the terminal merges a repeat tap into the matching line at `qty + 1`; the kiosk pushes a new
+line per tap today and should merge the same way, since `OrderItemDto` carries the quantity either way
+(Kiosk data contract). `Mods` is a rendered string because no field carries a selection (GAP-01), and
+the kiosk line adds its `COMBO · {side} + {drink}` chip as a `Pill` in `--upos-accent-deep` (GAP-02).
+The kiosk `Remove` is a ghost button at `--upos-ink` and drops the line with no confirmation: nothing
+is sent until submit, and the line is one tap to add back.
+
+#### QtyStepper
+
+**Classes:** `.u-qty-stepper`, and its `button` and `span` children.
+**Props:** `Value` (int), `Min` (int), `Max` (int?), `ValueChanged` (EventCallback<int>), `ValueSize`
+(int, px).
+**States:** at `Min`, where `−` is inert or drops the line it sits on; at `Max`, where `+` is inert;
+hover tints a button `--upos-surface-hover` on pointer surfaces.
+**Consumed by:** Order entry (the cart line), Modifier modal (the footer count, floored at 1), Floor plan
+(the guest-count dialog, clamped 1 to 12), Payment (the split modal's even body, 2 to 6).
+**Notes:** **the buttons already set `--upos-touch-terminal` 48px**, against the artboard's 24–40px, and
+Part II-A's preamble makes that shipped size the rule wherever a spec names a stepper. What changes per
+call site is `ValueSize` — 13px on a cart line, 32px in the guest-count dialog — never the target.
+`overflow:hidden` is on the recipe, so no child paints past the pill corner (§7).
+
+#### TipPad
+
+**Classes:** `.u-tip-btn`, `.is-selected`.
+**Props:** `Subtotal` (decimal), `Percentages` (IReadOnlyList<int>), `Selected` (int?), `OnSelect`
+(EventCallback<int?>), `GuestFacing` (bool).
+**States:** one percentage selected, on `--upos-grad-primary` with white ink and `--upos-shadow-button`,
+or none — `NO TIP` is a fourth button rather than an absence. Every dollar figure recomputes off
+`Subtotal`.
+**Consumed by:** Payment.
+**Notes:** the labels read `18% · $NN.NN`, so the pad renders money it never stores: tender, tip and
+split allocation have no model, no DTO and no endpoint, and `Completed` records that the check closed
+rather than how it was paid (GAP-08). `GuestFacing` raises the buttons to `--upos-touch-kiosk` 60px for
+the mirror sheet, where the artboard draws the tip labels as display-only and Part II-A makes them
+tappable (§11). A new order resets the selection to 20%.
+
+#### TenderTile
+
+**Classes:** `.u-tender-tile`, `.is-selected`.
+**Props:** `Label` (string), `Icon` (RenderFragment), `Selected` (bool), `Annotation` (string?),
+`Dashed` (bool), `OnSelect` (EventCallback<string>).
+**States:** unselected on `--upos-surface-inset`; selected on `--upos-grad-primary` with
+`--upos-shadow-button`; offline, where the selected card tender drops the gradient for a flat neutral
+fill with `--upos-ink-subtle` ink; `SPLIT CHECK` on the inset under a 2px dashed `--upos-border`.
+**Consumed by:** Payment, Offline behavior.
+**Notes:** **`Annotation` is §11's per-action offline rule in one parameter** — `will sync on reconnect`
+at 400/10.5px under the label, never a dialog, never a disabled primary and never a toast per queued
+write. The recipe already clears `--upos-touch-terminal`, and the tile lifts `-4px` on pointer surfaces
+like any card (§8). `CASH` and `GIFT CARD` are drawn but unwired in the artboard; wire them to the same
+tender flow as their neighbor (Payment).
+
+#### ChitCard
+
+**Classes:** `.u-chit`, `.u-chit__timer`, `.u-chit__timer--late`; composes `.u-badge-channel` and
+`.u-chip-allergen` inverted for dark, all inside the `.upos-kds` scope.
+**Props:** `Order` (OrderDto), `Lines` (IReadOnlyList<OrderItemDto>), `Station` (string?, null on an
+expo chit), `Now` (DateTime), `WarnAfter` (TimeSpan), `LateAfter` (TimeSpan), `Rush` (bool), `Struck`
+(IReadOnlyList<int>, client state), `Armed` (bool), `OnStrike` (EventCallback<int>), `OnBump`
+(EventCallback<int>).
+**States:** nothing started · some items struck · every item struck, and on an expo chit every station
+up and waiting to be bagged. The timer bands are `--upos-kds-ink` under `WarnAfter`,
+`--upos-status-fired` between, and `.u-chit__timer--late` pulsing `fl-pulse` past `LateAfter`, with
+the 5px status edge following. The bump bar is live (`BUMP`), refusing (`WAITING`) or bagging (`BAG IT`).
+`Armed` outlines the whole card 2px `--upos-accent` under plate view and suspends every other tap.
+**Consumed by:** Station board, Chit anatomy, Chit actions, KDS data contract.
+**Notes:** **both thresholds are per-station configuration**, derived on every tick and never stored —
+no endpoint returns an elapsed value or a late flag (§4). The 10px radius is the product's one square-ish
+exception and it lives here, under `.upos-kds` (§7). The board restyle is declared once in Part II-C:
+`--upos-kds-inset` under the chit, `--upos-kds-ink` on top, the on-dark status set, and the channel
+badge on `--upos-kds-inset-hover`, because the kit's light pairing does not hold contrast there. The bump
+bar runs 56px at the full chit width so a gloved hand cannot fire the wrong ticket (§11), and a bump
+writes the whole order's status, so per-station progress stays client state until expo closes it.
+
+#### ChannelBadge
+
+**Classes:** `.u-badge-channel`.
+**Props:** `Channel` (string), `Code` (string, the two-letter form), `Color` (string?), `Shape`
+(BadgeShape: `Pill` · `Circle`), `OnDark` (bool).
+**States:** pill on light, `--upos-surface-inset` under `--upos-ink-subtle`; a 34px circle carrying the
+code in white 800/11px on the channel's own color (Channels queue); on dark, `--upos-kds-inset-hover`
+under `--upos-kds-ink` (Chit anatomy).
+**Consumed by:** Channels queue, Chit anatomy, Integrations.
+**Notes:** **`Color` is the split Part II-B's Integrations spec calls out.** Per-channel color exists on
+the terminal's queue and nowhere else today: either the integrations rows carry the same colors or both
+surfaces stay neutral, and the difference is not to be split. Nothing behind it binds — `Order` has no
+channel or order type, so the name, the code and the color are literals (GAP-04). **It never reaches the
+kiosk**: no channel badge is guest-facing (Guest-facing rules).
+
+#### OfflinePill
+
+**Classes:** `.u-pill-offline`.
+**Props:** `QueuedCount` (int), `Visible` (bool, the observed connection state).
+**States:** hidden while online; offline with a queue, reading `OFFLINE · N QUEUED`; draining, where the
+count falls as writes replay; gone at zero.
+**Consumed by:** Order entry (the top-bar slot beside the venue name), Offline behavior.
+**Notes:** it pulses with `fl-pulse` and **keeps pulsing under `prefers-reduced-motion`**, because it
+carries status rather than decoration (§8). Connectivity is observed, never chosen — the artboard's
+offline toggle is demo scaffolding, not product UI. There is no success toast on reconnect: the absence
+of the pill is the message (§11). The queue behind the count is a local SQLite table on
+`Restaurant.Mobile`, planned rather than built, and with no idempotency key on `CreateOrderDto` a
+replayed write can double an order (GAP-10).
 
 ---
 
