@@ -103,7 +103,7 @@ Parts I, II and III are complete. Part IV carries a written-in marker naming the
   - [ChitCard](#chitcard)
   - [ChannelBadge](#channelbadge)
   - [OfflinePill](#offlinepill)
-  - [Switch](#switch)
+  - [UposSwitch](#uposswitch)
 - [Part IV · Data-model gaps](#part-iv--data-model-gaps)
 
 ## The screen-spec template
@@ -2335,9 +2335,11 @@ component.** The AI insight banner, the promo band, the concept and bag bars, th
 the report bars and the plate-stack builder are screen-level markup over the same tokens, and their
 screen specs are their whole definition.
 
-**Naming follows §12.** Four primitives take the `Upos*` prefix, because their bare names collide
-with framework and library types — `UposButton`, `UposIconButton`, `UposModal`, `UposDrawer`.
-Everything else is a plain domain noun.
+**Naming follows §12.** Five primitives take the `Upos*` prefix, because their bare names would
+collide with a BCL or Blazor type — `UposButton`, `UposIconButton`, `UposModal`, `UposDrawer` and
+`UposSwitch`, the last of these against `System.Diagnostics.Switch`. Everything else is a plain
+domain noun. The prefix is a Razor-side rule only: the CSS class stays `.u-switch`, because §12's
+class convention is `.u-*` and nothing collides in a stylesheet.
 
 **Prop types are the POC's wherever the POC has one**: `MenuItemDto`, `OrderDto`, `OrderItemDto`,
 `Table`, `OrderStatus`, `decimal` for money, `EventCallback` and `EventCallback<T>` for events,
@@ -2355,8 +2357,8 @@ Nothing takes an `IsLate` bool, because nothing upstream stores one and no endpo
 guard. The same component ships to all four surfaces, and press feedback stays the ripple tint (§8).
 
 **One recipe this part added to the kit.** Part II-B's Integrations spec routes the channel switch
-here and the kit had no recipe for it. `.u-switch` now ships in `upos-components.css`, and `Switch` is
-the last block below.
+here and the kit had no recipe for it. `.u-switch` now ships in `upos-components.css`, and
+`UposSwitch` is the last block below.
 
 | Component | CSS classes | Screens that consume it | Status |
 | --- | --- | --- | --- |
@@ -2384,7 +2386,7 @@ the last block below.
 | `ChitCard` | `.u-chit`, `.u-chit__timer`, `.u-chit__timer--late`; composes `.u-badge-channel`, `.u-chip-allergen` | Station board · Chit anatomy · Chit actions · KDS data contract | New |
 | `ChannelBadge` | `.u-badge-channel` | Channels queue · Chit anatomy · Integrations | New |
 | `OfflinePill` | `.u-pill-offline` | Order entry · Offline behavior | New |
-| `Switch` | `.u-switch`, `.is-on` | Integrations · Modifier modal | New |
+| `UposSwitch` | `.u-switch`, `.is-on` | Integrations · Modifier modal | New |
 
 #### MenuItemCard
 
@@ -2527,7 +2529,8 @@ options in `--upos-ink-subtle`; hover on an inactive option, pointer surfaces on
 artboard's 25–33px (Table drawer). The track is the literal `rgba(255,255,255,.75)`; there is no
 translucent-white token yet, and §12 says to add `--upos-surface-veil` when a second consumer needs one.
 **The KDS station strip is not this component** — it pages with paddles and carries per-station counts
-and a late dot, and Station board specs it whole. `Switch` is its two-state cousin, at the end below.
+and a late dot, and Station board specs it whole. `UposSwitch` is its two-state cousin, the last
+block below.
 
 #### StatCard
 
@@ -2772,7 +2775,7 @@ of the pill is the message (§11). The queue behind the count is a local SQLite 
 `Restaurant.Mobile`, planned rather than built, and with no idempotency key on `CreateOrderDto` a
 replayed write can double an order (GAP-10).
 
-#### Switch
+#### UposSwitch
 
 **Classes:** `.u-switch`, `.is-on`.
 **Props:** `Checked` (bool), `CheckedChanged` (EventCallback<bool>), `Label` (string, the accessible
