@@ -97,13 +97,26 @@ Four surfaces run the same language at four densities:
 | Kitchen display | New surface | 1280×800 to 1920×800 touchscreen | Dark board · read at two metres |
 | Kiosk | New surface | Portrait guest device | Guest scale · body ≥19px · 60px targets |
 
-Adopted from the parent language without change: the ground, the ink and blues, the three gradient
-uses, Archivo 400/700/800, the radius scale, the shadow trio, the one easing curve and six
-keyframes, inline-SVG iconography, and the copy voice.
+**Adopted from the parent language without change:** the two-lamp ground, the blue rotation, the
+three gradient uses, Archivo 400/700/800 with its tracking scale, the one easing curve and the six
+`fl-*` keyframes, the hover and press rules, inline-SVG iconography, and the copy voice.
 
-Added by UPOS because a sales tool never needed them: status semantics bound to `OrderStatus` (§4),
-allergen violet (§5), the offline pattern, touch targets, the theming contract, and the kitchen
-display derivation (§11).
+**Adopted reduced**, because a POS does not need the range a sales tool carried:
+
+- **Ink** — the parent ships a nine-step ramp from `#1b1f24` to `#9aa5b1`; the kit exposes two of
+  them, `--upos-ink` (`#1b1f24`, step one) and `--upos-ink-subtle` (`#8b95a1`, the parent's label
+  step), and reaches the rest with opacity (§3).
+- **Radii** — the parent ships nine plus three mobile variants; the kit exposes four
+  (panel · card · inset · pill) plus the three mobile values. `--upos-radius-card` is **18px**, a
+  deliberate UPOS choice rather than a transcription: the parent's card radii are 20–22px and 18px
+  is its Android mobile panel value, picked because the terminal is an Android tablet and the tile
+  grid reads tighter at 18px (§7).
+- **Shadows** — the parent ships thirteen; the kit exposes three (card · modal · button). Anything
+  that needs a fourth borrows the nearest of the three and is recorded in §12.
+
+**Added by UPOS** because a sales tool never needed them: status semantics bound to `OrderStatus`
+(§4), allergen violet (§5), food photography as content (§3), the offline pattern, touch targets,
+the theming contract, and the kitchen display derivation (§11).
 
 The rule that keeps the language intact: **if a value is not in the token kit, it is not in the
 design.** When you need something the kit lacks, add the token and use it — never fork a value into
@@ -117,7 +130,7 @@ A white page is a bug, not a blank state.
 
 **Everything floats.** Panels, cards and rails sit on the ground as detached rounded objects. Outer
 page padding is `--upos-space-page` 14px; the main column stands `--upos-space-main-offset` 14px off
-the sidebar. There is no page-width container and no centred column: the shell fills the viewport.
+the sidebar. There is no page-width container and no centered column: the shell fills the viewport.
 Sidebars and rails are `position:sticky; top:14px` with `max-height:calc(100vh - 28px)`.
 
 **The surface ladder:**
@@ -140,7 +153,7 @@ On a dark surface, inset blocks are `--upos-kds-inset` `rgba(238,241,245,.06)`, 
 `--upos-ink-subtle`, and minimum height `--upos-touch-terminal` on the terminal and
 `--upos-touch-kiosk` on the kiosk. On focus the border goes
 `--upos-accent` and the fill goes `--upos-surface`, so the focused field is the one white box on the
-card. This is the only place a control changes surface colour to show state.
+card. This is the only place a control changes surface color to show state.
 
 **Dark theme** swaps ground to `#14181d`, surface `#1c2229`, inset `#171c22`, hover `#20262e`,
 border `#2a323b` and ink `#eef1f5` through `[data-theme="dark"]`. Status hues do not move (§11).
@@ -169,6 +182,14 @@ header strip and on the row so the columns line up.
 Gaps come from the same family: `--upos-space-gap-card` 16px between cards,
 `--upos-space-gap-chip` 7px between chips, `--upos-space-gap-inline` 10px inside a row,
 `--upos-space-gap-section` 26px between sections.
+
+**Two component recipes override a step on purpose.** `.u-chip-status` and `.u-chip-allergen` use
+`5px 12px` instead of `--upos-space-pad-chip` `3px 10px`, because a status chip is read across a
+kitchen and 3px does not carry that far. `.u-btn` uses `0 20px` with
+`min-height:var(--upos-touch-terminal)` instead of `--upos-space-pad-btn` `11px 22px`, because on a
+terminal the 48px touch target sets the button's height and padding only sets its width (§11). The
+table above is the step set to reach for; where a component recipe states its own value, the recipe
+is the authority for that component.
 
 **Density is the point.** Body copy is 13px and a 1440×900 terminal carries a 170px category rail,
 an item grid and a 380px cart panel without the shell scrolling. A screen that needs more room loses
@@ -258,7 +279,7 @@ scope (§12).
 
 **Late is derived, never stored.** A row is late when
 `DateTime.UtcNow - order.CreatedAt > slaThreshold`, where the threshold is per station and per
-channel configuration. Late overrides the status colour for as long as it holds: a `Preparing`
+channel configuration. Late overrides the status color for as long as it holds: a `Preparing`
 order that breaches its SLA renders red, not orange, and its timer pulses with `fl-pulse`. Nothing
 is written back to `OrderStatus`, and no API returns a "late" value.
 
@@ -269,7 +290,7 @@ Removing it from the grid loses the staff's muscle memory for where it lives.
 **Red is never decorative.** Red means a problem someone has to act on: late tickets, 86'd items,
 voids, comps flagged for review, the offline queue, COGS over target, stock under threshold. Red is
 not a delete button at rest, not a brand accent, not a divider, and not the kitchen display's house
-colour (§11).
+color (§11).
 
 Status shows up in exactly these places: `.u-chip-status--*` chips, the 1px status border on
 `.u-data-row`, the 2px border on a floor-plan table, the top edge of a kitchen chit, and
@@ -292,7 +313,7 @@ tracking, `--upos-radius-pill`.
 - The chip rides the item everywhere the item appears: grid tile, cart line, modifier modal,
   item info modal, kitchen chit, kiosk card and kiosk detail.
 - The label is the allergen word in uppercase — `GLUTEN`, `DAIRY`, `NUTS`, `SHELLFISH`. Never an
-  icon alone, never an emoji, never a colour-only signal.
+  icon alone, never an emoji, never a color-only signal.
 - On a chit the allergen row sits directly under the header, above the build, so a cook reads it
   before the items.
 - **On dark surfaces the chip inverts**: fill `--upos-allergen-text` `#7c3aed`, text
@@ -323,7 +344,7 @@ button labels. 400 is body copy only. There is no 500 and no 600. The secondary 
 weights map to 800.
 
 **Tracking tightens as size grows and opens as it shrinks.** Set `letter-spacing` alongside the
-`font:` shorthand — tracking is not tokenised.
+`font:` shorthand — tracking is not tokenized.
 
 | Size | Tracking |
 | --- | --- |
@@ -381,7 +402,7 @@ The big negative spread is deliberate: these read as float, not as drop shadow. 
 tinted with the button's own blue rather than neutral grey.
 
 There are no inner shadows and **no borders as elevation** — a card is shadow plus radius, never a
-border. The one exception is `.u-data-row`: white fill plus a 1px status-coloured border and no
+border. The one exception is `.u-data-row`: white fill plus a 1px status-colored border and no
 shadow at rest, picking up `--upos-shadow-card` when it lifts.
 
 **Blur is rationed.** `--upos-blur-glass` 14px belongs to a sticky search or top bar and nothing
@@ -390,7 +411,7 @@ sheets. Never blur behind a row or card carrying data — it softens the text yo
 to read at speed. The terminal runs one blurred surface at a time: when a scrim is up, the glass top
 bar drops its blur.
 
-**Translucent white** covers segmented tracks, secondary panels and de-emphasised tails, in the
+**Translucent white** covers segmented tracks, secondary panels and de-emphasized tails, in the
 range `rgba(255,255,255,.7)` to `rgba(255,255,255,.82)`. `.u-segmented` uses `.75`. No token exists
 for it yet (§12).
 
@@ -403,7 +424,7 @@ for it yet (§12).
 second curve in UPOS.
 
 **Durations.** UI transitions run from `--upos-dur-fast` `.25s` to `--upos-dur-slow` `.45s`. Use
-`.25s` for colour, tint and opacity; use `.45s` for anything that moves a panel. The named keyframes
+`.25s` for color, tint and opacity; use `.45s` for anything that moves a panel. The named keyframes
 carry their own durations from the parent system and are not bound by that range.
 
 | Keyframe | Duration | What it does | Where it runs |
@@ -496,7 +517,7 @@ same rules.
 - **Sentence case everywhere readable**, UPPERCASE only in the label class and status words (§6).
 - **AI copy is quoted and shown as a draft, never as a fact.** The dashboard insight is a sentence
   in quotation marks, attributed to the brain, with the data it rests on beside it.
-- **Empty states argue a point, they do not apologise.** "No open checks. The floor is clear." beats
+- **Empty states argue a point, they do not apologize.** "No open checks. The floor is clear." beats
   "Nothing to show here."
 - **No emoji. No exclamation marks. No hedging, no metadiscourse.** Nothing is seamless, powerful or
   intelligent. The system never explains why something matters — it states the thing and lets the
@@ -537,6 +558,11 @@ The terminal keeps taking orders with no network. Offline is a state, never a wa
 - `--upos-touch-kiosk` `60px` is the minimum for kiosk primary actions.
 - Adjacent targets sit at least `--upos-space-gap-row` 8px apart, and two irreversible controls are
   never adjacent — void does not touch send.
+- **A destructive control takes `.u-btn--ghost` at rest** — void, comp, refund, remove line. Red
+  marks a problem that exists (§4), and an action nobody has taken yet is not one, so the button
+  stays quiet until it is pressed. The red arrives on the confirming step, where the dialog names
+  the consequence in `--upos-status-late-text` and the confirm button is `.u-btn--primary` carrying
+  the verb. There is no red button variant in the kit, and adding one would make red decorative.
 - **Prefer a modal or drawer over navigation.** The five bottom-nav destinations are the only
   full-screen transitions in the order flow; everything else opens over the current screen so the
   check stays visible behind it.
@@ -550,7 +576,7 @@ The terminal keeps taking orders with no network. Offline is a state, never a wa
 - **One attribute flip changes the theme.** No recompilation, no class sweep, no per-component
   override. A component that hard-codes a hex breaks this contract.
 - Dark theme moves ground, surfaces, border and ink. Status hues, allergen violet and the accent
-  presets are identical in both themes — a colour that means "late" means it under any lighting.
+  presets are identical in both themes — a color that means "late" means it under any lighting.
 - Defaults per surface: terminal light (kitchen glare), back office the user's choice, kitchen
   display always the dark board regardless of `data-theme`, kiosk light.
 - Accent is per-venue branding, stored with the venue and applied at app start.
@@ -587,7 +613,7 @@ does not.
 - Archivo 900. Weights are 400, 700 and 800.
 - The `rushpulse`, `upflash` and `plateflash` keyframes. Use `fl-pulse`.
 
-Status colours on the board come from the on-dark set — `--upos-kds-status-new`,
+Status colors on the board come from the on-dark set — `--upos-kds-status-new`,
 `--upos-kds-status-late`, `--upos-kds-status-ready` — plus `--upos-status-fired` unchanged, which
 holds 5.4:1 on `--upos-panel-dark`. The board root carries `.upos-kds`, the scope marker that owns
 the one radius exception in the product.
@@ -671,7 +697,7 @@ Migration:
    panel `div` at `--upos-radius-panel`; `modal` → `.u-modal` over `.u-scrim`; nav links →
    `.u-nav-item`; `<table>` → a list of `.u-data-row` elements, because rows never share a table
    border (§2).
-5. Keep `app.css` for layout scaffolding only. Any colour, radius, shadow or font value still in it
+5. Keep `app.css` for layout scaffolding only. Any color, radius, shadow or font value still in it
    moves to a token reference.
 6. Verify each app in light and dark across all four accents.
    `docs/design/tokens/preview.html` renders every token and component class for comparison.
@@ -680,8 +706,9 @@ Migration:
 
 - **No translucent-white token.** `.u-segmented` uses the literal `rgba(255,255,255,.75)`; the
   parent range is `.7` to `.82`. Add `--upos-surface-veil` when a second consumer needs it.
-- **`.u-toast` reuses `--upos-shadow-modal`.** Right family, heavier than a toast needs; there is no
-  toast-weight shadow token.
+- **`.u-toast` reuses `--upos-shadow-modal`.** Right family, heavier than a toast needs. The parent
+  ships the value the kit is missing — `--shadow-toast: 0 20px 44px -20px rgba(20,25,31,.9)` in
+  `tokens/elevation.css`. Transcribe it as `--upos-shadow-toast` and point `.u-toast` at it.
 - **Two ink steps only.** `--upos-ink` and `--upos-ink-subtle`; use opacity on `--upos-ink` for
   anything between them.
 - **The on-dark status tokens are named `--upos-kds-status-*`** but apply to every dark surface
@@ -690,7 +717,11 @@ Migration:
   `:root` and resolve anywhere they are referenced.
 - **Chrome dimensions are literals, not tokens** — `.u-icon-btn` 34px, back-office sidebar 224px,
   terminal top bar 76px, bottom nav 78px, KDS header 60px. Part II carries them per screen.
-- **Tracking is not tokenised.** Set `letter-spacing` from §6's table.
+- **Tracking is not tokenized.** Set `letter-spacing` from §6's table.
+- **`overflow:hidden` on pill-radius elements is not applied kit-wide.** §7 states the rule; the kit
+  sets it on `.u-qty-stepper` and `.u-chit` only. Chips, pills, the segmented track and bars rely on
+  their own fills not overflowing today — set it at the call site whenever a child could paint past
+  the corner, and fold it into the recipes when one does.
 - **The kit implements the hover lift, not the hover fills.** `.u-btn--secondary` and
   `.u-btn--ghost` lift; the fill and ink changes in §8's table are set at the call site.
 
