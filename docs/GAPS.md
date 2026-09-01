@@ -53,13 +53,17 @@ single-select groups, optional multi-select add-ons with upcharges, no/remove li
 rules, default selections and kitchen names. `OrderItemDto` carries a quantity and a menu-item name
 and nothing else, so a selection reaches the API as nothing at all — worse on the kiosk than at the
 terminal, because a server can tell the kitchen what the modal could not carry and a guest cannot.
+The POC's only per-line customization today is the free-text `OrderItem.SpecialInstructions` string:
+no structured options, no upcharges, no validation.
 
 **Where it bites:** Order entry · Modifier modal · Menu manager · Chit anatomy · Chit actions · KDS
 data contract · Kiosk flow · Kiosk data contract · CartLine.
 
 **Minimal suggestion:** `ModifierGroup` (name, type required/optional/no-remove, min, max) →
 `ModifierOption` (name, priceDelta, kitchenName, isDefault), with an `OrderItemModifier` join on
-`OrderItem` so a build reaches the kitchen as structure rather than as rendered text.
+`OrderItem` so a build reaches the kitchen as structure rather than as rendered text. Structured
+modifiers replace the free-text `OrderItem.SpecialInstructions` (a nullable string on `OrderItem` in
+the POC) as the carrier for per-line modifications.
 
 **Release:** R1 (outline: "Modifier system — P0", scoped as "Required/optional modifiers, min/max
 selections, nested groups, upcharges, default selections, kitchen names"; Release 1 carries the
