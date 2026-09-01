@@ -108,9 +108,9 @@ three gradient uses, Archivo 400/700/800 with its tracking scale, the one easing
   step), and reaches the rest with opacity (§3).
 - **Radii** — the parent ships nine plus three mobile variants; the kit exposes four
   (panel · card · inset · pill) plus the three mobile values. `--upos-radius-card` is **18px**, a
-  deliberate UPOS choice rather than a transcription: the parent's card radii are 20–22px and 18px
-  is its Android mobile panel value, picked because the terminal is an Android tablet and the tile
-  grid reads tighter at 18px (§7).
+  deliberate UPOS choice rather than a transcription of the parent: the parent's card radii are
+  20–22px; 18px transcribes the UPOS Fusion artboard itself, whose menu-item cards render at
+  `border-radius:18px` (§7).
 - **Shadows** — the parent ships thirteen; the kit exposes three (card · modal · button). Anything
   that needs a fourth borrows the nearest of the three and is recorded in §12.
 
