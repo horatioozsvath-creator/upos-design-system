@@ -1048,9 +1048,16 @@ stays a literal, recorded here.
   browse strip** — "a strip of `flex:1` category buttons ... selected on `--upos-grad-primary`" —
   with `flex:1` dropped, because at 393px the categories have to be allowed to run off the edge
   rather than share it.
-- **Item grid → one column of `MenuItemCard` at `Layout=ListRow`** (Part III), which is the layout
-  the kiosk's list view already consumes and which already ships: `.u-menu-card--list` is
-  `--upos-radius-inset`, a row, and clears `--upos-touch-terminal`. Grid padding drops 22px →
+- **Item grid → one column in `MenuItemCard`'s `ListRow` form** (Part III), which is the layout the
+  kiosk's list view already consumes and which already ships: `.u-menu-card--list` is a row at
+  `--upos-radius-inset` that clears `--upos-touch-terminal`. **The form is reached by the container,
+  not by the `Layout` parameter.** Part III rules that no component takes a touch flag, because a
+  host should not have to suppress an affordance the CSS already withholds; the same argument holds
+  one step over, so **no component takes a width flag either**. The screen passes `Tile` at every
+  width and the container query puts the tile into the row form below 800px. `MenuItemCard` never
+  learns how wide the shell is, and its call sites outside the shell — the Menu manager's cards —
+  are untouched, because a container query on a container they do not sit in cannot match. Grid
+  padding drops 22px →
   `var(--upos-space-page)` 14px and the gap drops `--upos-space-gap-card` 16px →
   `--upos-space-gap-row` 8px. The name sits left at 700/14px, the price right at 800/15px in
   `--upos-accent-deep` — the tile's two type overrides, kept, because they are what the terminal's
@@ -1068,9 +1075,10 @@ stays a literal, recorded here.
   at staff scale — `--upos-surface`, 1px `--upos-border` top, padding `0 var(--upos-space-page)`:
   `IN CHECK` in the 10px label class at `.12em`, the line count and the running total at 800/15px
   with the total in `--upos-accent-deep`, then a `.u-btn--primary` at `--upos-touch-terminal` reading
-  `Review · $NN.NN`. It reads `IN CHECK` and not `IN BAG` because a guest has a bag and a server has
-  a check (§10), and it says `Review` and not `Charge` because Charge lives inside the sheet, where
-  the check is actually worked.
+  `Review`. It reads `IN CHECK` and not `IN BAG` because a guest has a bag and a server has a check
+  (§10), and it says `Review` and not `Charge` because Charge lives inside the sheet, where the check
+  is actually worked. The amount is on the bar and not on the button, which is the kiosk's division
+  of the same two jobs: the bar reports and the button acts.
 - **The sheet is the `UposDrawer` recipe on the bottom edge, not a new component.** `.u-drawer`'s
   inset flips from `top/right/bottom` to `left/right/bottom`: full width, `max-height:82%`,
   `--upos-radius-panel` on the two top corners only, `--upos-surface`, `--upos-shadow-modal`, over
@@ -1093,16 +1101,16 @@ added.
 - Summary bar **empty** — no button, and the cart's own empty line, `No items yet — tap the menu to
   build the order.` at 400/13px `--upos-ink-subtle`, in place of the counter and total. A bar with a
   live-looking `Review` over an empty check is a control that refuses a tap, which §11 rules out.
-- Chip row **scrolled** or at rest. The selected chip is scrolled into view whenever the selection
-  changes, so the one chip that is always selected is never the one off the edge.
+- Chip row **scrolled** or at rest. Nothing scrolls it programmatically and nothing needs to: the
+  row opens at the first category, which is the one selected on load, and every later selection is a
+  chip the server has just touched, so the selected chip is on screen by construction.
 
 **Interactions.**
 
 - Tap a chip to filter, exactly as tapping a rail button does. Nothing navigates.
 - Tap a row to add — the same tap the tile takes, with the same merge at `qty + 1` and the same
   refusal on an 86'd item.
-- `Review` opens the sheet. The scrim, the close `.u-icon-btn` and the system back gesture all close
-  it.
+- `Review` opens the sheet. The scrim and the close `.u-icon-btn` close it.
 - **Send-all does not close the sheet.** It confirms as `SENT TO KITCHEN` for 2s where it was
   pressed, with the emptied check behind it, and the server closes it. Animating the panel away from
   the confirmation the person is reading trades a message for a transition.
@@ -1130,6 +1138,18 @@ added.
   terminal roles and `--upos-touch-terminal` 48px. It does not take `--upos-touch-kiosk`: a smaller
   screen is not a guest-facing one, and §11 sizes 60px for a stranger with nobody to ask, not for a
   narrow viewport.
+- **The host's system bars.** On the Memor 20 the WebView fills the whole 1080×2160 panel, so the
+  shell runs under Android's status bar at the head and its gesture bar at the foot: the 26px mark is
+  clipped from above and the lower half of the 78px nav sits under the system bar. It predates this
+  subsection — the wide layout was cut in the same two places — and the step does not cause it, but a
+  58px top bar under a status bar is tighter than a 76px one. It is not a rule any stylesheet can
+  carry: `env(safe-area-inset-*)` reports zero on that WebView, because Android exposes cutout insets
+  there and not system-bar insets. The host has to consume the window insets, so this belongs to the
+  terminal's shell app rather than to Part II-A.
+- **The system back gesture does not close the sheet.** Android's back is a host concern — a MAUI
+  page override, not a rule any stylesheet can carry — and wiring one host's hardware gesture to one
+  screen's transient state before the fleet is chosen buys a habit that may not survive the device.
+  The scrim is a full-width target and the close control clears 48px.
 - **Density.** No second column, no compact row, no swipe-to-remove on a line, no long-press. Every
   action is a tap on a target that clears 48px, which is the whole of §11's speed contract and the
   only part of it a narrow screen makes harder.
