@@ -18,17 +18,24 @@ approved designs without guessing at colors, dimensions, states or data requirem
 The product being designed is a five-project .NET solution living in a separate repository,
 [POC-Razor-Hospitality](https://github.com/tpaing00/POC-Razor-Hospitality):
 
-- **API** (`Restaurant.Api`) — ASP.NET Core Web API over PostgreSQL on Azure (EF Core), with a
-  SignalR hub at `/hubs/orders` pushing live order events, and OpenAPI docs.
-- **Domain** (`Restaurant.Shared`) — four models: `MenuItem`, `Table`, `Order`, `OrderItem`, plus an
-  `OrderStatus` enum and five data-transfer objects.
-- **Shared UI** (`Restaurant.UI.Shared`) — a Razor component library: `MenuItemCard`, `OrderCard`,
-  `OrderStatusBadge`, and the API client.
-- **Back office** (`Restaurant.Blazor`) — a Blazor Server progressive web app.
-- **Terminal** (`Restaurant.Mobile`) — .NET MAUI Blazor Hybrid, targeting Android.
+- **API** (`Restaurant.Api`) — the server every device talks to. An ASP.NET Core Web API storing
+  data in PostgreSQL on Azure (through EF Core), with a live-push channel at `/hubs/orders`
+  (SignalR) so a new order appears on the kitchen screen without anyone refreshing.
+- **Domain** (`Restaurant.Shared`) — the shared vocabulary: four models, `MenuItem`, `Table`,
+  `Order` and `OrderItem`, plus the `OrderStatus` enum that tracks an order from placed to paid,
+  and the order and menu data-transfer objects the API sends over the wire.
+- **Shared UI** (`Restaurant.UI.Shared`) — the building blocks both apps reuse rather than each
+  writing its own: a menu-item card, an order card, a status badge, and the client that calls the
+  API. Technically a Razor component library.
+- **Back office** (`Restaurant.Blazor`) — the manager's app, running in a browser (Blazor Server)
+  and installable like a desktop app.
+- **Terminal** (`Restaurant.Mobile`) — the tablet app staff carry to tables. Android, built with
+  .NET MAUI Blazor Hybrid: the same web-style screens packaged as a native app.
 
-This repository holds `docs/` and nothing else: the handbook, the token kit (two CSS files and a
-preview page), the gap register, and the vendored design sources the handbook was written from.
+This repository holds no product code. Under `docs/`: the handbook, the token kit (two CSS files
+and a preview page), the gap register, the vendored design sources the handbook was written from,
+and `docs/superpowers/` — the design spec and implementation plan this work followed. At the root,
+`.superpowers/` holds the working briefs and task reports behind each commit.
 
 ## Current status
 
@@ -50,12 +57,13 @@ preview page), the gap register, and the vendored design sources the handbook wa
   inventory. Part IV points at the gap register.
 - `docs/design/tokens/` — `upos-tokens.css` (77 custom properties: color, type, spacing, shape,
   elevation, motion, touch targets), `upos-components.css` (21 component recipes with their
-  modifiers), and `preview.html`, which renders every token and component for eyeballing. Checked
-  in a browser in light and dark; the four accent presets switch independently of the theme.
+  modifiers), and `preview.html`, which renders every token and component for eyeballing. Verified
+  in a browser across both themes and all four accent presets, with no console errors.
 - `docs/GAPS.md` — thirteen entries, `GAP-01` to `GAP-13`, covering everything the design draws
   that the current four-model schema cannot express.
-- `docs/design/reference/` — the vendored design sources: both artboards, the SecondBrain design
-  system the language derives from, and the scope outline.
+- `docs/design/reference/` — the vendored design sources: both artboards, the scope outline, and
+  two design systems under `_ds/` — SecondBrain, which the language derives from, and the
+  modernist kit the secondary artboard was drawn in, kept as the superseded source.
 
 Nothing here is deployed, because there is nothing to deploy. The deliverable is documentation.
 
@@ -98,9 +106,10 @@ Nothing here is deployed, because there is nothing to deploy. The deliverable is
 **Green — the design is fully specified.** Every interactive element in both artboards maps to
 exactly one screen spec. Every gap the design exposes is recorded and cross-referenced in both
 directions. The token kit resolves standalone: every variable the components and preview reference
-is defined in `upos-tokens.css`, the page was checked in a browser in light and dark, and the four
-accent presets are independent of the theme so either can change without touching the other. A
-developer can style a new screen from Part I and the tokens alone, without opening an artboard.
+is defined in `upos-tokens.css`, and the preview page was verified in a browser in both themes and
+all four accents, with no unresolved custom properties and no console errors. Theme and accent are
+independent, so either can change without touching the other. A developer can style a new screen
+from Part I and the tokens alone, without opening an artboard.
 
 **Amber — the schema decisions are the critical path.** Nine of thirteen gaps are P0 Release 1
 work, and several of them (payments, employees and approvals, modifiers) are whole domains that do
@@ -113,8 +122,9 @@ it yet, and the API has no idempotency key to make a replay safe (`GAP-10`). Thi
 gap between what is designed and what exists.
 
 - **Tests:** none. This repository holds documentation; there is nothing to test. The token kit was
-  verified by opening `docs/design/tokens/preview.html` in a browser and by a structural check that
-  every `var(--upos-*)` reference resolves.
+  verified two ways: `docs/design/tokens/preview.html` opened in a browser across both themes and
+  all four accents with no console errors, and a structural check that every `var(--upos-*)`
+  reference resolves to a defined token.
 - **Deploys:** none, and none planned for this repository. The handbook is meant to be read in the
   repository or shared as a rendered page.
 - **Risks:** the schema decisions above are the main one. Second, the handbook is long and

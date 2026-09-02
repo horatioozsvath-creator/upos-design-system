@@ -774,9 +774,11 @@ Migration:
   sets it on `.u-qty-stepper` and `.u-chit` only. Chips, pills, the segmented track and bars rely on
   their own fills not overflowing today — set it at the call site whenever a child could paint past
   the corner, and fold it into the recipes when one does.
-- **No input recipe.** There is no `.u-input`, and inputs land on real screens already — the menu
-  manager's add-item and add-group forms (Part II-B), and the manager PIN field every approval
-  needs (Part II-A's void and re-fire; GAP-09). §2 specs the behavior in prose instead: fill
+- **No input recipe.** There is no `.u-input`, and a specced screen needs one already: the menu
+  manager's add-item and add-group forms, which Part II-B sends to §2's input contract by name. The
+  manager PIN field behind an approval will want the same recipe, but no screen draws that field
+  yet and GAP-09 records that there is no PIN or approval model to draw it from. §2 specs the
+  behavior in prose instead: fill
   `--upos-surface-inset`, 1px `--upos-border`, `--upos-radius-inset`, `--upos-type-body`,
   placeholder `--upos-ink-subtle`, minimum height `--upos-touch-terminal` on the terminal and
   `--upos-touch-kiosk` on the kiosk, and on focus the border goes `--upos-accent` while the fill
