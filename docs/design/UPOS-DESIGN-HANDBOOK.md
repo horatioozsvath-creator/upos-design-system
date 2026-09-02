@@ -237,7 +237,12 @@ header strip and on the row so the columns line up.
 
 Gaps come from the same family: `--upos-space-gap-card` 16px between cards,
 `--upos-space-gap-chip` 7px between chips, `--upos-space-gap-inline` 10px inside a row,
-`--upos-space-gap-section` 26px between sections.
+`--upos-space-gap-line` 12px between two lines on a check, `--upos-space-gap-section` 26px between
+sections. `--upos-space-gap-line` is the one gap that is not vendored: the check's list has always
+stacked at 12px, a step above `--upos-space-gap-inline` and below `--upos-space-gap-card` and neither
+of them, and it was a literal at its one call site until Part II-A · Handheld had to size a region
+from it — three lines and their gaps is a height, and a height built half from a token and half from
+a literal is a height nobody can re-derive.
 
 **Two component recipes override a step on purpose.** `.u-chip-status` and `.u-chip-allergen` use
 `5px 12px` instead of `--upos-space-pad-chip` `3px 10px`, because a status chip is read across a
@@ -994,7 +999,9 @@ kitchen and charge.
 
 **This subsection is provisional.** Order entry went to a real device before the fleet was chosen: a
 Datalogic Memor 20, a rugged 5.7" Android handheld at 1080×2160 and 440dpi, which the WebView reports
-as a **393×785 CSS-pixel portrait viewport**. The three-pane layout above cannot be drawn there. It
+as a **393×713 CSS-pixel portrait viewport** — the panel less a 66px status bar and a 132px navigation
+bar, once its host stops drawing behind them (see *The host's system bars* below). It read 393×785
+while the window was edge to edge, and 785 was the defect, not the device. The three-pane layout above cannot be drawn there. It
 spends 170px on the rail and 380px on the cart before a single item exists, and the grid's own
 `minmax(190px,1fr)` tile inside 22px of padding needs 234px more — **784px before the screen has one
 item on it, into 393px of glass.** The panes collide and the cart leaves the screen entirely.
@@ -1080,18 +1087,59 @@ stays a literal, recorded here.
   is actually worked. The amount is on the bar and not on the button, which is the kiosk's division
   of the same two jobs: the bar reports and the button acts.
 - **The sheet is the `UposDrawer` recipe on the bottom edge, not a new component.** `.u-drawer`'s
-  inset flips from `top/right/bottom` to `left/right/bottom`: full width, `max-height:82%`,
-  `--upos-radius-panel` on the two top corners only, `--upos-surface`, `--upos-shadow-modal`, over
-  `.u-scrim` at `--upos-blur-scrim`. It rises with `fl-rise` at `--upos-dur-slow` — the kit's own
-  drawer call, unchanged, and no seventh keyframe (§8). Inside it the cart's three bands are
-  structurally identical to the panel above and lose only their left hairline and their 22px side
-  padding, which becomes `var(--upos-space-page)`: a header carrying the check label, the loyalty
-  control and a close `.u-icon-btn`; the line list scrolling; the footer carrying Subtotal, Tax,
-  Total, the 48px `.u-btn--secondary` send-all and the 58px `.u-btn--primary` Charge. Nothing in the
-  cart is redesigned. It is the same panel, given the side of the screen it can have.
+  inset flips from `top/right/bottom` to `left/right/bottom`: full width, `--upos-radius-panel` on
+  the two top corners only, `--upos-surface`, `--upos-shadow-modal`, over `.u-scrim` at
+  `--upos-blur-scrim`. It rises with `fl-rise` at `--upos-dur-slow` — the kit's own drawer call,
+  unchanged, and no seventh keyframe (§8). Inside it the cart's three bands are structurally
+  identical to the panel above and lose only their left hairline and the panel's padding, which
+  becomes `var(--upos-space-page)` **on every edge** — a 393px sheet is a page, and a page has a page
+  step: a header carrying the check label, the loyalty control and a close `.u-icon-btn`; the line
+  list scrolling; the footer carrying Subtotal, Tax, Total, the 48px `.u-btn--secondary` send-all and
+  the 58px `.u-btn--primary` Charge. Nothing in the cart is redesigned. It is the same panel, given
+  the side of the screen it can have.
+- **The line region asks for three lines; the cap is a band, not a percentage.** The drawer recipe's
+  `max-height:82%` is a 1440 figure and it does not survive contact with the device: the sheet's own
+  header and pinned footer are 339px of a 577px destination, so 82% — 473px — left the line list 98px
+  and the totals cut the second line in half. Two rules replace it.
+  - The list takes `flex:1 1 calc(var(--upos-touch-terminal) * 3 + var(--upos-space-gap-line) * 3)`.
+    A cart line is exactly `--upos-touch-terminal` tall — `CartLine` sets no height of its own and the
+    `QtyStepper` inside it carries the touch floor — and the list stacks lines at
+    `--upos-space-gap-line`. So the request is three touch floors and three gaps: the two between the
+    lines, and one more so the top of the fourth line's gap is inside the region and a full check
+    reads as scrollable rather than as finished. It is a **basis and not a floor**, so on a host too
+    short to hold header + three lines + footer the list gives way and the totals, `SEND ALL TO
+    KITCHEN` and Charge stay whole rather than falling off the bottom. It is a floor as well as a
+    ceiling in practice, which is deliberate: the sheet stands the same height at zero, one, two and
+    three lines, so it does not grow under the thumb as items are tapped in and Charge does not move.
+  - The cap is `calc(100% - var(--upos-space-gap-section))`. The scrim keeps one section gap at the
+    head of the destination and the sheet takes the rest, which is a visible strip of the menu on
+    every host rather than a percentage that has to be re-derived for each one. On the Memor 20 the
+    sheet asks for 548px — 109px of header, 208px of list, 230px of footer — against a 577px
+    destination, so the cap does not bind and the scrim band is 29px.
+- **The footer's tax-and-tender paragraph folds at this width, and only at this width.** It is the
+  one thing in the pinned footer that is not the check, and on a 393px sheet it is 72px — more than a
+  line and a half of the check it annotates. Nothing it names goes unsaid: the Tax row still reads
+  `NO TAX RULE · GAP-08` in position and the Charge block still reads `PAYMENT SCREEN AND PAYMENTS
+  DOMAIN · GAP-08` under it. GAP-13 is the one statement the fold costs, and it stands in full in the
+  1440 panel, which is the primary design.
 - §11 already prefers a drawer over navigation, and this is that rule doing its job at a width where
   the grid and the check cannot both be on the glass: the check is one tap away and the menu is never
   navigated off.
+
+**The host's system bars.** This was open when the subsection was written and it is closed now, and
+the account belongs here because it is what fixed the viewport every figure above is measured
+against. The WebView filled the whole 1080×2160 panel, so the shell ran under Android's 66px status
+bar at the head and its 132px navigation bar at the foot: the 26px mark clipped from above, the lower
+half of the 78px nav underneath. The cause was the host and not the stylesheet. .NET MAUI 10 puts
+every Android window into edge to edge on every API level — `Microsoft.Maui` calls
+`WindowCompat.SetDecorFitsSystemWindows(window, false)` in the activity's `OnCreate`, and the
+generated theme's `maui_edgetoedge_optout` is only read on API 35 and up, while the Memor 20 is API
+28. `MainActivity` now calls the same method with `true` after `base.OnCreate`, so the WebView is laid
+out between the bars and the shell's `height:100%` is 393×713. **No rule in any stylesheet changed**,
+which is the point: the shell was always right about the box it was handed, and it was handed the
+wrong box. `env(safe-area-inset-*)` was never the answer — that WebView reports zero for all four,
+because Android exposes display-cutout insets there and not system-bar insets, and padding by four
+zeroes is a rule that looks like a fix and is not.
 
 **States.** Every state in the spec above holds unchanged — the 86'd row, the empty check, the
 sent/unsent line, the send-all confirmation, the check label, the offline annotations. Three are
@@ -1132,20 +1180,12 @@ added.
   §6, which is one scale for the whole product; if the Memor 20 becomes the fleet, the correct fix is
   a handheld type role in Part I, not a local override in a screen spec. That decision waits on the
   fleet, and until it lands this subsection is legible rather than comfortable.
-- **Landscape.** 785×393 is a different problem — the bottom nav and the summary bar together take
+- **Landscape.** 713×393 is a different problem — the bottom nav and the summary bar together take
   142px out of 393px of height — and no rule is written for it. The device is used in portrait.
 - **The touch floor does not move and the type scale does not move.** Handheld keeps Part I's
   terminal roles and `--upos-touch-terminal` 48px. It does not take `--upos-touch-kiosk`: a smaller
   screen is not a guest-facing one, and §11 sizes 60px for a stranger with nobody to ask, not for a
   narrow viewport.
-- **The host's system bars.** On the Memor 20 the WebView fills the whole 1080×2160 panel, so the
-  shell runs under Android's status bar at the head and its gesture bar at the foot: the 26px mark is
-  clipped from above and the lower half of the 78px nav sits under the system bar. It predates this
-  subsection — the wide layout was cut in the same two places — and the step does not cause it, but a
-  58px top bar under a status bar is tighter than a 76px one. It is not a rule any stylesheet can
-  carry: `env(safe-area-inset-*)` reports zero on that WebView, because Android exposes cutout insets
-  there and not system-bar insets. The host has to consume the window insets, so this belongs to the
-  terminal's shell app rather than to Part II-A.
 - **The system back gesture does not close the sheet.** Android's back is a host concern — a MAUI
   page override, not a rule any stylesheet can carry — and wiring one host's hardware gesture to one
   screen's transient state before the fleet is chosen buys a habit that may not survive the device.
