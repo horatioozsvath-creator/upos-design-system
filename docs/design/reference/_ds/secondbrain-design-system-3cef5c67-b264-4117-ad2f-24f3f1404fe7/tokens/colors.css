@@ -1,0 +1,111 @@
+/* SecondBrain Fluid — colour. Base values first, semantic aliases after.
+   Rule: colour carries meaning. Red = problem, green = healthy, orange =
+   stale/expired, blue = every neutral fact. Rotate the blues down a list of
+   values rather than repeating one. */
+:root {
+  /* ── Ground ─────────────────────────────────────────────── */
+  --ground-base: #eef1f5;
+  --ground-lamp-1: #dbe7f2;
+  --ground-lamp-2: #e7eef0;
+  --ground: radial-gradient(1100px 700px at 88% -8%, #dbe7f2 0%, rgba(219, 231, 242, 0) 62%),
+    radial-gradient(900px 600px at -6% 12%, #e7eef0 0%, rgba(231, 238, 240, 0) 60%), #eef1f5; /* @kind color */
+
+  /* ── Ink and neutrals ───────────────────────────────────── */
+  --ink: #1b1f24;
+  --ink-800: #20262e;
+  --ink-700: #3b4652;
+  --ink-600: #4a545f;
+  --ink-500: #5b6570;
+  --ink-400: #6f8299;
+  --ink-300: #8b95a1;
+  --ink-200-dark: #8d99a6;
+  --ink-100-dark: #9aa5b1;
+  --surface: #ffffff;
+  --surface-tint: #f4f7fa;
+  --surface-hover: #f2f6fa;
+  --surface-hover-2: #eef3f8;
+  --hairline: #e3e7ec;
+
+  /* ── Blues — the working palette ────────────────────────── */
+  --slate-deep: #22496a;
+  --slate: #33648b;
+  --slate-light: #4d84b8;
+  --slate-ink: #2a5578;
+  --sky: #6fa3cf;
+  --sky-bright: #8fc9ff;
+  --teal-blue: #2f7d8f;
+  --blue-pale: #a8c4de;
+  --blue-chip-fill: #e8f2fb;
+  --blue-chip-edge: #cfe2f4;
+  --blue-mute: #c3ccd7;
+
+  /* ── Status ─────────────────────────────────────────────── */
+  --problem: #ec3013;
+  --problem-text: #ae1800;
+  --problem-tint: #fbeeeb;
+  --problem-edge: #f2c9c0;
+  --problem-deep: #7d2412;
+  --urgent: #c62828;
+  --healthy: #22c55e;
+  --healthy-text: #159548;
+  --healthy-edge: #b9e6c9;
+  --stale: #f97316;
+  --stale-text: #d95f06;
+  --dormant: #a8c4de;
+  --dormant-text: #4d84b8;
+
+  /* On dark panels the same three read lighter */
+  --on-dark-green: #9ee6b4;
+  --on-dark-blue: #8fc9ff;
+  --on-dark-coral: #ff8a70;
+
+  /* ── Gradients ──────────────────────────────────────────── */
+  --grad-primary: linear-gradient(135deg, #33648b, #22496a); /* @kind color */
+  --grad-primary-soft: linear-gradient(140deg, #4d84b8, #2a5578); /* @kind color */
+  --grad-dark-panel: linear-gradient(168deg, #20262e 0%, #171c22 100%); /* @kind color */
+  --grad-card-light: linear-gradient(150deg, #ffffff 0%, #f3f7fb 100%); /* @kind color */
+  --grad-modal-header: linear-gradient(150deg, #f4f7fa, #fff); /* @kind color */
+  --grad-rail-inset: linear-gradient(170deg, #f2f6fa, #e8eef5); /* @kind color */
+  --grad-bar-sky: linear-gradient(90deg, #6fa3cf, #2a5578); /* @kind color */
+  --grad-headline-accent: linear-gradient(120deg, #33648b, #6fa3cf); /* @kind color */
+
+  /* ── Semantic aliases ───────────────────────────────────── */
+  --text-body: var(--ink);
+  --text-strong-secondary: var(--ink-700);
+  --text-meta: var(--ink-500);
+  --text-quiet: var(--ink-300);
+  --text-label: var(--ink-300);
+  --text-on-dark: #eef1f5;
+  --text-on-dark-body: #c8d0d9;
+  --text-on-dark-meta: #a9b3be;
+  --text-on-dark-label: var(--ink-200-dark);
+
+  --surface-page: var(--ground-base);
+  --surface-card: var(--surface);
+  --surface-inset: var(--surface-tint);
+  --surface-dark: var(--ink-800);
+  --surface-glass: rgba(255, 255, 255, 0.72);
+  --surface-veil: rgba(255, 255, 255, 0.7);
+  --surface-dark-inset: rgba(238, 241, 245, 0.06);
+  --surface-dark-inset-hover: rgba(238, 241, 245, 0.12);
+
+  --border-neutral: var(--hairline);
+  --border-soft: rgba(27, 31, 36, 0.12);
+  --border-hair: rgba(27, 31, 36, 0.05);
+  --border-on-dark: rgba(238, 241, 245, 0.22);
+
+  --accent: var(--slate);
+  --accent-strong: var(--slate-deep);
+  --accent-quiet: var(--slate-light);
+  --link: var(--slate-ink);
+  --link-hover: #1f4260;
+
+  /* Value rotation — walk these in order down a column of numbers */
+  --value-1: var(--slate-deep);
+  --value-2: var(--slate);
+  --value-3: var(--slate-light);
+  --value-4: var(--teal-blue);
+
+  --scrim: rgba(20, 25, 31, 0.5);
+  --selection: #cfe0ef;
+}

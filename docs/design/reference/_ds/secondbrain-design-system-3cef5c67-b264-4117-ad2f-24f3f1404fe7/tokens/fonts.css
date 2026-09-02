@@ -1,0 +1,4 @@
+/* SecondBrain type — Archivo, weights 400 / 700 / 800.
+   The source prototypes load Archivo from Google Fonts (no local binaries were
+   shipped in the handoff bundle), so the system does the same. */
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;700;800&display=swap');

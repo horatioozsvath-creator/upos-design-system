@@ -1,0 +1,21 @@
+/* SecondBrain Fluid — elevation. Wide, soft, low-opacity, heavily negative
+   spread: they suggest float, never a drop shadow. */
+:root {
+  --shadow-panel: 0 20px 50px -30px rgba(27, 31, 36, 0.5);
+  --shadow-card: 0 22px 54px -36px rgba(27, 31, 36, 0.5);
+  --shadow-card-deep: 0 24px 60px -34px rgba(27, 31, 36, 0.6);
+  --shadow-row-hover: 0 20px 40px -26px rgba(27, 31, 36, 0.4);
+  --shadow-row-hover-soft: 0 18px 34px -22px rgba(27, 31, 36, 0.5);
+  --shadow-dark-panel: 0 24px 60px -34px rgba(23, 28, 34, 0.9);
+  --shadow-sidebar: 0 18px 44px -18px rgba(23, 28, 34, 0.55);
+  --shadow-button: 0 12px 24px -14px rgba(34, 73, 106, 0.95);
+  --shadow-button-hover: 0 18px 34px -12px rgba(34, 73, 106, 0.95);
+  --shadow-modal: 0 40px 90px -40px rgba(20, 25, 31, 0.9);
+  --shadow-toast: 0 20px 44px -20px rgba(20, 25, 31, 0.9);
+  --shadow-glass: 0 8px 24px -14px rgba(27, 31, 36, 0.4);
+  --shadow-ticker: 0 12px 30px -18px rgba(23, 28, 34, 0.8);
+
+  /* Frosted glass — search bar and modal backdrops only. Never on a data row. */
+  --blur-glass: blur(14px); /* @kind other */
+  --blur-scrim: blur(6px); /* @kind other */
+}

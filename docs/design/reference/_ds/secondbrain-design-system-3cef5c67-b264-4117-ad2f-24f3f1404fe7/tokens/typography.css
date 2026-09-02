@@ -1,0 +1,59 @@
+/* SecondBrain Fluid — type scale. Archivo 400 / 700 / 800. Nothing below 10px.
+   Weight 800 carries every heading and every number; 700 carries row titles and
+   button labels; 400 is body only. */
+:root {
+  --font-core: "Archivo", system-ui, sans-serif;
+  --font-heading: var(--font-core);
+  --font-body: var(--font-core);
+  --font-mono: ui-monospace, monospace;
+
+  --weight-body: 400; /* @kind font */
+  --weight-medium: 700; /* @kind font */
+  --weight-display: 800; /* @kind font */
+
+  /* Sizes */
+  --size-hero: 42px;
+  --size-page-title: 32px;
+  --size-card-headline: 28px;
+  --size-card-headline-sm: 25px;
+  --size-value-lg: 30px;
+  --size-value: 26px;
+  --size-value-sm: 19px;
+  --size-section-head: 21px;
+  --size-section-head-sm: 19px;
+  --size-row-title: 15px;
+  --size-row-title-sm: 13px;
+  --size-body: 13px;
+  --size-body-sm: 12.5px;
+  --size-meta: 12px;
+  --size-meta-sm: 11px;
+  --size-label: 10px;
+  --size-label-sm: 9.5px;
+  --size-floor: 10px;
+
+  /* Tracking — tighter the bigger it gets */
+  --track-hero: -0.035em; /* @kind font */
+  --track-page-title: -0.03em; /* @kind font */
+  --track-value: -0.03em; /* @kind font */
+  --track-card-headline: -0.025em; /* @kind font */
+  --track-section-head: -0.02em; /* @kind font */
+  --track-row-title: -0.01em; /* @kind font */
+  --track-label: 0.16em; /* @kind font */
+  --track-label-wide: 0.2em; /* @kind font */
+
+  /* Line heights */
+  --leading-hero: 1.05; /* @kind font */
+  --leading-headline: 1.15; /* @kind font */
+  --leading-body: 1.55; /* @kind font */
+  --leading-body-loose: 1.65; /* @kind font */
+  --leading-tight: 1.3; /* @kind font */
+
+  /* Composed roles */
+  --type-hero: var(--weight-display) var(--size-hero) / var(--leading-hero) var(--font-core);
+  --type-page-title: var(--weight-display) var(--size-page-title) / 1.1 var(--font-core);
+  --type-card-headline: var(--weight-display) var(--size-card-headline) / var(--leading-hero) var(--font-core);
+  --type-value: var(--weight-display) var(--size-value) / 1.1 var(--font-core);
+  --type-section-head: var(--weight-display) var(--size-section-head) / 1.2 var(--font-core);
+  --type-row-title: var(--weight-display) var(--size-row-title) / 1.2 var(--font-core);
+  --type-body: var(--weight-body) var(--size-body) / var(--leading-body) var(--font-core);
+}

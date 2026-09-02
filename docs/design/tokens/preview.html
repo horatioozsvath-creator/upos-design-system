@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" data-accent="slate">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UPOS token kit preview</title>
+<link rel="stylesheet" href="upos-tokens.css">
+<link rel="stylesheet" href="upos-components.css">
+<style>
+  .pv-grid{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0 26px}
+  .pv-swatch{width:120px;border-radius:14px;overflow:hidden;font:700 10px/1.4 Archivo,system-ui,sans-serif}
+  .pv-swatch > div:first-child{height:56px}
+  .pv-swatch > div:last-child{padding:6px 8px;background:var(--upos-surface)}
+  .pv-controls{position:fixed;top:14px;right:14px;display:flex;gap:8px;z-index:10}
+</style>
+</head>
+<body>
+<div class="pv-controls">
+  <button onclick="var h=document.documentElement; h.getAttribute('data-theme')==='dark' ? h.removeAttribute('data-theme') : h.setAttribute('data-theme','dark')">theme</button>
+  <select onchange="document.documentElement.setAttribute('data-accent',this.value)">
+    <option>slate</option><option>teal</option><option>indigo</option><option>sky</option>
+  </select>
+</div>
+<main style="max-width:1100px;margin:0 auto;padding:40px 24px">
+  <h1>UPOS Fusion Fluid · token kit preview</h1>
+
+  <h2>Ground and surfaces</h2>
+  <div class="pv-grid">
+    <div class="pv-swatch"><div style="background:var(--upos-surface)"></div><div>--upos-surface</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-surface-inset)"></div><div>--upos-surface-inset</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-panel-dark)"></div><div>--upos-panel-dark</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-border)"></div><div>--upos-border</div></div>
+  </div>
+
+  <h2>Ink and blues</h2>
+  <div class="pv-grid">
+    <div class="pv-swatch"><div style="background:var(--upos-ink)"></div><div>--upos-ink</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-ink-subtle)"></div><div>--upos-ink-subtle</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-value-1)"></div><div>--upos-value-1</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-value-2)"></div><div>--upos-value-2</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-value-3)"></div><div>--upos-value-3</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-value-4)"></div><div>--upos-value-4</div></div>
+  </div>
+
+  <h2>Status</h2>
+  <div class="pv-grid">
+    <div class="pv-swatch"><div style="background:var(--upos-status-new)"></div><div>--upos-status-new</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-status-fired)"></div><div>--upos-status-fired</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-status-late)"></div><div>--upos-status-late</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-status-ready)"></div><div>--upos-status-ready</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-allergen-bg)"></div><div>--upos-allergen-bg</div></div>
+  </div>
+
+  <h2>Gradients and veil</h2>
+  <div class="pv-grid">
+    <div class="pv-swatch"><div style="background:var(--upos-grad-primary)"></div><div>--upos-grad-primary</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-grad-dark)"></div><div>--upos-grad-dark</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-grad-bar)"></div><div>--upos-grad-bar</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-grad-bar-v)"></div><div>--upos-grad-bar-v</div></div>
+    <div class="pv-swatch"><div style="background:var(--upos-surface-inset)"><div style="height:100%;background:var(--upos-surface-veil)"></div></div><div>--upos-surface-veil</div></div>
+  </div>
+
+  <h2>Type roles</h2>
+  <div style="font:var(--upos-type-display)">Display 800 · $4,820</div>
+  <div style="font:var(--upos-type-heading)">Heading 800 · Riverside Grill · Today</div>
+  <div style="font:var(--upos-type-row)">Row title 700 · Classic Cheeseburger</div>
+  <div style="font:var(--upos-type-body);color:var(--upos-ink-subtle)">Body 400 · Tap the menu to build the order.</div>
+  <div style="font:var(--upos-type-label);letter-spacing:.15em;color:var(--upos-ink-subtle)">LABEL · NET SALES</div>
+
+  <h2>Elevation and motion</h2>
+  <div class="pv-grid">
+    <div style="width:180px;height:90px;border-radius:var(--upos-radius-card);background:var(--upos-surface);box-shadow:var(--upos-shadow-card)"></div>
+    <div style="width:180px;height:90px;border-radius:var(--upos-radius-panel);background:var(--upos-surface);box-shadow:var(--upos-shadow-modal)"></div>
+    <div style="width:180px;height:90px;border-radius:var(--upos-radius-card);background:var(--upos-grad-primary);box-shadow:var(--upos-shadow-button);animation:fl-rise .6s var(--upos-ease)"></div>
+  </div>
+
+  <h2 id="pv-components">Component recipes</h2>
+  <section id="pv-components-body">
+
+    <h3>Buttons</h3>
+    <div class="pv-grid" style="align-items:center">
+      <button class="u-btn u-btn--primary">Charge $18.40</button>
+      <button class="u-btn u-btn--secondary">Save order</button>
+      <button class="u-btn u-btn--ghost">Cancel</button>
+      <button class="u-icon-btn" aria-label="Settings">&#9881;</button>
+    </div>
+
+    <h3>Pills and chips</h3>
+    <div class="pv-grid" style="align-items:center">
+      <span class="u-pill">Lunch menu</span>
+      <span class="u-chip-status u-chip-status--new">New</span>
+      <span class="u-chip-status u-chip-status--fired">Fired</span>
+      <span class="u-chip-status u-chip-status--late">Late</span>
+      <span class="u-chip-status u-chip-status--ready">Ready</span>
+      <span class="u-chip-allergen">Contains nuts</span>
+      <span class="u-pill-offline">Offline</span>
+      <span class="u-badge-channel">Dine-in</span>
+      <span class="u-badge-channel">DoorDash</span>
+    </div>
+
+    <h3>Segmented control</h3>
+    <div class="u-segmented">
+      <button class="u-segmented__opt is-active" type="button">Open</button>
+      <button class="u-segmented__opt" type="button">Held</button>
+      <button class="u-segmented__opt" type="button">Closed</button>
+    </div>
+
+    <h3>Switch</h3>
+    <div class="pv-grid" style="align-items:center">
+      <button class="u-switch is-on" type="button" role="switch" aria-checked="true" aria-label="Uber Eats connected"></button>
+      <button class="u-switch" type="button" role="switch" aria-checked="false" aria-label="SkipTheDish connected"></button>
+    </div>
+
+    <h3>Stat card and data rows</h3>
+    <div class="pv-grid" style="align-items:flex-start">
+      <div class="u-stat-card">
+        <span style="font:var(--upos-type-label);letter-spacing:.15em;color:var(--upos-ink-subtle)">NET SALES</span>
+        <span style="font:var(--upos-type-display)">$4,820</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:420px;margin:10px 0 26px">
+      <div class="u-data-row"><span>#128 &middot; Classic Cheeseburger</span></div>
+      <div class="u-data-row is-late"><span>#129 &middot; Table 6 &mdash; running late</span></div>
+    </div>
+
+    <h3>Tender, tip and quantity controls</h3>
+    <div class="pv-grid" style="align-items:center">
+      <div class="u-tender-tile is-selected">Cash</div>
+      <div class="u-tender-tile">Card</div>
+      <button class="u-tip-btn" type="button">15%</button>
+      <button class="u-tip-btn is-selected" type="button">18%</button>
+      <button class="u-tip-btn" type="button">20%</button>
+      <div class="u-qty-stepper">
+        <button type="button" aria-label="Decrease">&minus;</button>
+        <span>2</span>
+        <button type="button" aria-label="Increase">+</button>
+      </div>
+    </div>
+
+    <h3>Overlays &mdash; modal, scrim, drawer, toast</h3>
+    <div style="position:relative;height:260px;border-radius:var(--upos-radius-panel);overflow:hidden;background:var(--upos-surface-inset);margin:10px 0 14px">
+      <div class="u-scrim"></div>
+      <div class="u-modal" style="position:absolute;top:20px;left:50%;transform:translateX(-50%)">
+        <div style="display:flex;align-items:center">
+          <strong style="font:var(--upos-type-heading)">Void item?</strong>
+          <button class="u-icon-btn" aria-label="Close" style="margin-left:auto">&times;</button>
+        </div>
+        <p style="margin:0;color:var(--upos-ink-subtle)">This removes the item from the check.</p>
+        <div class="pv-grid" style="margin:0">
+          <button class="u-btn u-btn--secondary">Keep item</button>
+          <button class="u-btn u-btn--primary">Void item</button>
+        </div>
+      </div>
+    </div>
+    <div style="position:relative;height:220px;border-radius:var(--upos-radius-panel);overflow:hidden;background:var(--upos-surface-inset);margin:0 0 14px">
+      <div class="u-drawer">
+        <strong style="font:var(--upos-type-heading)">Order notes</strong>
+        <p style="margin:0;color:var(--upos-ink-subtle)">No allergies on file.</p>
+      </div>
+    </div>
+    <div style="position:relative;height:70px;margin:0 0 26px">
+      <div class="u-toast" style="position:absolute;bottom:0;left:0">Order #128 sent to kitchen</div>
+    </div>
+
+    <h3>Bottom navigation</h3>
+    <nav class="u-nav-bottom" style="max-width:420px;margin:10px 0 26px">
+      <div class="u-nav-item is-active">Orders</div>
+      <div class="u-nav-item">Tables</div>
+      <div class="u-nav-item">Reports</div>
+      <div class="u-nav-item">Settings</div>
+    </nav>
+
+    <h3>KDS chit</h3>
+    <div class="upos-kds" style="padding:20px;border-radius:8px;background:var(--upos-kds-board)">
+      <div class="u-chit">
+        <div style="padding:12px 14px;display:flex;justify-content:space-between;align-items:center">
+          <strong>#128 &middot; Table 6</strong>
+          <span class="u-chit__timer">04:12</span>
+        </div>
+        <div style="padding:0 14px 14px;display:flex;justify-content:space-between;align-items:center">
+          <span>Order overdue</span>
+          <span class="u-chit__timer u-chit__timer--late">12:41</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <h2>KDS scope</h2>
+  <div class="upos-kds" style="padding:24px;border-radius:8px;background:var(--upos-kds-board)">
+    <span style="color:var(--upos-kds-ink);font:800 15px/1 Archivo,system-ui,sans-serif;letter-spacing:.14em">GRILL STATION</span>
+    <span style="color:var(--upos-kds-status-late);font:800 15px/1 ui-monospace,Menlo,monospace"> 12:41</span>
+  </div>
+</main>
+</body>
+</html>

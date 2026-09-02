@@ -1,0 +1,353 @@
+Below is an engineering-oriented scope for a restaurant POS targeting both table-service and quick-service customers.
+I’m assuming an initial North American SMB/mid-market product. Enterprise chains, hotels, stadiums, and international fiscalization would require a substantially larger scope.
+1. Classification
+P0 — Operational requirement: The restaurant cannot reliably complete a normal shift without it.
+P1 — Competitive requirement: Needed to win mainstream deals against Toast, Square, Lightspeed, Clover, Squirrel, Micros/Simphony, and PAR. It may initially be delivered through an integration.
+P2 — Nice to have: Valuable add-on, enterprise capability, or differentiator that should not delay the core product.
+The competitive pattern is clear: order entry, payments, menu management, kitchen routing, reporting, employee controls, and resilient operation form the core. Table management, coursing, and check manipulation define credible table service; speed, multi-channel orders, availability, and production flow define credible QSR. This is reflected across the official product descriptions from Toast, Square, Lightspeed, Clover, Oracle Simphony, PAR, and Squirrel.
+2. Shared requirements
+These apply to both table service and QSR.
+Capability
+Priority
+Minimum engineering scope
+Restaurant/location configuration
+P0
+Organization, location, revenue center, terminal, timezone, business day, currency, tax rules, receipt settings
+Menu management
+P0
+Categories, items, sizes, prices, descriptions, images, taxes, availability, multiple menus and dayparts
+Modifier system
+P0
+Required/optional modifiers, min/max selections, nested groups, upcharges, default selections, kitchen names
+Combos and meal bundles
+P0 for QSR; P1 for table service
+Fixed and variable bundles, substitutions, price adjustments
+Order entry
+P0
+Create, edit, hold, send, recall, cancel, void, reopen, duplicate, and finalize orders
+Order types
+P0
+Dine-in, takeout, pickup, delivery, counter service; configurable pricing and taxes by type
+Item availability and “86”
+P0
+Manual item counts, automatic sold-out status, propagation to terminals and digital channels
+Discounts and promotions
+P0
+Item/check discounts, percentage/fixed amount, comp reasons, promo codes, manager approval
+Taxes and service charges
+P0
+Inclusive/exclusive taxes, multiple tax jurisdictions, exemptions, automatic gratuity and service fees
+Payments
+P0
+Credit/debit, EMV, contactless wallets, cash, gift card, split tender, tips, refunds and partial refunds
+Receipts
+P0
+Printed, email and SMS receipts; reprint; configurable headers, footers and tax details
+Cash management
+P0
+Drawer assignment, paid-in/out, cash drops, opening float, expected-versus-actual close
+Kitchen routing
+P0
+Route items by station, order type, menu category, revenue center and fulfillment channel
+Kitchen display or printer support
+P0
+At least one production workflow; KDS strongly preferred, with printer fallback
+Staff authentication
+P0
+PIN or device login, role-based permissions and fast employee switching
+Manager controls
+P0
+Approval for voids, comps, refunds, price overrides, reopened checks and cash exceptions
+Time tracking
+P0
+Clock-in/out, breaks, job codes and basic labor reporting
+Reporting and reconciliation
+P0
+Sales, tax, tenders, tips, discounts, voids, refunds, labor, menu mix and end-of-day reports
+Audit trail
+P0
+Immutable record of order, payment, configuration and employee actions
+Offline operation
+P0
+Continue order entry, kitchen routing and cash transactions without cloud connectivity
+Offline card handling
+P0
+Processor-supported store-and-forward with configurable value/time/risk limits
+Hardware support
+P0
+Fixed terminal, payment device, cash drawer, receipt/kitchen printer and customer display
+Remote administration
+P1
+Browser-based menu, employee, device, reporting and configuration management
+Online ordering
+P1, but needed by commercial GA
+First-party ordering or a deeply integrated partner; orders must enter the same order pipeline
+Delivery integrations
+P1
+DoorDash/Uber Eats or aggregator integration, menu synchronization and order injection
+Gift cards
+P1
+Physical/digital cards, issue, redeem, reload, balance inquiry and cross-location use
+Customer profiles
+P1
+Contact information, order history, preferences, consent and saved payment tokens
+Multi-location management
+P1
+Central configuration with controlled location-level overrides and consolidated reporting
+Integration API and webhooks
+P1
+Orders, menus, payments, employees, reporting, inventory and customer events
+Accounting export
+P1
+Daily journal summaries, taxes, tenders, liabilities and integration with common accounting systems
+For Canada, Interac, GST/PST/HST, tax-inclusive pricing where applicable, and compliant receipt presentation would be launch requirements. For the US, state/local tax rules and relevant card-processing requirements take that place.
+3. Table-service requirements
+A generic retail checkout with a “table number” field is not a table-service POS.
+Capability
+Priority
+Minimum engineering scope
+Graphical floor plan
+P0
+Rooms, tables, shapes, capacity, sections and table status
+Server sections
+P0
+Assign sections and tables; transfer responsibility during a shift
+Guest and seat tracking
+P0
+Cover count, seats, items by seat and seat-aware kitchen tickets
+Open checks
+P0
+Persistent checks that remain open across multiple ordering rounds
+Split checks
+P0
+Split by item, seat, amount, percentage or equal shares
+Merge and transfer
+P0
+Merge checks; move guests, items or entire checks between tables and servers
+Coursing
+P0
+Assign courses, hold/fire individual courses and display course information in the kitchen
+Tableside ordering
+P0
+Full order-entry workflow on handheld devices
+Tableside payment
+P0
+Present bill, split, tip, pay and issue receipt without returning to a terminal
+Preauthorization and tabs
+P0 for bars; P1 otherwise
+Card preauth, incremental authorization and secure tokenized tab management
+Auto-gratuity
+P0
+Party-size and rule-based gratuity with proper receipt and reporting treatment
+Table status and timing
+P0
+Seated, ordered, fired, served, check presented, paid; elapsed-time indicators
+Reservation/waitlist integration
+P1
+Guest lookup, quoted waits, seating and table-status synchronization
+Native reservations/waitlist
+P2
+Build only if it is part of the product’s differentiation
+Guest history/preferences
+P1
+Dietary notes, favorite items, visit history and service notes with access controls
+Advanced meal pacing
+P2
+Coordinated preparation times and predictive course firing
+Square explicitly markets floor plans, seat management, coursing and flexible check splitting; Clover emphasizes table mapping, reservations, firing and bill splitting; Lightspeed and Squirrel similarly position tableside service and complex coursing as core full-service functions.
+4. Quick-service requirements
+Capability
+Priority
+Minimum engineering scope
+High-speed order screen
+P0
+Configurable button grid, search, favorites and minimal taps for common orders
+Counter payment flow
+P0
+Order and payment in one fast workflow, including customer-facing tipping
+Order numbering/naming
+P0
+Sequential number, guest name or both; configurable by channel
+Combos and substitutions
+P0
+Meal construction, size upgrades, substitutions and modifier validation
+Production routing
+P0
+Route individual items to grill, fryer, beverage, assembly and expo
+Pickup workflow
+P0
+Preparing, ready and completed statuses with visible order identifiers
+Order-ready notification
+P1
+SMS, display board or push notification
+Customer-facing display
+P0
+Order confirmation, modifiers, totals, discounts, payment and tip prompts
+Multi-channel order queue
+P1, required by GA
+Counter, kiosk, online and delivery orders in one normalized queue
+Prep-time controls
+P1
+Capacity-aware quotes, throttling, channel pauses and scheduled orders
+Self-service kiosk
+P1 for high-volume QSR; otherwise P2
+Full menu, modifier, payment and receipt workflow
+QR/mobile order and pay
+P1
+Table/location identification, digital menu and payment
+Drive-thru mode
+P2 unless drive-thru is a target segment
+Lane/timer support, order confirmation board, headset integration and tender window
+Digital menu boards
+P2
+Scheduled menus, availability and pricing synchronized with POS
+Kitchen load balancing
+P2
+Route work based on station capacity and overflow rules
+Loyalty identification at checkout
+P1
+Phone, QR, app, card or payment-linked identification
+Square markets auto-86, order-ready texts and kiosks for QSR; Oracle supports kiosks and multi-channel KDS; PAR emphasizes high-speed ordering, drive-thru workflows, resilience and large-scale integrations.
+5. Nonfunctional requirements
+These are product requirements, not infrastructure polish.
+Area
+Requirement
+Availability
+Cloud services should target at least 99.95% availability, excluding planned maintenance
+Local continuity
+A cloud outage must not stop order entry, kitchen production or cash settlement
+Performance
+Common POS interactions should feel immediate; target under 150 ms for local UI actions
+Kitchen delivery
+Locally submitted orders should appear or print within approximately two seconds under normal conditions
+Idempotency
+Retried order and payment requests must not produce duplicate checks, tickets or charges
+Synchronization
+Explicit conflict-handling rules for devices editing the same check
+Payment security
+PCI-aligned architecture, tokenization, no application access to raw card data, EMV/contactless certification
+Data security
+Encryption in transit and at rest, least-privilege RBAC, session controls and secret rotation
+Auditability
+Every sensitive action records actor, device, location, timestamp, old value and new value
+Accessibility
+Customer-facing and administrative interfaces should target WCAG 2.2 AA where applicable
+Observability
+Device health, printer/KDS status, sync backlog, payment errors and API failures visible remotely
+Updates
+Controlled rollout, rollback and maintenance mechanisms that do not interrupt an active service period
+Recovery
+Tested backups and documented recovery objectives for configuration and transaction data
+Scale
+Avoid location-specific assumptions in the data model even if the first customers have one location
+Supportability
+Remote diagnostics, configuration snapshots, log collection and safe device re-provisioning
+PAR advertises 99.99% uptime, Toast highlights internet-outage continuity, Square supports offline payments, and Squirrel emphasizes redundancy. Reliability therefore has to be treated as a selling feature and an architectural foundation.
+6. Nice-to-have capabilities
+These are valuable, but most should follow completion of the transaction and restaurant-operations core.
+High-value P2 additions
+Advanced ingredient and recipe inventory
+Purchase orders, receiving and invoice scanning
+Food-cost and theoretical-versus-actual usage analysis
+Native workforce scheduling and shift swapping
+Native payroll
+CRM segmentation and automated email/SMS marketing
+Tiered loyalty and personalized offers
+Native reservation and waitlist platform
+Catering and event management
+Delivery-driver dispatch
+Branded consumer mobile app
+AI sales and labor forecasting
+AI menu optimization and suggested pricing
+Predictive prep and kitchen capacity management
+Voice or AI drive-thru ordering
+Business benchmarking against similar restaurants
+Embedded banking, lending and instant payouts
+Enterprise and vertical additions
+Franchise hierarchy and franchisee permissions
+Corporate menu governance with staged deployment
+Regional pricing and store-group configuration
+Configuration versioning, approvals and rollback
+Large-scale device fleet management
+Hotel PMS and room-charge integration
+Casino, stadium and venue workflows
+International languages, currencies and fiscalization
+Advanced data warehouse feeds
+Enterprise SSO, SCIM and fine-grained security policies
+Service-level reporting and dedicated support tooling
+These are important in Oracle, PAR, Toast and Lightspeed enterprise competitions, but building them before the basic shift workflow is dependable would create considerable scope risk.
+7. Recommended product architecture
+Do not build separate table-service and QSR applications. Build a common transaction platform with service-model-specific workflows and capability flags.
+flowchart TD
+    Core["Shared POS Core"] --&gt; Catalog["Menu &amp; Pricing"]
+    Core --&gt; Order["Orders &amp; Checks"]
+    Core --&gt; Pay["Payments &amp; Settlement"]
+    Core --&gt; Production["Kitchen &amp; Fulfillment"]
+    Core --&gt; Control["Staff, Audit &amp; Reporting"]
+    Order --&gt; FSR["Table-Service Workflow"]
+    Order --&gt; QSR["Quick-Service Workflow"]
+    FSR --&gt; FSRFeatures["Tables, Seats, Courses, Split Checks"]
+    QSR --&gt; QSRFeatures["Combos, Queue, Pickup, Kiosk"]
+Core domain entities should include:
+Organization → location → revenue center → device
+Catalog → menu → item → modifier group → price → tax
+Order → check → guest/seat → line item → course
+Fulfillment → production ticket → station → status
+Payment → tender → authorization → tip → refund
+Employee → job → role → shift
+Cash drawer → cash event → closeout
+Customer → consent → order history → loyalty account
+Audit event → actor → device → before/after state
+The same order model should support table, counter, online, kiosk and delivery channels. Creating a separate order representation for each channel will make menu synchronization, reporting, refunds, kitchen routing and integrations much harder.
+8. Suggested delivery sequence
+Release 1: Pilot-capable
+Core menu and modifier engine
+Orders, taxes, discounts and receipts
+Integrated payments and cash
+Kitchen printers or basic KDS
+Employee roles and audit trail
+Shift and end-of-day reporting
+Offline operation
+Table-service check/table/course workflows
+QSR fast-entry, combos and pickup workflows
+Release 2: Commercially competitive
+Production-grade KDS
+Handheld order and pay
+Online ordering
+Delivery integrations
+Gift cards
+Customer profiles and basic loyalty
+Multi-location administration
+Public integration APIs
+Reservation/waitlist integration
+Advanced reports and accounting export
+Release 3: Expansion and differentiation
+Kiosks and QR ordering
+Advanced inventory
+Native reservations
+Scheduling/payroll
+Drive-thru
+Enterprise governance
+Advanced CRM and marketing
+Forecasting and AI-assisted operations
+The key launch criterion should be: Can a busy restaurant complete an entire shift—including an internet outage, payment exception, printer failure, split check, refund and end-of-day close—without losing an order or requiring database intervention? If the answer is not yet consistently yes, add-on functionality should remain secondary.
+DEREK’S FEATURES:
+MUST be FAST ORDERING RESPONSE – 
+Quick Screen Transitions – Less toggling
+ANDROID OS
+DELIVERY APPS INTEGRATIONS
+UBER EATS
+SKIP THE DISH
+DOOR DASH
+Offline Mode
+KDS - NATIVE
+OPEN TABLE/ YELP – ONLINE RESERVATIONS
+ONLINE PAYMENT
+ONLINE ORDERING
+TABLE ORDERING – tablet ordering from the table
+Kiosk Ordering
+LOYALTY Programs
+Open API
+DASHBOARD REPORTING
+FOOD TRUCKS – CELLULAR 
+Digital Menu Boards
