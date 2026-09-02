@@ -651,7 +651,8 @@ The terminal keeps taking orders with no network. Offline is a state, never a wa
   never adjacent — void does not touch send.
 - **A destructive control takes `.u-btn--ghost` at rest** — void, comp, refund, remove line — with
   its label at `--upos-ink`, not ghost's default `--upos-ink-subtle` (`#8b95a1` on white computes
-  3.0:1 and fails AA at 13px; the ink label reads 16.6:1). Red marks a problem that exists (§4),
+  3.0:1 and fails AA at 13px; the ink label reads 16.6:1 — §12 records how far that failure
+  reaches beyond this one control). Red marks a problem that exists (§4),
   and an action nobody has taken yet is not one, so the button stays quiet until it is pressed. The
   red arrives on the confirming step, where the dialog names the consequence in
   `--upos-status-late-text` and the confirm button is `.u-btn--primary` carrying the verb. There is
@@ -809,13 +810,29 @@ Migration:
   ships the value the kit is missing — `--shadow-toast: 0 20px 44px -20px rgba(20,25,31,.9)` in
   `tokens/elevation.css`. Transcribe it as `--upos-shadow-toast` and point `.u-toast` at it.
 - **Two ink steps only.** `--upos-ink` and `--upos-ink-subtle`; use opacity on `--upos-ink` for
-  anything between them. **`--upos-ink-subtle` is a quiet step, not an accessible one** — it reads
-  3.0:1 on white and fails AA at every size the product uses, which is why §11 forces a destructive
-  control's label to `--upos-ink` and why `.u-segmented__opt` does the same. The kit ships one
-  intermediate step and it is that opacity: an inactive segmented option is `--upos-ink` at `.66`,
-  which reads **5.3:1 in light and 6.3:1 in dark**, against `--upos-ink-subtle`'s 3.0:1 and 4.61:1
-  on the same track. Reach for the same step wherever quiet text is still text somebody has to read;
-  `--upos-ink-subtle` keeps the labels and meta lines nobody has to act on.
+  anything between them. The one intermediate step the kit ships today is `--upos-ink` at `.66`, on
+  `.u-segmented__opt`. Read the next entry before reaching for `--upos-ink-subtle`.
+- **`--upos-ink-subtle` does not meet AA on a light surface.** `#8b95a1` is the parent system's label
+  step, transcribed unchanged (§1), and it is the ink under every kicker, label, caption, meta line
+  and subtext in the product. It measures **3.0:1 on `--upos-surface`**, **2.8:1 on
+  `--upos-surface-inset`** and 2.7:1 on the ground — under the 4.5:1 floor §11 makes binding, at
+  every size UPOS ships it, since the large-text allowance starts at 24px regular and this token's
+  largest role is 13px. In dark theme the token does not move and the surfaces do, so the same
+  pairing reads 5.3:1 on `--upos-surface` and 5.6:1 on `--upos-surface-inset` and holds: **this is a
+  light-theme exposure.** In the kit it is the default ink of four recipes that render text —
+  `.u-pill`, `.u-badge-channel`, `.u-btn--ghost` and `.u-nav-item` — and in Part II it is every line
+  specced `--upos-ink-subtle` over white. `.u-icon-btn` is the one use that is not text: an icon is
+  governed by the 3:1 non-text rule (1.4.11) rather than by 4.5:1, and 3.0:1 clears that with nothing
+  in hand. The threshold is whether text carries information, not whether it
+  is interactive — a badge reading `KIOSK` at 10px owes the floor whether or not it can be tapped.
+  **Three rulings already override it, and every call site under them is compliant**: §11 forces a
+  destructive control's label to `--upos-ink`, `.u-segmented__opt` takes `--upos-ink` at `.66` (§7),
+  and Guest-facing rules gives the token no role on the kiosk at all. **The remedy is the step the
+  kit already ships** — `--upos-ink` at `.66`, which measures 5.3:1 on `--upos-surface` and 5.2:1 on
+  `--upos-surface-inset` — applied either recipe by recipe or by re-basing the token itself onto that
+  value, which clears every call site at once and shifts the tone of every quiet line in the product.
+  **This is a live AA exposure against the target §11 states, not a cosmetic preference.** How far to
+  take it is the dev team's call, and this entry records it rather than settling it.
 - **The on-dark status tokens are named `--upos-kds-status-*`** but apply to every dark surface
   (§4). Read the name as "on dark", not "kitchen only".
 - **`.upos-kds` is a scope marker by convention.** It has no rule of its own; the KDS tokens sit on
