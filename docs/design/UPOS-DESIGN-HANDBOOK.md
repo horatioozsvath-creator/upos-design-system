@@ -170,6 +170,12 @@ The rule that keeps the language intact: **if a value is not in the token kit, i
 design.** When you need something the kit lacks, add the token and use it — never fork a value into
 a component.
 
+**That rule binds color, type, radius, shadow and motion.** It does not bind per-screen layout
+geometry. A panel's 32px padding, a grid's 22px gap, a rail's 170px width and a modal's 480px are
+transcribed from the artboards, carried in Part II per screen, and do not become tokens — §2's
+padding and gap steps are what you reach for when no artboard settles the value, not a set every
+measurement has to round to.
+
 ### 2 · Ground and surfaces
 
 **The page is never white.** `--upos-ground` is a two-lamp radial gradient — a cool blue lamp at
@@ -287,8 +293,11 @@ kiosk.
    clipped text on one figure per screen at most.
 2. `--upos-grad-dark` — `linear-gradient(168deg,#20262e,#171c22)`. Dark panels: back-office sidebar,
    kitchen board.
-3. `--upos-grad-bar` — `linear-gradient(90deg,#6fa3cf,#2a5578)`. Horizontal bar fills in reports and
-   dashboards.
+3. `--upos-grad-bar` — `linear-gradient(90deg,#6fa3cf,#2a5578)` — and `--upos-grad-bar-v`, the same
+   stops at `180deg` for a bar that grows upward. Bar fills that carry a quantity and nothing else:
+   the dashboard's daypart columns take the vertical token. **A bar whose color carries a problem
+   takes a status token instead**, which is why Reports uses neither (§4, Part II-B). One use, two
+   axes.
 
 There are no gradient borders, no rainbow fills, no purple gradients. A gradient never carries
 status.
@@ -348,9 +357,12 @@ voids, comps flagged for review, the offline queue, COGS over target, stock unde
 not a delete button at rest (destructive controls: §11), not a brand accent, not a divider, and not
 the kitchen display's house color (§11).
 
-Status shows up in exactly these places: `.u-chip-status--*` chips, the 1px status border on
-`.u-data-row`, the 2px border on a floor-plan table, the top edge of a kitchen chit, and
-`.u-chit__timer--late`.
+**Status takes a shape of its own in exactly five places**: `.u-chip-status--*` chips, the 1px
+status border on `.u-data-row`, the 2px border on a floor-plan table, the top edge of a kitchen
+chit, and `.u-chit__timer--late`. Nothing else gets a new element to carry status. Coloring
+something already on the screen is the other rule above and it is not restricted to those five: a
+fill token also colors a report dot or level bar, a station tab's live dot, a chit's `NO` · `SUB` ·
+`ADD` prefix and a dashboard comparison line, and a text token colors the words that go with them.
 
 ### 5 · Allergen color
 
@@ -462,7 +474,8 @@ border. The one exception is `.u-data-row`: white fill plus a 1px status-colored
 shadow at rest, picking up `--upos-shadow-card` when it lifts.
 
 **Blur is rationed.** `--upos-blur-glass` 14px belongs to a sticky search or top bar and nothing
-else. `--upos-blur-scrim` 6px runs with `--upos-scrim` `rgba(20,25,31,.5)` under modals, drawers and
+else; the terminal's 76px top bar is the one element that takes it, over `--upos-surface-veil`
+because a blur behind an opaque fill does nothing (Order entry). `--upos-blur-scrim` 6px runs with `--upos-scrim` `rgba(20,25,31,.5)` under modals, drawers and
 sheets. Never blur behind a row or card carrying data — it softens the text you are asking someone
 to read at speed. The terminal runs one blurred surface at a time: when a scrim is up, the glass top
 bar drops its blur.
@@ -811,13 +824,16 @@ The terminal is one 1440×900 shell at `--upos-radius-panel` 26px (the artboard 
 them is a destination, and everything that is not a destination opens over the destination. Order
 entry carries the shell; the other seven specs assume it.
 
-Two rulings hold across all eight specs, so no spec below repeats them. **Every round close, mirror
+Three rulings hold across all eight specs, so no spec below repeats them. **Every round close, mirror
 and utility control is `.u-icon-btn`** — 34px at `--upos-radius-pill` — centered in a hit area of at
 least `--upos-touch-terminal` 48px. The artboard draws those controls at 30px, and the payment
 screen's guest-mirror button at 36px; both are under §11's minimum, and §11's rule outranks the
 artboard's pixels. **Every quantity control is `.u-qty-stepper`**, whose buttons already set
-`--upos-touch-terminal`; the artboard draws its steppers between 24px and 40px. Where a spec names an
-icon button or a stepper it means those shipped sizes.
+`--upos-touch-terminal`; the artboard draws its steppers between 24px and 40px. **Every
+`.u-segmented` track clears `--upos-touch-terminal` 48px**, passed as the control's minimum height;
+the artboard draws its segmented options between 9px and 33px tall, and the same minimum holds
+whether the track picks a view, a delay or a split. Where a spec names an icon button, a stepper or a
+segmented track it means those shipped sizes.
 
 #### Order entry
 
@@ -826,11 +842,15 @@ kitchen and charge.
 
 **Layout.** The shell's chrome belongs to this spec because every destination inherits it.
 
-- **Top bar, 76px**, `--upos-surface-inset`, 1px `--upos-border` bottom, padding `0 28px`, three
+- **Top bar, 76px**. This is the glass top bar §7 rations `--upos-blur-glass` for, and the only
+  element in the product that takes it: `--upos-surface-veil` under
+  `backdrop-filter: blur(var(--upos-blur-glass))`, 1px `--upos-border` bottom, padding `0 28px`. The
+  artboard fills it flat with `--upos-surface-inset`; the veil is what makes the blur mean anything,
+  and it is the same token `.u-segmented` takes (§7). Three
   groups: a 26px `--upos-grad-primary` mark, the venue and terminal id at 800/15px
   (`Riverside Grill · Counter 2`) and the offline pill slot on the left; the server and clock at
   700/13px in `--upos-ink-subtle` on the right.
-- **Bottom nav, 78px**, same inset fill, 1px top hairline, 8px between items. Five `.u-nav-item`
+- **Bottom nav, 78px**, `--upos-surface-inset` and no blur, 1px top hairline, 8px between items. Five `.u-nav-item`
   buttons, each `flex:1` capped at 150px, `--upos-radius-inset`, a 17px icon over a 700/10.5px
   label — ORDER · TABLES · PAYMENTS · CHANNELS · MORE. The active destination fills with
   `--upos-grad-primary` and white ink; the rest are `--upos-ink-subtle` on transparent. MORE is a
@@ -965,8 +985,9 @@ line is unit × quantity. The confirmed line reaches the API only inside `Create
   `.u-chip-allergen` chips at `3px 8px`, and a close `.u-icon-btn`.
 - `INGREDIENTS` label at 700/10.5px `.08em`, then an inset list — `--upos-surface-inset`, 16px
   radius, `14px 16px`, 6px gaps, one row per ingredient at 700/12.5px.
-- When the item has both views, a `.u-segmented` track: 4px padding on the inset, two options at
-  `9px 0` reading `PLATING` and `STACK`, the active one on `--upos-grad-primary`.
+- When the item has both views, a `.u-segmented` track: 4px padding on the inset, two options
+  reading `PLATING` and `STACK`, the active one on `--upos-grad-primary`. The artboard draws the
+  options at `9px 0`; ship the track at `--upos-touch-terminal` 48px, the preamble's ruling.
 - Plating view: a 220×220 circular image slot on the inset fill, centered — food photography as
   content, framed, never behind text (§3).
 - Stack view: an inset block at `--upos-radius-inset`, 10px padding, layers 30px tall in ingredient
@@ -1137,7 +1158,8 @@ check.
   60px `.u-btn--primary` pinned to the bottom with `margin-top:auto`.
 - **Split modal**: 460px, `--upos-radius-panel` 26px (the artboard draws 24px), 26px padding, 18px
   gaps, on `--upos-scrim`. Header `Split the check` with a close `.u-icon-btn`; a `.u-segmented`
-  track — `EVENLY` · `BY SEAT`; then either the even body (a `.u-qty-stepper` around the count at
+  track at `--upos-touch-terminal` 48px (the preamble's ruling) — `EVENLY` · `BY SEAT`; then either
+  the even body (a `.u-qty-stepper` around the count at
   800/28px over a `GUESTS` label, then the per-guest amount at 800/24px with `per guest` at
   400/13px) or the seat body (four inset rows at `12px 14px`, seat name left, amount right); and a
   52px `.u-btn--primary` reading `Done`.
@@ -1333,10 +1355,11 @@ acting on.
 - **Charts row**, `1.3fr 1fr` at 20px, both cards `--upos-surface-inset` at `--upos-radius-card` (the
   artboard draws 20px), 24px padding.
 - **Sales by daypart**: a 700/13px title, then four columns 22px apart in a 180px band, each a
-  `--upos-grad-bar` fill under a 700/12px `--upos-ink-subtle` label — Breakfast · Lunch · Dinner ·
-  Late Night. These columns grow upward, and §3 scopes `--upos-grad-bar` to horizontal fills, so the
-  call site rotates its `90deg` to `180deg` and changes nothing else — same token, same stops, turned
-  to follow the bar. The artboard additionally ties the gradient's far stop to the accent; the token
+  `--upos-grad-bar-v` fill under a 700/12px `--upos-ink-subtle` label — Breakfast · Lunch · Dinner ·
+  Late Night. These columns grow upward, so they take the vertical token — `--upos-grad-bar`'s stops
+  at `180deg`, the same fill turned to follow the bar (§3). The columns carry a quantity and no
+  status, which is what keeps them on the gradient at all (§4). The artboard additionally ties the
+  gradient's far stop to the accent; the token
   does not, and the token wins. Round the top pair at `--upos-radius-inset` (the artboard draws
   `10px 10px 0 0`) and let the foot sit flush on the chart baseline, where §7 has no exposed corner to
   govern.
@@ -1571,10 +1594,10 @@ under `Reports · Riverside Grill` at 800/24px.
   `--upos-ink-subtle`; then a hairline and the footer — `Labor %` at 800/13px against
   `27% · target 24%` in `--upos-status-fired-text`.
 - Every bar here is colored by status, not by the palette: its fill is a status token and never
-  `--upos-grad-bar`. §3 names reports as somewhere that gradient belongs, and this page overrides that
-  scope — a bar whose length already carries a number and whose color carries a problem is §4's, and a
-  gradient never carries status. The dashboard's daypart chart is where the gradient actually lands on
-  this surface, and the two do not swap.
+  `--upos-grad-bar` or `--upos-grad-bar-v`. That is §3's own split — a bar whose length already
+  carries a number and whose color carries a problem is §4's, and a gradient never carries status.
+  The dashboard's daypart chart is the one bar on this surface that carries a quantity alone, so it
+  is where the gradient lands, and the two do not swap.
 
 **States.**
 
@@ -2380,9 +2403,11 @@ value or a timestamp plus the threshold to measure it against, and derives the s
 Nothing takes an `IsLate` bool, because nothing upstream stores one and no endpoint returns one
 (§4).
 
-**No component takes a touch flag.** The kit's `:hover` transforms are pointer-surface behavior, and
-`Restaurant.Mobile`, the board and the kiosk suppress them at the host with one `@media (hover:hover)`
-guard. The same component ships to all four surfaces, and press feedback stays the ripple tint (§8).
+**No component takes a touch flag.** Every `:hover` rule in `upos-components.css` is declared inside
+one `@media (hover:hover)` block, so the lift reaches a pointer surface and never reaches
+`Restaurant.Mobile`, the board or the kiosk, all three of which report `hover: none`. There is
+nothing for a host to suppress. The same component ships to all four surfaces, and press feedback
+stays the ripple tint set at the call site (§8).
 
 **One recipe this part added to the kit.** Part II-B's Integrations spec routes the channel switch
 here and the kit had no recipe for it. `.u-switch` now ships in `upos-components.css`, and

@@ -2,11 +2,12 @@
    docs/design/tokens/upos-tokens.css; no new tokens are introduced here. Style
    rules honored throughout (vendored readme, "Hover, press, focus" / "Elevation" /
    "Shape" / "Transparency and blur"): buttons lift translateY(-2px) on hover,
-   cards -4px, rows -3px, nav/list items slide translateX(3px); no borders-as-
-   elevation except .u-data-row (status-colored border, no shadow at rest); the
-   scrim is --upos-scrim plus a blur; the segmented track is translucent white on
-   a pill; chips, pills and controls are radius 999px; no square corners outside
-   the .upos-kds scope. */
+   cards -4px, rows -3px, nav/list items slide translateX(3px) — all of it inside
+   the single @media (hover:hover) block at the foot of this file, so touch
+   surfaces never receive it; no borders-as-elevation except .u-data-row
+   (status-colored border, no shadow at rest); the scrim is --upos-scrim plus a
+   blur; the segmented track is --upos-surface-veil on a pill; chips, pills and
+   controls are radius 999px; no square corners outside the .upos-kds scope. */
 
 /* Buttons */
 .u-btn { display:inline-flex; align-items:center; justify-content:center; gap:8px;
@@ -16,7 +17,6 @@
 .u-btn--primary { background:var(--upos-grad-primary); color:#fff; box-shadow:var(--upos-shadow-button); font-weight:800; }
 .u-btn--secondary { background:var(--upos-surface); color:var(--upos-ink); border:1px solid var(--upos-border); }
 .u-btn--ghost { background:transparent; color:var(--upos-ink-subtle); }
-.u-btn:hover { transform:translateY(-2px); }
 
 /* Icon button — 34px per the vendored --icon-btn dimension (not transcribed as a
    token; literal px per controller decision). Circular, unlike .u-btn's inset radius. */
@@ -25,9 +25,6 @@
   background:var(--upos-surface); color:var(--upos-ink-subtle); cursor:pointer;
   box-shadow:var(--upos-shadow-card); font:700 15px/1 Archivo,system-ui,sans-serif;
   transition:transform var(--upos-dur-fast) var(--upos-ease), color var(--upos-dur-fast) var(--upos-ease); }
-.u-icon-btn:hover { transform:translateY(-2px); color:var(--upos-ink); }
-/* Modal close button: rotates instead of lifting, per readme. */
-.u-modal .u-icon-btn:hover { transform:rotate(90deg); }
 
 /* Generic pill (tags, categories) */
 .u-pill { display:inline-flex; align-items:center; gap:6px; padding:6px 14px;
@@ -85,7 +82,6 @@
 .u-stat-card { display:flex; flex-direction:column; gap:6px; padding:20px 22px;
   border-radius:var(--upos-radius-card); background:var(--upos-surface); box-shadow:var(--upos-shadow-card);
   transition:transform var(--upos-dur-fast) var(--upos-ease); }
-.u-stat-card:hover { transform:translateY(-4px); }
 
 /* Data row — the one exception to "no borders-as-elevation": white fill + 1px
    status-colored border, no shadow at rest. Lifts -3px and picks up a shadow on
@@ -94,7 +90,6 @@
   border-radius:var(--upos-radius-inset); background:var(--upos-surface);
   border:1px solid var(--upos-border);
   transition:transform var(--upos-dur-fast) var(--upos-ease); }
-.u-data-row:hover { transform:translateY(-3px); box-shadow:var(--upos-shadow-card); }
 .u-data-row.is-late { border-color:var(--upos-status-late); }
 
 /* Modal + scrim — rendered statically inside a position:relative demo container */
@@ -128,7 +123,6 @@
   border-radius:var(--upos-radius-inset); color:var(--upos-ink-subtle); cursor:pointer;
   font:700 10px/1 Archivo,system-ui,sans-serif;
   transition:transform var(--upos-dur-fast) var(--upos-ease), color var(--upos-dur-fast) var(--upos-ease); }
-.u-nav-item:hover { transform:translateX(3px); color:var(--upos-ink); }
 .u-nav-item.is-active { color:var(--upos-accent); }
 
 /* Tender tile — payment method selector; selected state recolors with the accent */
@@ -137,7 +131,6 @@
   background:var(--upos-surface); box-shadow:var(--upos-shadow-card); color:var(--upos-ink); cursor:pointer;
   font:700 13px/1.2 Archivo,system-ui,sans-serif;
   transition:transform var(--upos-dur-fast) var(--upos-ease), box-shadow var(--upos-dur-fast) var(--upos-ease); }
-.u-tender-tile:hover { transform:translateY(-4px); }
 .u-tender-tile.is-selected { background:var(--upos-grad-primary); color:#fff; box-shadow:var(--upos-shadow-button); }
 
 /* Tip button */
@@ -146,7 +139,6 @@
   border-radius:var(--upos-radius-pill); background:var(--upos-surface); color:var(--upos-ink);
   font:700 14px/1 Archivo,system-ui,sans-serif; cursor:pointer;
   transition:transform var(--upos-dur-fast) var(--upos-ease), background var(--upos-dur-fast) var(--upos-ease); }
-.u-tip-btn:hover { transform:translateY(-2px); }
 .u-tip-btn.is-selected { background:var(--upos-grad-primary); color:#fff; border-color:transparent; box-shadow:var(--upos-shadow-button); }
 
 /* Qty stepper — [- qty +] compound control; children are plain elements */
@@ -156,7 +148,6 @@
   min-width:var(--upos-touch-terminal); min-height:var(--upos-touch-terminal);
   border:none; background:transparent; color:var(--upos-ink); font:800 15px/1 Archivo,system-ui,sans-serif; cursor:pointer;
   transition:background var(--upos-dur-fast) var(--upos-ease); }
-.u-qty-stepper button:hover { background:var(--upos-surface-hover); }
 .u-qty-stepper span { min-width:24px; text-align:center; font:700 13px/1 Archivo,system-ui,sans-serif; }
 
 /* KDS chit — scoped inside .upos-kds; the one place square-ish corners are allowed */
@@ -164,3 +155,21 @@
   color:var(--upos-kds-ink); display:flex; flex-direction:column; overflow:hidden; }
 .u-chit__timer { font:var(--upos-type-mono); }
 .u-chit__timer--late { color:var(--upos-kds-status-late); }
+
+/* Hover — pointer surfaces only. Every :hover rule in the kit is declared inside
+   this one guard, so Restaurant.Mobile, the kitchen board and the kiosk (all
+   hover:none) never receive a lift and no host has to retract anything. Press
+   feedback on those surfaces is the ripple tint set at the call site (handbook
+   §8, Part III). Order inside the block matches the recipes above; the modal
+   close rotates instead of lifting, so it follows .u-icon-btn. */
+@media (hover:hover) {
+  .u-btn:hover { transform:translateY(-2px); }
+  .u-icon-btn:hover { transform:translateY(-2px); color:var(--upos-ink); }
+  .u-modal .u-icon-btn:hover { transform:rotate(90deg); }
+  .u-stat-card:hover { transform:translateY(-4px); }
+  .u-data-row:hover { transform:translateY(-3px); box-shadow:var(--upos-shadow-card); }
+  .u-nav-item:hover { transform:translateX(3px); color:var(--upos-ink); }
+  .u-tender-tile:hover { transform:translateY(-4px); }
+  .u-tip-btn:hover { transform:translateY(-2px); }
+  .u-qty-stepper button:hover { background:var(--upos-surface-hover); }
+}
