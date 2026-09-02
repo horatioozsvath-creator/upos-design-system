@@ -55,7 +55,7 @@ and `docs/superpowers/` — the design spec and implementation plan this work fo
   language in twelve sections. Part II specs twenty screens across the four surfaces, each with
   layout, states, interactions and the data it needs. Part III is a twenty-five component
   inventory. Part IV points at the gap register.
-- `docs/design/tokens/` — `upos-tokens.css` (77 custom properties: color, type, spacing, shape,
+- `docs/design/tokens/` — `upos-tokens.css` (79 custom properties: color, type, spacing, shape,
   elevation, motion, touch targets), `upos-components.css` (21 component recipes with their
   modifiers), and `preview.html`, which renders every token and component for eyeballing. Verified
   in a browser across both themes and all four accent presets, with no console errors.
@@ -69,6 +69,10 @@ Nothing here is deployed, because there is nothing to deploy. The deliverable is
 
 ## Recent progress
 
+- 2026-09-01 — Whole-branch review applied: per-accent AA ruling on the four accent presets, a
+  theme-aware `--upos-surface-veil` in place of a hard-coded translucent white, `--upos-grad-bar-v`
+  for the vertical bars, every `:hover` rule moved behind one `@media (hover:hover)` guard, an
+  offline `@font-face` path for the terminal, and two more kit gaps recorded in §12
 - 2026-09-01 — Project overview written; acceptance sweep run against the spec's five criteria
 - 2026-09-01 — `docs/GAPS.md` register, `GAP-01` to `GAP-13`, cross-checked against every handbook
   citation
