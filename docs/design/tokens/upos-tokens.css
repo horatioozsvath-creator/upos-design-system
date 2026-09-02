@@ -3,6 +3,19 @@
    Renamed --sb-* → --upos-* per handbook Part I. */
 @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;700;800&display=swap');
 
+/* TERMINAL BUILD (Restaurant.Mobile): delete the @import above and uncomment the
+   three @font-face rules below. An offline terminal cannot reach Google Fonts and
+   must still render Archivo (handbook §11, §12). Drop archivo-400/700/800.woff2
+   into Restaurant.Mobile/wwwroot/fonts/. The back office keeps the @import.
+
+@font-face { font-family:Archivo; font-style:normal; font-weight:400; font-display:swap;
+  src:url('../fonts/archivo-400.woff2') format('woff2'); }
+@font-face { font-family:Archivo; font-style:normal; font-weight:700; font-display:swap;
+  src:url('../fonts/archivo-700.woff2') format('woff2'); }
+@font-face { font-family:Archivo; font-style:normal; font-weight:800; font-display:swap;
+  src:url('../fonts/archivo-800.woff2') format('woff2'); }
+*/
+
 :root {
   /* Ground */
   --upos-ground: radial-gradient(1100px 700px at 88% -8%, #dbe7f2 0%, rgba(219,231,242,0) 62%),

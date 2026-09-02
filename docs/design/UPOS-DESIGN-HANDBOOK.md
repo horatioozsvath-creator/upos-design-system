@@ -510,6 +510,12 @@ carry their own durations from the parent system and are not bound by that range
 | `fl-grow` | `.8–.9s` | `scaleX` from the left | Every bar on mount: daypart bars, COGS bars, stock levels |
 | `fl-marquee` | `42s` linear | `translateX(0 → -50%)` | Ticker strips · duplicate the list for a seamless loop |
 
+**`fl-grow` grows on `scaleX`, so a vertical bar turns it rather than replacing it.** The dashboard's
+daypart columns grow upward: they set `transform-origin: bottom` and run the same growth on `scaleY`
+at the call site, over `fl-grow`'s own `.8–.9s` on `--upos-ease`. Same motion, other axis — it is not
+a seventh keyframe, and the vocabulary above is still six. A horizontal bar runs `fl-grow` unchanged
+from `transform-origin: left`.
+
 Those six are the whole vocabulary. Do not add a keyframe; override a duration at the call site
 instead. The component kit already does this: `.u-modal` and `.u-drawer` run `fl-rise` at
 `--upos-dur-slow` and `.u-toast` runs it at `--upos-dur-fast`, because the terminal is a speed-first
@@ -701,8 +707,11 @@ the one radius exception in the product.
 **Link two stylesheets, tokens first.**
 
 Copy `docs/design/tokens/upos-tokens.css` and `docs/design/tokens/upos-components.css` into each
-app's `wwwroot/css/`. There is no build step and no dependency beyond the Google Fonts `@import` at
-the top of `upos-tokens.css`.
+app's `wwwroot/css/`. There is no build step. The one external dependency is the Google Fonts
+`@import` at the top of `upos-tokens.css`, and **the terminal does not ship it** — the file carries
+the replacement as a commented `@font-face` block directly under the `@import`, and the terminal
+build swaps one for the other before anything else below happens. Self-hosting is not an optional
+hardening step: the terminal must render with no network (§11).
 
 Back office — the host page, `Components/App.razor` in a .NET 8 Blazor Web App or
 `Pages/_Host.cshtml` in an older Blazor Server host:
@@ -720,9 +729,12 @@ Terminal — `Restaurant.Mobile/wwwroot/index.html`: the same two links, in the 
 component unstyled.
 
 **Self-host Archivo on the terminal.** The `@import` fetches Archivo 400/700/800 from Google Fonts,
-which an offline terminal cannot reach. Drop the three `.woff2` files into
-`Restaurant.Mobile/wwwroot/fonts/` and replace the `@import` with `@font-face` rules. The terminal
-must render correctly with no network (§11).
+which an offline terminal cannot reach, and a terminal that loses its typeface offline fails a P0
+requirement (§11). `upos-tokens.css` carries the fix in the file rather than only here: drop
+`archivo-400.woff2`, `archivo-700.woff2` and `archivo-800.woff2` into
+`Restaurant.Mobile/wwwroot/fonts/`, delete the `@import` line, and uncomment the three `@font-face`
+rules beneath it. The back office runs on a network and keeps the `@import`; nothing else in either
+file changes.
 
 **Set the attributes on `<html>`.**
 
@@ -1388,8 +1400,9 @@ acting on.
 **Interactions.** The AI toggle hides and restores the banner, and touches nothing else on the page.
 The exception row is drawn without a handler — wire the row and its `→` to the flagged comps. Nothing
 else here is interactive: the stat cards, the bars and the top-items rows are read-only, and a figure
-that changes restyles in place rather than announcing itself. The banner rises with `fl-rise`; every
-bar runs `fl-grow` on mount (§8).
+that changes restyles in place rather than announcing itself. The banner rises with `fl-rise`; the
+daypart columns grow on mount, and because they grow upward they run `fl-grow`'s growth on `scaleY`
+from `transform-origin: bottom` rather than the keyframe's `scaleX` (§8).
 
 **Data.** Every figure on this screen is an artboard fixture; none of it has an endpoint today.
 
