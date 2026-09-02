@@ -21,8 +21,11 @@ new ID rather than a renumbering.
 **Pure API work is not tracked here.** Where the fields already exist and only an endpoint is
 missing, the handbook's own Data sections say so and keep it: the dashboard and report aggregations,
 the Menu write endpoints behind the 86 badge and `Add`, a device registry, per-item done flags, and
-the assembly label on `Order`. Those are additive work that contradicts nothing in the current
-model. This register is for what the model cannot say at all.
+the assembly label on `Order`. The KDS data contract names a third item alongside those last two — a
+station column on `OrderItem` — as the same kind of additive work; this register carries the
+item-to-station linkage itself as a schema gap under GAP-06, so the two statements stand side by side
+rather than one quietly dropping the other. Those are additive work that contradicts nothing in the
+current model. This register is for what the model cannot say at all.
 
 **Priorities and releases** come from `docs/design/reference/outline-extracted.txt` — P0
 operational, P1 competitive, P2 nice to have; Release 1 pilot-capable, Release 2 commercially
@@ -95,9 +98,10 @@ check cannot say which items run together or which guest they belong to.
 
 **Where it bites:** Floor plan · Table drawer.
 
-**Minimal suggestion:** `Course` (order reference, sequence, status, firedAt) with a course
-reference and a seat number on `OrderItem`, and a fire endpoint that moves a course rather than the
-order.
+**Minimal suggestion:** `Course` (order reference, sequence, status, scheduledFireAt, firedAt) with a
+course reference and a seat number on `OrderItem`, and a fire endpoint that moves a course rather
+than the order. `firedAt` alone is past-tense only; the Table drawer's delay track picks a pending
+fire time before the course fires, and `scheduledFireAt` is where that selection persists.
 
 **Release:** R1 (outline: "Coursing — P0", scoped as "Assign courses, hold/fire individual courses
 and display course information in the kitchen", and "Guest and seat tracking — P0"; Release 1
@@ -116,8 +120,10 @@ Kiosk data contract · OrderCard · ChannelBadge · UposSwitch.
 
 **Minimal suggestion:** an `OrderType` enum on `Order` (dine-in, takeout, pickup, delivery, counter)
 and a `Channel` reference (name, two-letter code, color, connected state), so an order carries both
-its service model and the surface that created it. One order model across all channels, not one per
-channel.
+its service model and the surface that created it. The outline states the principle this sketch
+follows: "The same order model should support table, counter, online, kiosk and delivery channels.
+Creating a separate order representation for each channel will make menu synchronization, reporting,
+refunds, kitchen routing and integrations much harder."
 
 **Release:** R1 (outline: "Order types — P0", scoped as "Dine-in, takeout, pickup, delivery, counter
 service; configurable pricing and taxes by type"; Release 1 carries "Orders, taxes, discounts and
@@ -199,6 +205,7 @@ the card-present step records neither the approval nor the tender.
 **Minimal suggestion:** `Payment` on `Order` (tender type, amount, tip, authorization reference,
 status) with `SplitAllocation` (seat or share, amount) and `Refund` and `Comp` records carrying a
 reason and an approver. Card data stays with the processor; the POS stores a token and a reference.
+The receipt needs no field of its own — it renders from `Payment` plus the `Order` it settles.
 
 **Release:** R1 (outline: "Payments — P0", scoped as "Credit/debit, EMV, contactless wallets, cash,
 gift card, split tender, tips, refunds and partial refunds"; Release 1 carries "Integrated payments
@@ -256,7 +263,7 @@ than on the report.
 threshold) and a depletion rule read off the recipe, so availability can be derived rather than
 typed. Depends on GAP-06 for the recipe that connects a sold item to a count.
 
-**Release:** R2. The outline's "Item availability and '86' — P0" is already met for the manual half
+**Release:** R2. The outline's "Item availability and “86” — P0" is already met for the manual half
 by `IsAvailable`; the counted half — "Manual item counts, automatic sold-out status, propagation to
 terminals and digital channels" — needs inventory, which the outline places among the P2 additions
 as "Advanced ingredient and recipe inventory" and in Release 3 as "Advanced inventory". Registered
@@ -282,11 +289,12 @@ profiles and basic loyalty").
 
 **What's missing:** no venue or organization entity, and therefore no scope to attach a setting to.
 `Riverside Grill` is a literal in the dashboard heading and again in Reports, and every aggregation
-above it is silently single-location. A channel connects to the installation rather than to a
-location, so a second restaurant has nowhere to keep its own. The per-station threshold that
-`OVER TARGET` counts against, the kiosk's daypart windows, its tax rate and both its timeouts have
-no scope to be stored on, and Settings has no scope at all — which is why it can be specified but
-not bound.
+above it is silently single-location — though Reports' own Gaps block does not cite this entry, so
+Reports does not appear below in "Where it bites" despite carrying the same literal. A channel
+connects to the installation rather than to a location, so a second restaurant has nowhere to keep
+its own. The per-station threshold that `OVER TARGET` counts against, the kiosk's daypart windows,
+its tax rate and both its timeouts have no scope to be stored on, and Settings has no scope at all —
+which is why it can be specified but not bound.
 
 **Where it bites:** Dashboard · Integrations · Employees, Devices, Settings · Station board ·
 Guest-facing rules · UposSwitch.
