@@ -430,6 +430,13 @@ numbers, kitchen elapsed timers and kiosk prices — values a person reads digit
 down a column. Money in the terminal and the back office is Archivo 800 so it aligns with the
 headings around it. Body copy is never monospace.
 
+**The tie-break, where a figure is both.** A column of money on a staff surface — a drawer count's
+denominations, a split's per-seat amounts, a labor column — is a column to compare and it is money,
+and money wins: it renders Archivo 800, right-aligned so the decimals line up, because alignment is
+what the column actually needed. Mono keeps the values that are not money: IDs, order and table
+numbers, elapsed timers. The kiosk is the one place money is mono, as the scope line above says, and
+it is a guest reading one price rather than a manager reading down twelve.
+
 **Nothing goes below 10px.** The 10px label class is the floor on every surface. If a label does not
 fit at 10px, cut the words.
 
@@ -810,11 +817,24 @@ Migration:
   sets it on `.u-qty-stepper` and `.u-chit` only. Chips, pills, the segmented track and bars rely on
   their own fills not overflowing today — set it at the call site whenever a child could paint past
   the corner, and fold it into the recipes when one does.
-- **No input recipe.** There is no `.u-input`, and a specced screen needs one already: the menu
-  manager's add-item and add-group forms, which Part II-B sends to §2's input contract by name. The
-  manager PIN field behind an approval will want the same recipe, but no screen draws that field
-  yet and GAP-09 records that there is no PIN or approval model to draw it from. §2 specs the
-  behavior in prose instead: fill
+- **No numeric-entry or keypad pattern.** Nothing in the language covers a number a person types.
+  `.u-qty-stepper` is a two-button increment, which is right for a cover count and wrong for a
+  cash-drawer count — a dozen denomination fields on a touch terminal, each taking a figure. A price
+  override, a manual discount, a partial-refund amount and a manager PIN all want the same missing
+  thing: a numeric field at `--upos-touch-terminal`, and behind it an on-screen keypad, since a MAUI
+  terminal has no keyboard. Neither is drawn in either artboard. The `.u-input` entry below is the
+  same hole seen from one screen; the need is wider than that screen.
+- **No selection control.** There is no checkbox, no radio and no multi-select row anywhere in the
+  language, and neither `CartLine` nor `DataRow` exposes a selection prop. Any list a person picks
+  from — the lines of a partial refund, a bulk 86, a set of records to export — has nothing to build
+  from. The option pills in the Modifier modal and on the kiosk item screen are call-site controls
+  bound to one purpose, not a general selection recipe, and the segmented control picks a view rather
+  than a set.
+- **No input recipe.** There is no `.u-input`. The one screen that needs it in this handoff is the
+  menu manager's add-item and add-group forms, which Part II-B sends to §2's input contract by name,
+  but the need is not menu-manager-shaped: every field in the numeric-entry entry above wants the
+  same recipe, and so does the manager PIN behind an approval, which no screen draws yet and which
+  GAP-09 records has no model to draw from. §2 specs the behavior in prose instead: fill
   `--upos-surface-inset`, 1px `--upos-border`, `--upos-radius-inset`, `--upos-type-body`,
   placeholder `--upos-ink-subtle`, minimum height `--upos-touch-terminal` on the terminal and
   `--upos-touch-kiosk` on the kiosk, and on focus the border goes `--upos-accent` while the fill
