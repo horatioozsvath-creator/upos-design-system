@@ -774,6 +774,14 @@ Migration:
   sets it on `.u-qty-stepper` and `.u-chit` only. Chips, pills, the segmented track and bars rely on
   their own fills not overflowing today — set it at the call site whenever a child could paint past
   the corner, and fold it into the recipes when one does.
+- **No input recipe.** There is no `.u-input`, and inputs land on real screens already — the menu
+  manager's add-item and add-group forms (Part II-B), and the manager PIN field every approval
+  needs (Part II-A's void and re-fire; GAP-09). §2 specs the behavior in prose instead: fill
+  `--upos-surface-inset`, 1px `--upos-border`, `--upos-radius-inset`, `--upos-type-body`,
+  placeholder `--upos-ink-subtle`, minimum height `--upos-touch-terminal` on the terminal and
+  `--upos-touch-kiosk` on the kiosk, and on focus the border goes `--upos-accent` while the fill
+  goes `--upos-surface`. Write that at the call site until a recipe exists. Every value is already
+  a token, so nothing is hard-coded meanwhile.
 - **The kit implements the hover lift, not the hover fills.** `.u-btn--secondary` and
   `.u-btn--ghost` lift; the fill and ink changes in §8's table are set at the call site.
 
