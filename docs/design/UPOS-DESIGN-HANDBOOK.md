@@ -57,6 +57,7 @@ All four parts are complete.
 - [Part II · Screen specs](#part-ii--screen-specs)
   - [Part II-A · Terminal](#part-ii-a--terminal)
     - [Order entry](#order-entry)
+      - [Handheld](#handheld) · provisional
     - [Modifier modal](#modifier-modal)
     - [Item info modal](#item-info-modal)
     - [Floor plan](#floor-plan)
@@ -884,6 +885,11 @@ The terminal is one 1440×900 shell at `--upos-radius-panel` 26px (the artboard 
 them is a destination, and everything that is not a destination opens over the destination. Order
 entry carries the shell; the other seven specs assume it.
 
+**1440×900 is the terminal.** One provisional exception exists, and it is declared in one place:
+[Order entry · Handheld](#handheld) degrades that screen below 800px of shell width, because it
+reached a 393px device before the fleet was chosen. It applies to that screen and to no other spec
+below.
+
 Three rulings hold across all eight specs, so no spec below repeats them. **Every round close, mirror
 and utility control is `.u-icon-btn`** — 34px at `--upos-radius-pill` — centered in a hit area of at
 least `--upos-touch-terminal` 48px. The artboard draws those controls at 30px, and the payment
@@ -983,6 +989,157 @@ kitchen and charge.
 - GAP-04 — `Order` has no channel or order type, so `Dine In` in the check header is a literal.
 - GAP-05 — `MenuItem` has no allergens, so every violet chip in the grid and the cart is design-only.
 - GAP-12 — no loyalty account entity; the cart-header loyalty toggle has nothing to attach to.
+
+##### Handheld
+
+**This subsection is provisional.** Order entry went to a real device before the fleet was chosen: a
+Datalogic Memor 20, a rugged 5.7" Android handheld at 1080×2160 and 440dpi, which the WebView reports
+as a **393×785 CSS-pixel portrait viewport**. The three-pane layout above cannot be drawn there. It
+spends 170px on the rail and 380px on the cart before a single item exists, and the grid's own
+`minmax(190px,1fr)` tile inside 22px of padding needs 234px more — **784px before the screen has one
+item on it, into 393px of glass.** The panes collide and the cart leaves the screen entirely.
+
+The counter unit, the 10.1" handheld and this 5.7" device are all still candidates, so what follows
+is a **graceful-degradation rule, not a designed-for target**: it keeps the screen usable on anything
+narrow. It is not a second design. Nothing else in Part II has been drawn for it, no artboard covers
+it, and when the fleet is settled this subsection is either promoted to a spec of its own or deleted.
+**1440×900 stays the primary design and nothing below changes it.**
+
+**The breakpoint.** One step, at **800px** — 784 rounded up to the nearest hundred, so the number is
+readable as what it is. Above it, everything above this subsection; at or below it, everything in it.
+There is no tablet tier and no second step: the rule exists so that one alternative layout has to be
+reasoned about and tested, and a scale of three would be a design nobody has drawn.
+
+**The step measures the shell, not the window.** It is a container query on the shell — the element
+Part II-A calls "one 1440×900 shell" — and not a viewport media query, because the shell is what the
+panes have to fit inside and the viewport is only sometimes the same thing. On the device they are
+identical. In the back office's development preview they are not: the preview stands the shell in a
+fixed frame, so a viewport rule would flip a 1440px frame to the handheld layout the moment the
+browser window narrowed, and would report the opposite of the truth. The width that matters is the
+shell's own.
+
+**The 800 does not become a token.** A custom property cannot be read inside a `@container` or
+`@media` condition, so `--upos-bp-handheld` would be a token nothing could spend. §12's
+add-the-token rule governs a value a declaration takes; this is a value a condition takes, and it
+stays a literal, recorded here.
+
+**Layout.** Everything not named below is unchanged from the spec above.
+
+- **Top bar, 76px → 58px**, padding `0 28px` → `0 var(--upos-space-page)`. It keeps the 26px
+  `--upos-grad-primary` mark, the venue and terminal id — now 700/13px, truncating from the terminal
+  id with an ellipsis — the offline pill slot, and the clock. **The server name drops.** Of the two
+  right-hand items it is the one whose reader already knows the answer: the person holding the device
+  is the server. The clock stays because a check is a thing that gets stamped, and the offline pill
+  stays because §11 gives it a permanent slot and a handheld carried away from the counter is the
+  most likely thing in the venue to lose the network. The glass treatment is unchanged — this is
+  still the one element in the product that spends `--upos-blur-glass` (§7).
+- **Bottom nav, 78px, unchanged, and it takes no rule at all.** `.u-nav-item` is already `flex:1`
+  capped at 150px inside `--upos-space-gap-row` 8px gaps: five items into 393px is 72px each, and
+  `PAYMENTS` at 700/10.5px `.16em` measures under that. It is the one piece of chrome that was
+  width-independent before this subsection existed.
+- **Category rail, 170px column → a horizontally scrolling chip row, 62px**, sitting at the head of
+  the item area under the top bar. `--upos-surface-inset` behind a 1px `--upos-border` bottom — the
+  rail's fill and its hairline, turned through ninety degrees — padding `7px var(--upos-space-page)`,
+  `--upos-space-gap-chip` 7px between chips, `overflow-x:auto`, no wrap. A chip clears
+  `--upos-touch-terminal` 48px, takes `--upos-radius-pill` and `0 16px`, carries the category at
+  700/13px, and fills with `--upos-grad-primary` when it is selected. Same fill, same type, same
+  selection rule as the rail's buttons; only the radius moves, because a row of `--upos-radius-inset`
+  buttons reads as a broken grid and a row of pills reads as a filter strip. **This is Part II-D's
+  browse strip** — "a strip of `flex:1` category buttons ... selected on `--upos-grad-primary`" —
+  with `flex:1` dropped, because at 393px the categories have to be allowed to run off the edge
+  rather than share it.
+- **Item grid → one column of `MenuItemCard` at `Layout=ListRow`** (Part III), which is the layout
+  the kiosk's list view already consumes and which already ships: `.u-menu-card--list` is
+  `--upos-radius-inset`, a row, and clears `--upos-touch-terminal`. Grid padding drops 22px →
+  `var(--upos-space-page)` 14px and the gap drops `--upos-space-gap-card` 16px →
+  `--upos-space-gap-row` 8px. The name sits left at 700/14px, the price right at 800/15px in
+  `--upos-accent-deep` — the tile's two type overrides, kept, because they are what the terminal's
+  menu reads like. **The tile does not survive one column**: a 190px square stretched to 365px is a
+  card with a hole in it.
+- **One column, not `auto-fill`.** A row grid at `minmax` would put two abreast at 560px and three at
+  780px, which is neither the tile grid nor a list, and it would put a third layout into a rule whose
+  whole purpose is that there is one. Between 393px and 800px a single column of rows is wide. It is
+  also unambiguous, and the 5.7" device is the case this rule exists for.
+- **Cart panel, 380px → a persistent summary bar plus a sheet.** The panel has nowhere to stand, so
+  it collapses behind a bar directly above the bottom nav and opens over the menu on demand.
+- **Summary bar, 64px. This is Part II-D's bag bar, brought to the terminal.** The kiosk's is 96px on
+  `--upos-surface` under a 1px `--upos-border` carrying `IN BAG` in the label class, the line count,
+  the running total in mono, and a primary filling the bar's height; the terminal's is the same bar
+  at staff scale — `--upos-surface`, 1px `--upos-border` top, padding `0 var(--upos-space-page)`:
+  `IN CHECK` in the 10px label class at `.12em`, the line count and the running total at 800/15px
+  with the total in `--upos-accent-deep`, then a `.u-btn--primary` at `--upos-touch-terminal` reading
+  `Review · $NN.NN`. It reads `IN CHECK` and not `IN BAG` because a guest has a bag and a server has
+  a check (§10), and it says `Review` and not `Charge` because Charge lives inside the sheet, where
+  the check is actually worked.
+- **The sheet is the `UposDrawer` recipe on the bottom edge, not a new component.** `.u-drawer`'s
+  inset flips from `top/right/bottom` to `left/right/bottom`: full width, `max-height:82%`,
+  `--upos-radius-panel` on the two top corners only, `--upos-surface`, `--upos-shadow-modal`, over
+  `.u-scrim` at `--upos-blur-scrim`. It rises with `fl-rise` at `--upos-dur-slow` — the kit's own
+  drawer call, unchanged, and no seventh keyframe (§8). Inside it the cart's three bands are
+  structurally identical to the panel above and lose only their left hairline and their 22px side
+  padding, which becomes `var(--upos-space-page)`: a header carrying the check label, the loyalty
+  control and a close `.u-icon-btn`; the line list scrolling; the footer carrying Subtotal, Tax,
+  Total, the 48px `.u-btn--secondary` send-all and the 58px `.u-btn--primary` Charge. Nothing in the
+  cart is redesigned. It is the same panel, given the side of the screen it can have.
+- §11 already prefers a drawer over navigation, and this is that rule doing its job at a width where
+  the grid and the check cannot both be on the glass: the check is one tap away and the menu is never
+  navigated off.
+
+**States.** Every state in the spec above holds unchanged — the 86'd row, the empty check, the
+sent/unsent line, the send-all confirmation, the check label, the offline annotations. Three are
+added.
+
+- Cart sheet **closed** (the default, and the state a fresh check opens in) or **open**.
+- Summary bar **empty** — no button, and the cart's own empty line, `No items yet — tap the menu to
+  build the order.` at 400/13px `--upos-ink-subtle`, in place of the counter and total. A bar with a
+  live-looking `Review` over an empty check is a control that refuses a tap, which §11 rules out.
+- Chip row **scrolled** or at rest. The selected chip is scrolled into view whenever the selection
+  changes, so the one chip that is always selected is never the one off the edge.
+
+**Interactions.**
+
+- Tap a chip to filter, exactly as tapping a rail button does. Nothing navigates.
+- Tap a row to add — the same tap the tile takes, with the same merge at `qty + 1` and the same
+  refusal on an 86'd item.
+- `Review` opens the sheet. The scrim, the close `.u-icon-btn` and the system back gesture all close
+  it.
+- **Send-all does not close the sheet.** It confirms as `SENT TO KITCHEN` for 2s where it was
+  pressed, with the emptied check behind it, and the server closes it. Animating the panel away from
+  the confirmation the person is reading trades a message for a transition.
+- Horizontal scrolling belongs to the chip row and to nothing else on the screen.
+- No hover, at any width. §8 already puts every lift inside `@media (hover:hover)` and this device
+  reports `hover: none`; press feedback is `--upos-press-tint` with no transform.
+
+**Not solved at this width, deliberately.**
+
+- **The other seven Part II-A screens.** Floor plan, table drawer, payment, channels queue, both
+  modals and offline behavior are drawn at 1440×900 and get no rule here. The Modifier modal is
+  480px wide and the Item info modal wider; `.u-modal`'s `max-width:100%` stops them clipping and
+  nothing beyond that is tuned. Order entry is the screen that reached a device, so it is the screen
+  that has a rule — writing seven more against a fleet nobody has chosen is seven designs to throw
+  away.
+- **Legibility, which is the real open question.** A CSS pixel on Android is 1/160 inch and in the
+  preview's browser it is 1/96, so §6's 13px body renders roughly a third smaller in the hand than it
+  does in the frame. Nothing here compensates. Raising the ramp for one candidate device would fork
+  §6, which is one scale for the whole product; if the Memor 20 becomes the fleet, the correct fix is
+  a handheld type role in Part I, not a local override in a screen spec. That decision waits on the
+  fleet, and until it lands this subsection is legible rather than comfortable.
+- **Landscape.** 785×393 is a different problem — the bottom nav and the summary bar together take
+  142px out of 393px of height — and no rule is written for it. The device is used in portrait.
+- **The touch floor does not move and the type scale does not move.** Handheld keeps Part I's
+  terminal roles and `--upos-touch-terminal` 48px. It does not take `--upos-touch-kiosk`: a smaller
+  screen is not a guest-facing one, and §11 sizes 60px for a stranger with nobody to ask, not for a
+  narrow viewport.
+- **Density.** No second column, no compact row, no swipe-to-remove on a line, no long-press. Every
+  action is a tap on a target that clears 48px, which is the whole of §11's speed contract and the
+  only part of it a narrow screen makes harder.
+- **The range between 393px and 800px is degraded, not designed.** One column of rows is correct at
+  393px and merely acceptable at 780px. The rule keeps that range usable; it does not claim to have
+  drawn it.
+
+**Gaps.** The same five the spec above cites — GAP-01, GAP-02, GAP-04, GAP-05, GAP-12 — carried
+across unchanged. Width changes no binding, and this subsection introduces no new gap: every element
+in it reads the data the 1440 spec already reads.
 
 #### Modifier modal
 
