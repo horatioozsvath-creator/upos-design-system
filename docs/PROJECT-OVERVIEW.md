@@ -39,7 +39,15 @@ and `docs/superpowers/` — the design spec and implementation plan this work fo
 
 ## Current status
 
-**No product code has been written yet.** The POC repository is a working skeleton, not a product:
+> **This section is behind the code.** It was written when the deliverable was documentation only.
+> Since then the token kit has landed in both client projects, the terminal shell and Order entry
+> have been built in `Restaurant.UI.Shared`, and the terminal runs on a real Datalogic Memor 20 in
+> immersive full screen with a live battery and connectivity readout. `## Recent progress` below is
+> current; the paragraphs immediately underneath are not, and are kept until this section is rewritten
+> in full rather than patched.
+
+**No product code had been written when this was written.** The POC repository was a working
+skeleton, not a product:
 
 - Orders flow end to end — the API persists them, and SignalR broadcasts status changes live.
 - The back office and terminal projects both still carry .NET template leftovers (`Counter`,
@@ -69,6 +77,20 @@ Nothing here is deployed, because there is nothing to deploy. The deliverable is
 
 ## Recent progress
 
+- 2026-09-02 — **The terminal owns the whole screen.** `MainActivity` hides Android's status and
+  navigation bars (sticky immersive), because the navigation bar's back and home controls let a
+  member of staff leave the app mid-order. The hidden status bar's instruments move into the
+  shell's top bar: battery and connectivity, read through a new `IDeviceStatus` abstraction that
+  `Restaurant.UI.Shared` owns and each host answers — MAUI Essentials on the device, an explicit
+  "no reading" in the back office's preview. The viewport is 393×785 again, the whole panel, and no
+  layout rule had to change for it
+- 2026-09-02 — **The offline pill is half real.** Connectivity is observed now, so the pill states
+  `OFFLINE` truthfully; the queue behind §11's count still does not exist, so it prints no count and
+  names GAP-10 beside itself. GAP-10 narrowed, not closed — the P0 is still a doubled order on replay
+- 2026-09-02 — **Handheld bottom nav fixed.** At 393px the five labels plus padding and §11's 8px
+  gaps summed to 442.93px into 393px, so the strip overflowed and `MORE` clipped to `MO`. Labels drop
+  below 800px and the icons step to 20px; smaller labels and a `MORE` overflow were both measured and
+  rejected. Every item is now 69×48px with nothing clipped
 - 2026-09-01 — Whole-branch review applied: per-accent AA ruling on the four accent presets, a
   theme-aware `--upos-surface-veil` in place of a hard-coded translucent white, `--upos-grad-bar-v`
   for the vertical bars, every `:hover` rule moved behind one `@media (hover:hover)` guard, an
@@ -152,3 +174,13 @@ gap between what is designed and what exists.
   recommendation, approved)
 - 2026-09-01 — Record data-model gaps; do not resolve them. Schema changes are the dev team's call.
   (Horatio)
+- 2026-09-02 — The terminal hides Android's system bars. The reason is operational, not cosmetic:
+  the navigation bar's back and home controls are a way out of the app mid-order. The status bar's
+  battery and signal move into the shell's top bar as the cost of it. (Horatio)
+- 2026-09-02 — A blocked control may become partly real. Where a claim is observable it is stated;
+  where it is not, the gap is named beside it rather than filled with a zero. The offline pill is
+  the first control to ship this way. (Horatio)
+- 2026-09-02 — `Restaurant.UI.Shared` never references MAUI. Anything the device knows reaches the
+  shared components through an interface the library owns and each host implements, with nullable
+  readings so a host with no device renders the absence rather than a plausible number. (Claude
+  recommendation, approved)

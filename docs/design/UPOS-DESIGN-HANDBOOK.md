@@ -639,6 +639,15 @@ The terminal keeps taking orders with no network. Offline is a state, never a wa
 - **One pill in the top bar.** `.u-pill-offline` — `--upos-status-late` fill, white 800/11px at
   `.05em`, pill radius — reading `OFFLINE · N QUEUED`, where N is the count of writes waiting to
   replay. It stays until the queue drains.
+- **The pill makes two claims, and they became true at different times.** *The terminal is offline*
+  is observable now: the host reads it from the platform and the terminal states it. *N writes are
+  waiting to replay* is not, because no queue exists to hold them (GAP-10). Until it does, **the
+  pill ships the half it can prove and says nothing about the half it cannot**: it reads `OFFLINE`,
+  with no count and no `QUEUED`, and the missing queue is named beside it in the Menu manager's
+  blocked treatment rather than implied by a zero. A pill reading `OFFLINE · 0 QUEUED` would be the
+  worst available answer — it is a sentence about a queue, and it is the sentence a working terminal
+  with an empty queue would also print, so it cannot be read as a gap. The count and the word
+  `QUEUED` arrive together with the table, and not before.
 - **Per-action annotation, not a dialog.** The card tender carries "will sync on reconnect" at
   400/10.5px under its label; a kitchen-sent line reads `QUEUED` instead of `SENT`.
 - **Never a blocking modal**, never a disabled Charge button, never a toast for each queued action.
@@ -781,6 +790,31 @@ Part III is the full component inventory with props and consumers. Scoped Razor 
 (`Component.razor.css`) may read the tokens; it must never redefine them. Never write a hex in a
 component — if the value you need has no token, add the token.
 
+**Reading the device from a shared component: `IDeviceStatus`.**
+
+`Restaurant.UI.Shared` is a plain Razor class library. It holds the terminal shell and every screen
+both hosts render, and it has no MAUI reference — which is the point of it, because a component that
+referenced MAUI could not be stood up in the back office's preview at all. So when the shell needed
+the battery level and the connection state, it could not call `Battery.Default` or
+`Connectivity.Default` to get them.
+
+**The library owns the question and each host answers it.** `IDeviceStatus` is declared beside the
+components that consume it, exposing `BatteryLevel`, `IsOnline` and a `Changed` event.
+`Restaurant.Mobile` registers the implementation that reads MAUI Essentials; the back office
+registers the one that reads nothing. The dependency points from the host to the library and never
+the other way, which is the arrangement that lets one shell render truthfully in two places.
+
+**Both readings are nullable, and the null is the whole design.** `double?` and `bool?` rather than
+`0` and `false`, because a host that cannot read a battery has not read a flat one and a host that
+cannot see a network has not seen it fail. The back office's implementation returns null for both and
+is named for what it is rather than for the host that registers it — it is the library's own answer
+for any host without a device, and a WASM build or a test would want the same one. **A design system
+must not ship a placeholder that is indistinguishable from data.** Every other blocked control in
+this product is drawn quiet and named as a gap (the Menu manager's treatment); an invented battery
+would be the first one drawn as though it were real, and it would be the one a person acts on. So the
+rule is stated once, here, and Order entry's instrument cluster implements it: **render the reading,
+or render the absence of the reading, and never render a number nobody measured.**
+
 **Bootstrap: remove it.**
 
 Rationale:
@@ -919,9 +953,36 @@ kitchen and charge.
   artboard fills it flat with `--upos-surface-inset`; the veil is what makes the blur mean anything,
   and it is the same token `.u-segmented` takes (§7). Three
   groups: a 26px `--upos-grad-primary` mark, the venue and terminal id at 800/15px
-  (`Riverside Grill · Counter 2`) and the offline pill slot on the left; the server and clock at
-  700/13px in `--upos-ink-subtle` on the right.
-- **Bottom nav, 78px**, `--upos-surface-inset` and no blur, 1px top hairline, 8px between items. Five `.u-nav-item`
+  (`Riverside Grill · Counter 2`) and the offline pill slot on the left; the server, then the
+  **instrument cluster**, then the clock at 700/13px in `--upos-ink-subtle` on the right.
+- **The instrument cluster — connectivity and battery — sits between the server and the clock**, at
+  `--upos-space-gap-inline` 10px, and it exists because the terminal hides Android's status bar
+  (Handheld · *The host's system bars*). That bar carried the clock, the signal and the battery; the
+  clock was already here and the other two had nowhere else to go. Identity reads left, instruments
+  read right, and the clock ends the bar where it always did — so on the handheld, where the server
+  drops, the right of the bar is exactly the three things the status bar used to show.
+  - **Connectivity** is a 15px stroke glyph (§9's dense band), `currentColor` on the bar's
+    `--upos-ink-subtle`: a wifi mark when the terminal has a network, the wifi-off mark in
+    `--upos-status-late-text` when it does not. It is an instrument and it is drawn in both states,
+    which is what separates it from the offline pill below.
+  - **Battery** is a 15px battery glyph whose fill is the charge, followed by the level at
+    `--upos-type-mono` and `--upos-space-gap-chip` 7px. It inks `--upos-status-late-text` at or below
+    **20%** — §4's rule that red marks a problem that exists, and a terminal about to die mid-service
+    is one. The 20 is a policy literal recorded here, like the 800 of the handheld step; it is a
+    threshold a condition tests, not a value a declaration takes, so §12's add-the-token rule does
+    not reach it.
+  - **Neither is ever drawn from a guess.** A host that cannot read the device renders no glyph, no
+    percentage and no plausible-looking dial; the cluster is replaced by one blocked chip in the
+    Menu manager's treatment reading `BATTERY AND SIGNAL · NO DEVICE READING`, short form
+    `NO READING`. The development preview is that host, and a preview showing a battery would be
+    inventing the one thing on the bar a person would act on.
+  - **The cluster and the offline pill are not the same statement.** The cluster is instrumentation:
+    permanent, quiet, present online and offline, answering *what is the device doing*. The pill is
+    §11's operational mode banner: absent while online, red when the terminal is running without a
+    network, answering *what is this terminal doing about it*. They agree when the terminal is
+    offline, and a phone's status bar and an app's offline banner are the same pair.
+- **Bottom nav, 78px**, `--upos-surface-inset` and no blur, 8px between items — `--upos-space-gap-row`
+  and §11's floor for adjacent targets, which the handheld rule leans on. 1px top hairline. Five `.u-nav-item`
   buttons, each `flex:1` capped at 150px, `--upos-radius-inset`, a 17px icon over a 700/10.5px
   label — ORDER · TABLES · PAYMENTS · CHANNELS · MORE. The active destination fills with
   `--upos-grad-primary` and white ink; the rest are `--upos-ink-subtle` on transparent. MORE is a
@@ -999,9 +1060,15 @@ kitchen and charge.
 
 **This subsection is provisional.** Order entry went to a real device before the fleet was chosen: a
 Datalogic Memor 20, a rugged 5.7" Android handheld at 1080×2160 and 440dpi, which the WebView reports
-as a **393×713 CSS-pixel portrait viewport** — the panel less a 66px status bar and a 132px navigation
-bar, once its host stops drawing behind them (see *The host's system bars* below). It read 393×785
-while the window was edge to edge, and 785 was the defect, not the device. The three-pane layout above cannot be drawn there. It
+as a **393×785 CSS-pixel portrait viewport** — the whole panel, because the terminal hides Android's
+status and navigation bars rather than sharing the screen with them (see *The host's system bars*
+below). That figure has moved twice and it is worth reading the sequence, because two of the three
+numbers were right about a terminal this one is not. It read 393×785 while the window drew edge to
+edge *underneath* both bars, and that 785 was a defect: the shell was measuring 72px of chrome it did
+not own, and it was clipped at both ends. It read 393×713 once the window was fitted to the bars —
+correct, for a terminal that shares its screen with the host. It reads 393×785 again now that the
+bars are gone, and this 785 is the device: the same number, arrived at by removing the bars rather
+than by ignoring them. The three-pane layout above cannot be drawn there. It
 spends 170px on the rail and 380px on the cart before a single item exists, and the grid's own
 `minmax(190px,1fr)` tile inside 22px of padding needs 234px more — **784px before the screen has one
 item on it, into 393px of glass.** The panes collide and the cart leaves the screen entirely.
@@ -1034,16 +1101,77 @@ stays a literal, recorded here.
 
 - **Top bar, 76px → 58px**, padding `0 28px` → `0 var(--upos-space-page)`. It keeps the 26px
   `--upos-grad-primary` mark, the venue and terminal id — now 700/13px, truncating from the terminal
-  id with an ellipsis — the offline pill slot, and the clock. **The server name drops.** Of the two
-  right-hand items it is the one whose reader already knows the answer: the person holding the device
-  is the server. The clock stays because a check is a thing that gets stamped, and the offline pill
-  stays because §11 gives it a permanent slot and a handheld carried away from the counter is the
-  most likely thing in the venue to lose the network. The glass treatment is unchanged — this is
-  still the one element in the product that spends `--upos-blur-glass` (§7).
-- **Bottom nav, 78px, unchanged, and it takes no rule at all.** `.u-nav-item` is already `flex:1`
-  capped at 150px inside `--upos-space-gap-row` 8px gaps: five items into 393px is 72px each, and
-  `PAYMENTS` at 700/10.5px `.16em` measures under that. It is the one piece of chrome that was
-  width-independent before this subsection existed.
+  id with an ellipsis — the offline pill slot, the instrument cluster and the clock. **The server
+  name drops.** Of the right-hand items it is the one whose reader already knows the answer: the
+  person holding the device is the server. The clock stays because a check is a thing that gets
+  stamped, the instrument cluster stays because this is the terminal it was added for, and the
+  offline pill stays because §11 gives it a permanent slot and a handheld carried away from the
+  counter is the most likely thing in the venue to lose the network. The glass treatment is
+  unchanged — this is still the one element in the product that spends `--upos-blur-glass` (§7).
+- **The bar is full at 393px, and two things give way when the terminal is offline.** Measured into
+  365px of content: the mark and its gap take 36px, the instrument cluster and the clock take 123px
+  with their gaps, and an offline pill with §11's wifi-off icon takes 95px more — leaving the venue
+  and terminal id 18px, which is not a truncation, it is a deletion. Two rules recover it, and both
+  drop the redundant half of a pair rather than shrinking anything.
+  - **The blocked queue chip drops below 800px.** The 1440 bar carries `OFFLINE QUEUE · GAP-10`
+    beside the pill; the handheld bar does not. Of the two, the red pill states the terminal's
+    condition and the grey chip names a gap in the model, and on 393px of glass the condition wins.
+    This is the move the footer's tax-and-tender paragraph already makes one screen over: the gap
+    stands in full in the 1440 design, which is the primary one.
+  - **The pill drops its wifi-off icon and keeps its word.** The instrument cluster's connectivity
+    glyph is on the same bar, eight pixels away, saying the same thing in the same mark. `OFFLINE`
+    is not ambiguous without a picture of it.
+- **Bottom nav, 78px → the labels drop and the icons carry the destinations**, at 17px → 20px. The
+  strip's own geometry does not move: 78px tall, `--upos-surface-inset`, the 1px top hairline,
+  `--upos-space-gap-row` 8px between items, every item still `flex:1` over
+  `--upos-touch-terminal` 48px, and the active destination still filled `--upos-grad-primary` with
+  white ink. Only the word goes, and it goes because it does not fit.
+
+  **The previous claim here was arithmetic, and the arithmetic was wrong.** It read "five items into
+  393px is 72px each, and `PAYMENTS` measures under that", which divided the strip as though `flex:1`
+  could shrink an item to any width. It cannot: a flex item's default `min-width:auto` floors it at
+  its own min-content, an unbreakable word is its own min-content, and so **each item's floor is its
+  label plus its padding.** Measured in the browser at 393px, the five floors are ORDER 67px,
+  TABLES 71.63px, PAYMENTS 92.25px, CHANNELS 93px and MORE 59.05px — 382.93px — and with four 8px
+  gaps and the strip's 28px of side padding that is **442.93px into 393px.** The strip does not
+  compress, it overflows by 49.93px, and the shell's own `overflow:hidden` cuts whatever is last:
+  MORE begins at 369.88px, so 23px of a 59px item survives and the label renders as `MO`. That is
+  the clipping, and its cause is a sum. **No distribution rule fixes a sum**, which is why nothing
+  about `flex`, `max-width` or the item order was ever going to help.
+
+  Three treatments were measured against that sum before the labels were dropped.
+  - **Smaller labels.** The five labels are 302.93px of the 442.93px, so they have to lose 49.93px —
+    16.5%. Dropping the label class's `.16em` tracking alone saves 52.08px across the 31 characters
+    and closes it, *by 2.15px*, with every label then exactly touching its own padding. That is a fit
+    with no tolerance, decided by a font metric: the terminal self-hosts Archivo (§12) and any frame
+    rendered on the fallback stack clips. It also spends the one property §6's label class is defined
+    by — 10px uppercase paired with `.1–.2em` — to buy two pixels. Going after the size instead needs
+    roughly 9px at `.06em` to leave any margin, and **a CSS pixel on this device is 1/160 inch against
+    the preview's 1/96**, so a 9px label in the hand is what a 5.4px label looks like in the frame.
+    This subsection already records 13px body here as legible rather than comfortable; 9px is neither.
+  - **`MORE` collapsing into an overflow.** It is circular — `MORE` *is* the overflow destination, and
+    folding it into another one names the same drawer twice — and it does not reach the defect. Four
+    items into 393px leaves each label 65.25px, and CHANNELS needs 73px. The strip still overflows.
+    MORE is where the clipping showed, not where it came from.
+  - **Icon-only, which is what ships.** An item becomes a 20px glyph over nothing: five of them with
+    8px gaps and 8px of strip padding fit in 393px with room to spare, every target clears
+    `--upos-touch-terminal` by 30px, and the sum stops being the constraint instead of being narrowly
+    beaten.
+
+  **It stays recognisable against 1440 because everything that identifies a destination is still
+  there**: the same five glyphs, in the same order, with the same active fill and the same on-dark
+  ink. What the handheld drops is the redundant gloss on a strip the reader is looking straight at,
+  and it drops it uniformly — a strip where only the active item keeps its word was considered and
+  rejected, because one wide item beside four narrow ones reads as a broken grid rather than as a
+  quiet one, and because the active destination is the one whose name the screen behind it already
+  gives away. **The label does not leave the document**, only the layout: every item carries its word
+  as its accessible name, so the strip is unchanged to a screen reader and the four unbuilt
+  destinations still announce themselves as what they are.
+
+  **The icon steps 17px → 20px** because it is now carrying the destination alone. §9 draws dense UI
+  at 15–18px and the kitchen display and kiosk at 20–24px, and an unlabelled glyph is the second case
+  regardless of how small the screen is: 20px is the bottom of that band and the smallest step that
+  reads as a nav rather than as a row of specks in a 78px strip.
 - **Category rail, 170px column → a horizontally scrolling chip row, 62px**, sitting at the head of
   the item area under the top bar. `--upos-surface-inset` behind a 1px `--upos-border` bottom — the
   rail's fill and its hairline, turned through ninety degrees — padding `7px var(--upos-space-page)`,
@@ -1098,9 +1226,12 @@ stays a literal, recorded here.
   the 58px `.u-btn--primary` Charge. Nothing in the cart is redesigned. It is the same panel, given
   the side of the screen it can have.
 - **The line region asks for three lines; the cap is a band, not a percentage.** The drawer recipe's
-  `max-height:82%` is a 1440 figure and it does not survive contact with the device: the sheet's own
-  header and pinned footer are 339px of a 577px destination, so 82% — 473px — left the line list 98px
-  and the totals cut the second line in half. Two rules replace it.
+  `max-height:82%` is a 1440 figure and it did not survive contact with the device: the sheet's own
+  header and pinned footer are 339px, and against the 577px destination the device had while it still
+  shared its screen with Android's bars, 82% — 473px — left the line list 98px and the totals cut the
+  second line in half. The destination is 649px now that the terminal owns the whole screen and 82%
+  would no longer bind, which is exactly the objection to it: a percentage that is wrong on one host
+  and accidentally right on the next is not a rule. Two rules replace it.
   - The list takes `flex:1 1 calc(var(--upos-touch-terminal) * 3 + var(--upos-space-gap-line) * 3)`.
     A cart line is exactly `--upos-touch-terminal` tall — `CartLine` sets no height of its own and the
     `QtyStepper` inside it carries the touch floor — and the list stacks lines at
@@ -1113,9 +1244,14 @@ stays a literal, recorded here.
     three lines, so it does not grow under the thumb as items are tapped in and Charge does not move.
   - The cap is `calc(100% - var(--upos-space-gap-section))`. The scrim keeps one section gap at the
     head of the destination and the sheet takes the rest, which is a visible strip of the menu on
-    every host rather than a percentage that has to be re-derived for each one. On the Memor 20 the
-    sheet asks for 548px — 109px of header, 208px of list, 230px of footer — against a 577px
-    destination, so the cap does not bind and the scrim band is 29px.
+    every host rather than a percentage that has to be re-derived for each one. Measured on the Memor
+    20 at 393×785: the destination is 649px, the cap is 623px, and the sheet asks for 548px — 109px of
+    header, 208px of list, 230px of footer — so the cap does not bind and the scrim band is 101px. It
+    was 29px against the 577px destination the device had while the system bars were still on screen,
+    and **nothing had to be re-derived when they went**: the sheet stands the same 548px and the
+    recovered 72px went to the band. That is the difference between a cap expressed as a gap and a cap
+    expressed as a percentage, and it is why the rule survived a change in the viewport it was written
+    against.
 - **The footer's tax-and-tender paragraph folds at this width, and only at this width.** It is the
   one thing in the pinned footer that is not the check, and on a 393px sheet it is 72px — more than a
   line and a half of the check it annotates. Nothing it names goes unsaid: the Tax row still reads
@@ -1126,20 +1262,63 @@ stays a literal, recorded here.
   the grid and the check cannot both be on the glass: the check is one tap away and the menu is never
   navigated off.
 
-**The host's system bars.** This was open when the subsection was written and it is closed now, and
-the account belongs here because it is what fixed the viewport every figure above is measured
-against. The WebView filled the whole 1080×2160 panel, so the shell ran under Android's 66px status
-bar at the head and its 132px navigation bar at the foot: the 26px mark clipped from above, the lower
-half of the 78px nav underneath. The cause was the host and not the stylesheet. .NET MAUI 10 puts
-every Android window into edge to edge on every API level — `Microsoft.Maui` calls
-`WindowCompat.SetDecorFitsSystemWindows(window, false)` in the activity's `OnCreate`, and the
-generated theme's `maui_edgetoedge_optout` is only read on API 35 and up, while the Memor 20 is API
-28. `MainActivity` now calls the same method with `true` after `base.OnCreate`, so the WebView is laid
-out between the bars and the shell's `height:100%` is 393×713. **No rule in any stylesheet changed**,
-which is the point: the shell was always right about the box it was handed, and it was handed the
-wrong box. `env(safe-area-inset-*)` was never the answer — that WebView reports zero for all four,
-because Android exposes display-cutout insets there and not system-bar insets, and padding by four
-zeroes is a rule that looks like a fix and is not.
+**The host's system bars.** The account belongs here because it is what sets the viewport every
+figure above is measured against, and it has two chapters.
+
+*The first was a defect.* The WebView filled the whole 1080×2160 panel while Android still drew both
+bars over it, so the shell ran under the 66px status bar at the head and the 132px navigation bar at
+the foot: the 26px mark clipped from above, the lower half of the 78px nav underneath. The cause was
+the host and not the stylesheet. .NET MAUI 10 puts every Android window into edge to edge on every
+API level — `Microsoft.Maui` calls `WindowCompat.SetDecorFitsSystemWindows(window, false)` in the
+activity's `OnCreate`, and the generated theme's `maui_edgetoedge_optout` is only read on API 35 and
+up, while the Memor 20 is API 28. `MainActivity` answered it by calling the same method with `true`,
+so the WebView was laid out between the bars and the shell's `height:100%` was 393×713. **No rule in
+any stylesheet changed**, which was the point: the shell was always right about the box it was
+handed, and it was handed the wrong box. `env(safe-area-inset-*)` was never the answer — that WebView
+reports zero for all four, because Android exposes display-cutout insets there and not system-bar
+insets, and padding by four zeroes is a rule that looks like a fix and is not.
+
+*The second is a ruling, and it supersedes the first.* **The terminal owns the whole screen. Both
+system bars are hidden.** The reason is operational and not cosmetic: the navigation bar's back and
+home controls are a way out of the app, and a terminal a member of staff can leave mid-order is a
+terminal that loses a check. Hiding the bars is the only thing that removes the control; making the
+app the launcher's default or trapping `onBackPressed` covers one door and leaves the other open.
+
+**The two are one knob, turned opposite ways, and only one of them can win.** Below API 30
+`WindowCompat.SetDecorFitsSystemWindows` is not a distinct API — it clears (for `true`) or sets (for
+`false`) exactly three bits on the decor view, `SYSTEM_UI_FLAG_LAYOUT_STABLE`,
+`SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION` and `SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN`, and those are the
+same three bits `WindowInsetsControllerCompat.SystemBarsBehavior` sets when it is given
+`BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE`. Calling both leaves the result decided by call order, which
+is not a design. So the activity states the edge-to-edge layout it wants — `SetDecorFitsSystemWindows
+(window, false)`, which is also what MAUI itself does — and then hides the bars through
+`WindowInsetsControllerCompat.Hide(WindowInsetsCompat.Type.SystemBars())`. **The inset fix is not
+reverted so much as made unnecessary**: it existed to stop the shell being laid out under two bars
+that were taking screen, and there are no longer two bars taking screen. Its premise is gone, and
+what is left in its place is the same statement made once instead of twice.
+
+**A transient bar does not clip the shell, and the reason is that it does not re-lay-out anything.**
+`BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE` is sticky immersive: an edge swipe brings a bar back as a
+translucent overlay for a few seconds and then takes it away again, and the system dispatches no new
+window insets for it, because a bar that is about to leave is not a bar the layout should be built
+around. So the shell keeps its 393×785 box for the whole episode. The bar floats over the top or the
+foot of it, covers the mark or part of the nav while it is up, and retreats leaving both intact.
+**Momentarily covered is not clipped**: nothing is resized, nothing reflows, and no content is lost —
+which is precisely what the first chapter's defect did do, permanently, and what the fitted layout
+avoided by giving 72px away. Sticky immersive gives the 72px back and pays for it only during a
+swipe.
+
+The bars are re-hidden when the window regains focus. A system dialog, the notification shade or the
+keyboard can restore them and leave them restored, and a terminal that quietly grows a back button
+after an interruption is the failure this ruling exists to prevent.
+
+**What the hidden status bar costs, and where it is paid.** The status bar carried three things a
+person holding a device on a floor actually reads: the clock, the signal and the battery. The clock
+was already in the shell's top bar. The other two are not, and they do not stop mattering because
+they stopped being drawn — a handheld carried around a venue is the one terminal in the fleet that
+can run out of charge or walk out of coverage. So **the top bar takes them on**, as the instrument
+cluster specced under Order entry · Layout above. This is the ruling's own cost, paid in the same
+place it is incurred, and not a feature that arrived alongside it.
 
 **States.** Every state in the spec above holds unchanged — the 86'd row, the empty check, the
 sent/unsent line, the send-all confirmation, the check label, the offline annotations. Three are
@@ -1168,6 +1347,19 @@ added.
 
 **Not solved at this width, deliberately.**
 
+- **Whether an unlabelled nav survives the other four destinations being built.** Today ORDER is the
+  only one that routes, so the four quiet glyphs are a roadmap and nobody has to learn them. When
+  TABLES, PAYMENTS, CHANNELS and MORE become places a server goes twenty times a shift, a strip of
+  five wordless glyphs is a real question and not this one. It is not answered here because the
+  answer depends on the fleet: on a wider handheld the labels fit and the question never arises, and
+  on this one it is a choice between an unlabelled nav and a type ramp §6 does not have. Both are
+  decisions for the pass that promotes or deletes this subsection.
+- **The offline pill is half-built and looks whole.** It states a fact the host observes and it is
+  styled exactly as the finished control will be, so nothing on the bar signals that the count is
+  missing rather than zero. The blocked chip beside it carries that at 1440 and is dropped at 393px,
+  which means **the handheld bar is the one surface where the gap is invisible.** It is left that way
+  because the alternative is spending a third of the bar naming a table that does not exist, and
+  because GAP-10's real cost is a doubled order on replay, not an absent number.
 - **The other seven Part II-A screens.** Floor plan, table drawer, payment, channels queue, both
   modals and offline behavior are drawn at 1440×900 and get no rule here. The Modifier modal is
   480px wide and the Item info modal wider; `.u-modal`'s `max-width:100%` stops them clipping and
@@ -1180,7 +1372,7 @@ added.
   §6, which is one scale for the whole product; if the Memor 20 becomes the fleet, the correct fix is
   a handheld type role in Part I, not a local override in a screen spec. That decision waits on the
   fleet, and until it lands this subsection is legible rather than comfortable.
-- **Landscape.** 713×393 is a different problem — the bottom nav and the summary bar together take
+- **Landscape.** 785×393 is a different problem — the bottom nav and the summary bar together take
   142px out of 393px of height — and no rule is written for it. The device is used in portrait.
 - **The touch floor does not move and the type scale does not move.** Handheld keeps Part I's
   terminal roles and `--upos-touch-terminal` 48px. It does not take `--upos-touch-kiosk`: a smaller
@@ -1542,7 +1734,10 @@ badge and its color have no field behind them.
 
 - **One pill in the top bar**, in the slot beside the venue name: `.u-pill-offline` —
   `--upos-status-late` fill, white 800/11px at `.05em`, `--upos-radius-pill`, `6px 12px`, a 13px
-  wifi-off icon, reading `OFFLINE · 3 QUEUED`.
+  wifi-off icon, reading `OFFLINE · 3 QUEUED`. **What ships today reads `OFFLINE` and stops there** —
+  the connection is observed through `IDeviceStatus` (§12) and the count is not, so §11's two-claim
+  rule applies and the queue is named beside the pill in the blocked treatment rather than counted at
+  zero. The handheld bar drops that chip and keeps the pill (Handheld).
 - **One annotation per affected action.** On the card tender tile, `will sync on reconnect` at
   400/10.5px under the label; on a line sent to the kitchen, `QUEUED` in place of `SENT`.
 - **No banner, no blocking modal, no disabled primary, and no toast per queued write** (§11).
@@ -2983,6 +3178,14 @@ instead** — the terminal here, the sidebar in `SideNav` — so the active fill
 both and the tint has no consumer in this handoff. Leave the recipe as it is; set the fill where it is
 used. This nav is the only full-screen transition in the order flow: everything else opens over the
 check (§11). The strip is touch, so it ships no `:hover` transform.
+**Below 800px of shell width the labels are laid out away and the icon steps to 20px** (Order entry ·
+Handheld, which carries the measurement and the three treatments weighed against it). **The component
+takes no width flag for this**, on the same rule `MenuItemCard` follows one screen over: the form is
+reached by a container query on the terminal shell, so the strip never learns how wide it is and the
+recipe's other call sites — none in this handoff, `SideNav` being a separate rail — cannot match a
+container they do not sit in. **The label is hidden, never removed:** every item carries its `Label`
+as its accessible name at every width, so the strip reads identically to a screen reader and an
+unbuilt destination still announces what it is.
 
 #### SideNav
 
@@ -3128,16 +3331,23 @@ kiosk**: no channel badge is guest-facing (Guest-facing rules).
 #### OfflinePill
 
 **Classes:** `.u-pill-offline`.
-**Props:** `QueuedCount` (int), `Visible` (bool, the observed connection state).
-**States:** hidden while online; offline with a queue, reading `OFFLINE · N QUEUED`; draining, where the
-count falls as writes replay; gone at zero.
+**Props:** `QueuedCount` (int?, null while no queue exists), `Visible` (bool, the observed connection
+state).
+**States:** hidden while online; offline with a queue, reading `OFFLINE · N QUEUED`; **offline with no
+queue behind it, reading `OFFLINE` alone**; draining, where the count falls as writes replay; gone at
+zero.
 **Consumed by:** Order entry (the top-bar slot beside the venue name), Offline behavior.
 **Notes:** it pulses with `fl-pulse` and **keeps pulsing under `prefers-reduced-motion`**, because it
 carries status rather than decoration (§8). Connectivity is observed, never chosen — the artboard's
-offline toggle is demo scaffolding, not product UI. There is no success toast on reconnect: the absence
-of the pill is the message (§11). The queue behind the count is a local SQLite table on
-`Restaurant.Mobile`, planned rather than built, and with no idempotency key on `CreateOrderDto` a
-replayed write can double an order (GAP-10).
+offline toggle is demo scaffolding, not product UI, and the observation now comes from `IDeviceStatus`
+(§12) rather than from nothing. There is no success toast on reconnect: the absence of the pill is the
+message (§11). **The pill is the product's one half-built control, and the split is deliberate**: it
+states the connection because the connection is observable, and it omits the count because the queue
+behind it is a local SQLite table on `Restaurant.Mobile` that is planned rather than built. A null
+`QueuedCount` prints nothing — not `0 QUEUED`, which is the sentence a healthy terminal with an empty
+queue prints and therefore cannot be read as a gap. The gap is named beside the pill instead, in the
+blocked treatment, and with no idempotency key on `CreateOrderDto` a replayed write can still double
+an order (GAP-10).
 
 #### UposSwitch
 

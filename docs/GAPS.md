@@ -237,6 +237,15 @@ rather than built, and the contract replay has to honor is that a write reaching
 not produce two orders. On the kiosk the same hole is sharper: a submit retried across a flaky link
 can produce two orders and two numbers for one guest.
 
+**Narrowed, not closed.** This gap used to cover the whole of §11's offline pill, including whether
+the terminal could tell it was offline at all. **It can now**: `IDeviceStatus` reads the connection
+from the platform on `Restaurant.Mobile`, and the pill is real for that half — it appears when the
+device has no network and reads `OFFLINE`. What remains is everything behind it: the queue, the
+count, the replay and the idempotency key. So the pill ships stating the connection and saying
+nothing about a queue, because `OFFLINE · 0 QUEUED` is the sentence a healthy terminal with an empty
+queue also prints and could not be read as a gap. **Nothing else about this gap has moved** — the P0
+is the doubled order on replay, and that is untouched.
+
 **Where it bites:** §11 Offline · Offline behavior · Kiosk data contract · OfflinePill.
 
 **Minimal suggestion:** a client-generated idempotency key on `CreateOrderDto` and
