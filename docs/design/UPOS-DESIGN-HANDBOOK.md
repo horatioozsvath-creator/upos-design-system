@@ -897,7 +897,8 @@ kitchen and charge.
   single-select pills at `10px 16px`. `ADD-ONS · OPTIONAL`, then multi-select pills at `9px 14px`
   carrying the upcharge in the label — `Bacon +$1.50`, `Avocado +$1.75`, `Extra Cheese +$1.00`. Then
   a combo block: `--upos-surface-inset`, 16px radius, `14px 16px`, `Make it a combo` at 700/13px over
-  `+ side, + drink · +$3.50` at 400/11px, and a 50×28px switch whose 22px knob slides `3px → 25px`.
+  `+ side, + drink · +$3.50` at 400/11px, and a `.u-switch` at 50×28px whose 22px knob slides
+  `3px → 25px`.
 - Combo on adds `CHOOSE A SIDE` and `CHOOSE A DRINK` pill groups under it.
 - Drink body is one block: `SIZE · REQUIRED` and three pills — Small · Medium · Large.
 - Footer row: a `.u-qty-stepper` around the count at 800/15px, then a 52px `.u-btn--primary` taking
@@ -1486,8 +1487,8 @@ live.
 - **Switch**: a 50×28 track at `--upos-radius-pill` carrying a 22px white knob that slides
   `3px → 25px`. On, the track is `--upos-grad-primary`; off, `--upos-border`. The artboard animates it
   at `.2s` linear; ship `--upos-dur-fast` on `--upos-ease`, the one curve (§8). This is the same
-  switch the terminal's modifier modal uses for its combo control (Part II-A), and the kit has no
-  recipe for it — Part III adds one.
+  switch the terminal's modifier modal uses for its combo control (Part II-A). Part III routed it
+  into the kit: the recipe is `.u-switch` with `.is-on`, and the Razor primitive is `UposSwitch`.
 
 **States.**
 
