@@ -289,15 +289,13 @@ profiles and basic loyalty").
 
 **What's missing:** no venue or organization entity, and therefore no scope to attach a setting to.
 `Riverside Grill` is a literal in the dashboard heading and again in Reports, and every aggregation
-above it is silently single-location — though Reports' own Gaps block does not cite this entry, so
-Reports does not appear below in "Where it bites" despite carrying the same literal. A channel
-connects to the installation rather than to a location, so a second restaurant has nowhere to keep
-its own. The per-station threshold that `OVER TARGET` counts against, the kiosk's daypart windows,
+above it is silently single-location. A channel connects to the installation rather than to a
+location, so a second restaurant has nowhere to keep its own. The per-station threshold that `OVER TARGET` counts against, the kiosk's daypart windows,
 its tax rate and both its timeouts have no scope to be stored on, and Settings has no scope at all —
 which is why it can be specified but not bound.
 
-**Where it bites:** Dashboard · Integrations · Employees, Devices, Settings · Station board ·
-Guest-facing rules · UposSwitch.
+**Where it bites:** Dashboard · Integrations · Reports · Employees, Devices, Settings · Station
+board · Guest-facing rules · UposSwitch.
 
 **Minimal suggestion:** `Organization` → `Location` → `RevenueCenter` → `Device`, with a `Setting`
 keyed by scope so a value can be set once and overridden per location; a location reference on every

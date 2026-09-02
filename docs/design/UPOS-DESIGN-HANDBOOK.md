@@ -15,6 +15,7 @@ what the design renders that the data model cannot yet express.
 | Secondary artboard | `docs/design/reference/Kitchen Display and Kiosk.dc.html` | Kitchen display and kiosk content and flow · visual style superseded by §11 |
 | Token kit | `docs/design/tokens/upos-tokens.css` · `docs/design/tokens/upos-components.css` | Every value you type |
 | This handbook | `docs/design/UPOS-DESIGN-HANDBOOK.md` | Every rule you follow |
+| Gap register | `docs/GAPS.md` | Every `GAP-NN` a Part II spec or a Part III component cites |
 | Parent design language | `docs/design/reference/_ds/secondbrain-design-system-3cef5c67-b264-4117-ad2f-24f3f1404fe7/readme.md` | Where the language came from |
 | Scope and priorities | `docs/design/reference/outline-extracted.txt` | What ships in which release |
 
@@ -33,7 +34,7 @@ order every time. Copy that template for any screen the handoff does not cover.
 Part III is the lookup between the two: find the component a region needs, then read its props,
 states and consumers.
 
-Parts I, II and III are complete. Part IV carries a written-in marker naming the task that fills it.
+All four parts are complete.
 
 ## Contents
 
@@ -633,7 +634,7 @@ The terminal keeps taking orders with no network. Offline is a state, never a wa
   never adjacent — void does not touch send.
 - **A destructive control takes `.u-btn--ghost` at rest** — void, comp, refund, remove line — with
   its label at `--upos-ink`, not ghost's default `--upos-ink-subtle` (`#8b95a1` on white computes
-  3.0:1 and fails AA at 13px; the ink label reads 15.9:1). Red marks a problem that exists (§4),
+  3.0:1 and fails AA at 13px; the ink label reads 16.6:1). Red marks a problem that exists (§4),
   and an action nobody has taken yet is not one, so the button stays quiet until it is pressed. The
   red arrives on the confirming step, where the dialog names the consequence in
   `--upos-status-late-text` and the confirm button is `.u-btn--primary` carrying the verb. There is
@@ -964,7 +965,11 @@ upcharge and delta on this screen is artboard fixture. Pricing is client-side: a
 base plus selected add-ons plus the combo price; a drink's unit is base plus the size delta
 (`−$0.50` small, `$0` medium, `+$0.75` large — applied to the price, not shown in the label); the
 line is unit × quantity. The confirmed line reaches the API only inside `CreateOrderDto`, as an
-`OrderItemDto` with no field to carry the selection.
+`OrderItemDto` with no field to carry the selection. **The POC's one per-line customization carrier
+is `OrderItem.SpecialInstructions`**, a nullable free-text string on the entity — the field a server
+types a modification into today, and the field structured modifier groups replace. `OrderItemDto`
+carries nothing that maps to it, so the middot-joined mods string this modal builds reaches the API
+as nothing at all (GAP-01).
 
 **Gaps.**
 
@@ -1638,6 +1643,8 @@ only states them. Bars grow with `fl-grow` on mount (§8).
   all fixtures.
 - GAP-11 — no inventory model, so a level, its par threshold and its unit have nowhere to live, and
   nothing can 86 an item automatically.
+- GAP-13 — no venue or organization entity, so `Riverside Grill` in the heading is the same literal
+  the dashboard carries, and the per-category COGS targets have no scope to be configured on.
 
 #### Employees, Devices, Settings (roadmap)
 
@@ -1853,7 +1860,9 @@ on a chit moves.
 **Data.** The order number is `Order.OrderNumber`. The timer is derived from `Order.CreatedAt` and
 nothing else. Item lines are `OrderItemDto` — quantity and menu-item name, which is the whole of what
 binds. Everything else on the chit is unbound: the channel badge, the guest name, the rush flag, the
-allergen chips and the modifier lines all render from artboard fixture. The assembly label is the one
+allergen chips and the modifier lines all render from artboard fixture. The one field a modification
+can live in today is the free-text `OrderItem.SpecialInstructions`, which is not on `OrderItemDto` and
+carries no kind, so a cook cannot read `NO` from `SUB` from `ADD` out of it (GAP-01). The assembly label is the one
 field that is plain API work rather than a hole — a bag or tray number is a new column on `Order`
 contradicting nothing in the schema.
 
@@ -1923,11 +1932,11 @@ the current model.
 
 **Gaps.**
 
+- GAP-01 — no modifier model, so an all-day count aggregates item names and cannot separate a build
+  from its variants.
 - GAP-06 — no recipe, ingredient or plating model, so every panel in plate view — photos, stack,
   ingredient order, timing, hold — is drawn from fixture, and the same entry carries the
   item-to-station linkage that decides which chit a line lands on.
-- GAP-01 — no modifier model, so an all-day count aggregates item names and cannot separate a build
-  from its variants.
 
 #### KDS data contract
 
@@ -1981,13 +1990,13 @@ endpoint returns it (§4).
 
 **Gaps.**
 
-- GAP-06 — no recipe, ingredient or station model, so this entry carries the item-to-station linkage
-  the board routes on as well as plate view's content: which station makes an item is part of how the
-  item is made, so it belongs with the recipe rather than with the order.
+- GAP-01 — no modifier model, so the build lines a cook actually works from arrive as free text.
 - GAP-04 — `Order` has no channel or order type, so the chit's channel badge is unbindable and a
   per-channel target has no field to key on.
 - GAP-05 — `MenuItem` has no allergens, so the allergen row cannot be driven by data.
-- GAP-01 — no modifier model, so the build lines a cook actually works from arrive as free text.
+- GAP-06 — no recipe, ingredient or station model, so this entry carries the item-to-station linkage
+  the board routes on as well as plate view's content: which station makes an item is part of how the
+  item is made, so it belongs with the recipe rather than with the order.
 
 ### Part II-D · Kiosk
 
@@ -2226,13 +2235,13 @@ head. Width is not separation.
 
 **WCAG 2.2 AA, and one pairing fails it.** `--upos-ink-subtle` on `--upos-surface` computes 3.0:1
 (§11). Size does not rescue it here — the large-text allowance starts at 24px regular and kiosk body
-copy is 19px — so **anything the guest must read takes `--upos-ink`**, which reads 15.9:1 (§11).
+copy is 19px — so **anything the guest must read takes `--upos-ink`**, which reads 16.6:1 (§11).
 `--upos-ink-subtle` has no role on this surface at all: not on the description, not on the mods line,
 not on the quantity column, not on a ghost button's label. The pairings that do hold:
 
 | Pairing | Ratio | Where |
 | --- | --- | --- |
-| `--upos-ink` on `--upos-surface` | 15.9:1 | Every sentence and every name |
+| `--upos-ink` on `--upos-surface` | 16.6:1 | Every sentence and every name |
 | `--upos-accent-deep` on `--upos-surface` | 9.4:1 | Prices, the combo chip, the savings line |
 | White on `--upos-accent` | 6.29:1 slate · 6.60:1 indigo · 4.72:1 teal · 3.96:1 sky | The merchandising tag, whose fill is flat rather than the gradient |
 | White on `--upos-grad-primary` | 6.29:1 to 9.4:1 on slate; the accent end is the floor, so 4.72:1 on teal and 3.96:1 on sky | Primary buttons, the attract and done screens |
@@ -2262,8 +2271,9 @@ WCAG 2.2's target-size minimum is 24×24 (2.5.8) and this surface clears it two 
 **Interactions.**
 
 - **Idle wipes the cart, and warns first.** After 60 seconds untouched on any screen holding a cart, a
-  sheet rises: `Still there?` at 800/40px, `Your order clears in 10 seconds` at 400/26px counting
-  down, and a `Keep going` `.u-btn--primary` at 96px. A touch anywhere dismisses it. At zero the kiosk
+  560px sheet rises — inside `UposModal`'s 380-to-940 range (Part III) — carrying `Still there?` at
+  800/40px, `Your order clears in 10 seconds` at 400/26px counting down, and a `Keep going`
+  `.u-btn--primary` at 96px. A touch anywhere dismisses it. At zero the kiosk
   resets to attract with an empty bag. Neither timer is in the artboard; both are UPOS additions and
   both are configuration.
 - **The done screen resets itself after 30 seconds**, running the same reset `Start a new order` runs.
@@ -2365,11 +2375,11 @@ status.
   and nowhere to be stored.
 - GAP-04 — `Order` has no channel or order type, so nothing on a submitted order says it came from a
   kiosk.
+- GAP-05 — `MenuItem` has no allergens, so every chip §5 puts on a kiosk surface is design-only.
 - GAP-08 — no payments domain, so the card-present step records neither the approval nor the tender.
 - GAP-10 — no idempotency key on `CreateOrderDto`, so a submit retried across a flaky link can produce
   two orders and two numbers for one guest.
 - GAP-12 — no loyalty account entity, so a kiosk cannot identify the guest it is serving.
-- GAP-05 — `MenuItem` has no allergens, so every chip §5 puts on a kiosk surface is design-only.
 
 ---
 
@@ -2872,7 +2882,7 @@ endpoint, and a connected channel cannot mark the orders it sends (GAP-04, GAP-1
 
 ## Part IV · Data-model gaps
 
-*Written in Task 10, in `docs/GAPS.md`.* Everything the design renders that the current POC schema
-cannot express, as entries `GAP-01` to `GAP-13`, each with affected screens, a minimal entity
-suggestion, priority and release. Part II screen specs cite those IDs; this section is the pointer,
+Everything the design renders that the current POC schema cannot express lives in `docs/GAPS.md`, as
+entries `GAP-01` to `GAP-13`, each with affected screens, a minimal entity suggestion, priority and
+release. Part II screen specs and Part III components cite those IDs; this section is the pointer,
 and `docs/GAPS.md` is the register.
