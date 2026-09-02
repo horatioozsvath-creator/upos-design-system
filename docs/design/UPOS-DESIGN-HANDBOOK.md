@@ -265,12 +265,20 @@ On dark surfaces, accents are `--upos-on-dark-accent` `#8fc9ff`.
 actions, the active nav pill and the selected control. Never use the accent to say something is
 late, ready or wrong — that is §4's job.
 
-| `data-accent` | `--upos-accent` | `--upos-accent-deep` |
-| --- | --- | --- |
-| slate (default) | `#33648b` | `#22496a` |
-| teal | `#2f7d8f` | `#1c4a54` |
-| indigo | `#4a5a94` | `#2b3560` |
-| sky | `#4d84b8` | `#2a5578` |
+| `data-accent` | `--upos-accent` | `--upos-accent-deep` | White on accent | White on accent-deep |
+| --- | --- | --- | --- | --- |
+| slate (default) | `#33648b` | `#22496a` | 6.29:1 | 9.4:1 |
+| teal | `#2f7d8f` | `#1c4a54` | 4.72:1 | 9.7:1 |
+| indigo | `#4a5a94` | `#2b3560` | 6.60:1 | 11.8:1 |
+| sky | `#4d84b8` | `#2a5578` | 3.96:1 | 7.9:1 |
+
+**The four accents are not equally safe under white text**, and §11 makes WCAG 2.2 AA binding on the
+kiosk. White on `--upos-accent` is certified for slate and indigo. Teal clears the 4.5:1 floor with
+nothing in hand — 4.72:1 holds for normal text and leaves no margin for a lighter weight.
+**Sky does not clear it at all**, and `--upos-grad-primary` carries the same figure at its accent
+end, so on sky a guest-facing surface fills any white label with `--upos-accent-deep` `#2a5578`
+rather than with `--upos-accent` or the gradient. Part II-D's contrast table restates this for the
+kiosk.
 
 **Gradients are used exactly three ways and no others:**
 
@@ -459,9 +467,13 @@ sheets. Never blur behind a row or card carrying data — it softens the text yo
 to read at speed. The terminal runs one blurred surface at a time: when a scrim is up, the glass top
 bar drops its blur.
 
-**Translucent white** covers segmented tracks, secondary panels and de-emphasized tails, in the
-range `rgba(255,255,255,.7)` to `rgba(255,255,255,.82)`. `.u-segmented` uses `.75`. No token exists
-for it yet (§12).
+**The translucent veil** covers segmented tracks, the glass top bar, secondary panels and
+de-emphasized tails. `--upos-surface-veil` carries it: `rgba(255,255,255,.75)` in light, inside the
+parent's `.7` to `.82` range, and `rgba(238,241,245,.05)` in dark — the on-dark ink at low alpha, the
+same move `--upos-kds-inset` makes. It inverts because a literal white veil over a dark inset leaves
+an inactive `--upos-ink-subtle` label at 1.78:1; the dark value reads 4.97:1 on `--upos-surface-inset`
+and 4.61:1 on `--upos-surface`. A component that writes the literal instead breaks the theming
+contract (§11).
 
 **Edges fade with masks, not with a gradient div** — a scrolling strip is clipped with
 `mask-image: linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent)`.
@@ -756,8 +768,6 @@ Migration:
 
 **What the kit does not cover yet.** These are honest gaps, not oversights to work around silently:
 
-- **No translucent-white token.** `.u-segmented` uses the literal `rgba(255,255,255,.75)`; the
-  parent range is `.7` to `.82`. Add `--upos-surface-veil` when a second consumer needs it.
 - **`.u-toast` reuses `--upos-shadow-modal`.** Right family, heavier than a toast needs. The parent
   ships the value the kit is missing — `--shadow-toast: 0 20px 44px -20px rgba(20,25,31,.9)` in
   `tokens/elevation.css`. Transcribe it as `--upos-shadow-toast` and point `.u-toast` at it.
@@ -2201,9 +2211,16 @@ not on the quantity column, not on a ghost button's label. The pairings that do 
 | --- | --- | --- |
 | `--upos-ink` on `--upos-surface` | 15.9:1 | Every sentence and every name |
 | `--upos-accent-deep` on `--upos-surface` | 9.4:1 | Prices, the combo chip, the savings line |
-| White on `--upos-accent` | 6.3:1 | The merchandising tag, whose fill is flat rather than the gradient |
-| White on `--upos-grad-primary` | 6.3:1 to 9.4:1 | Primary buttons, the attract and done screens |
+| White on `--upos-accent` | 6.29:1 slate · 6.60:1 indigo · 4.72:1 teal · 3.96:1 sky | The merchandising tag, whose fill is flat rather than the gradient |
+| White on `--upos-grad-primary` | 6.29:1 to 9.4:1 on slate; the accent end is the floor, so 4.72:1 on teal and 3.96:1 on sky | Primary buttons, the attract and done screens |
 | `--upos-kds-ink` on `--upos-grad-dark` | 14.2:1 | The promo band and the list rail |
+
+**Two of the four accents do not hold white text on this surface** (§3). Slate and indigo are
+certified; teal at 4.72:1 clears the floor with nothing in hand; **sky at 3.96:1 fails it**. A kiosk
+running sky fills every white label — the merchandising tag, the primary buttons, the attract and
+done screens — with `--upos-accent-deep` `#2a5578` at 7.9:1 rather than with `--upos-accent` or
+`--upos-grad-primary`. The accent is per-venue branding (§11), so this is a rule the venue's accent
+picks, not one a screen picks.
 
 WCAG 2.2's target-size minimum is 24×24 (2.5.8) and this surface clears it two and a half times over.
 
@@ -2537,8 +2554,8 @@ options in `--upos-ink-subtle`; hover on an inactive option, pointer surfaces on
 (`EVENLY` · `BY SEAT`), Menu manager (the plate-view tabs and the `REQUIRED` · `OPTIONAL` ·
 `NO / REMOVE` row), Kiosk flow (the grid and list toggle).
 **Notes:** terminal call sites pass `MinHeight` 48 to reach `--upos-touch-terminal`, against the
-artboard's 25–33px (Table drawer). The track is the literal `rgba(255,255,255,.75)`; there is no
-translucent-white token yet, and §12 says to add `--upos-surface-veil` when a second consumer needs one.
+artboard's 25–33px (Part II-A's preamble). The track is `--upos-surface-veil`, which inverts on dark
+rather than staying white, so an inactive option holds contrast on a dark theme (§7).
 **The KDS station strip is not this component** — it pages with paddles and carries per-station counts
 and a late dot, and Station board specs it whole. `UposSwitch` is its two-state cousin, the last
 block below.

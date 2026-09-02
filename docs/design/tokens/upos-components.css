@@ -58,9 +58,11 @@
   border-radius:var(--upos-radius-pill); background:var(--upos-status-late); color:#fff;
   font:800 11px/1 Archivo,system-ui,sans-serif; letter-spacing:.05em; }
 
-/* Segmented control — translucent white track on a pill, per "Transparency and blur" */
+/* Segmented control — the translucent veil on a pill, per "Transparency and blur".
+   --upos-surface-veil moves with the theme; a literal rgba(255,255,255,.75) here
+   would leave an inactive option at 1.78:1 on a dark board. */
 .u-segmented { display:inline-flex; gap:4px; padding:4px; border-radius:var(--upos-radius-pill);
-  background:rgba(255,255,255,.75); box-shadow:var(--upos-shadow-card); }
+  background:var(--upos-surface-veil); box-shadow:var(--upos-shadow-card); }
 .u-segmented__opt { display:inline-flex; align-items:center; justify-content:center; padding:7px 16px;
   border:none; border-radius:var(--upos-radius-pill); background:transparent; color:var(--upos-ink-subtle);
   font:700 12px/1 Archivo,system-ui,sans-serif; cursor:pointer;

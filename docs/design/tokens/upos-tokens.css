@@ -12,6 +12,7 @@
   --upos-surface: #ffffff;
   --upos-surface-inset: #f4f7fa;
   --upos-surface-hover: #f2f6fa;
+  --upos-surface-veil: rgba(255,255,255,.75); /* translucent veil: segmented track, glass top bar */
   --upos-border: #e3e7ec;
   --upos-panel-dark: #20262e;
   --upos-grad-dark: linear-gradient(168deg,#20262e,#171c22);
@@ -29,6 +30,7 @@
   --upos-accent-deep: #22496a;
   --upos-grad-primary: linear-gradient(135deg,var(--upos-accent),var(--upos-accent-deep));
   --upos-grad-bar: linear-gradient(90deg,#6fa3cf,#2a5578);
+  --upos-grad-bar-v: linear-gradient(180deg,#6fa3cf,#2a5578); /* same stops, for a bar that grows upward */
   /* Status */
   --upos-status-new: #33648b;
   --upos-status-fired: #f97316;   --upos-status-fired-text: #d95f06;
@@ -105,6 +107,10 @@
   --upos-surface: #1c2229;
   --upos-surface-inset: #171c22;
   --upos-surface-hover: #20262e;
+  /* The veil inverts on dark: the on-dark ink at low alpha, the same move
+     --upos-kds-inset makes. At .05 an inactive --upos-ink-subtle option reads
+     4.97:1 over --upos-surface-inset and 4.61:1 over --upos-surface. */
+  --upos-surface-veil: rgba(238,241,245,.05);
   --upos-border: #2a323b;
   --upos-ink: #eef1f5;
   --upos-ink-subtle: #8b95a1;
