@@ -491,10 +491,14 @@ bar drops its blur.
 **The translucent veil** covers segmented tracks, the glass top bar, secondary panels and
 de-emphasized tails. `--upos-surface-veil` carries it: `rgba(255,255,255,.75)` in light, inside the
 parent's `.7` to `.82` range, and `rgba(238,241,245,.05)` in dark — the on-dark ink at low alpha, the
-same move `--upos-kds-inset` makes. It inverts because a literal white veil over a dark inset leaves
-an inactive `--upos-ink-subtle` label at 1.78:1; the dark value reads 4.97:1 on `--upos-surface-inset`
-and 4.61:1 on `--upos-surface`. A component that writes the literal instead breaks the theming
-contract (§11).
+same move `--upos-kds-inset` makes. It inverts because a white veil in dark theme puts near-white ink
+on a near-white track — an inactive segmented label lands at 1.3:1 — while the inverted value carries
+it at 6.3:1. A component that writes the literal instead breaks the theming contract (§11).
+
+**A label on the veil takes `--upos-ink` at `.66`, not `--upos-ink-subtle`.** The veil composites
+toward white in light theme, and `--upos-ink-subtle` on it reads 3.0:1, the same failure §11 rules
+out for a destructive control's label. The opacity step reads 5.3:1 in light and 6.3:1 in dark from
+one declaration, because `--upos-ink` flips with the theme and the veil flips under it (§3, §12).
 
 **Edges fade with masks, not with a gradient div** — a scrolling strip is clipped with
 `mask-image: linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent)`.
@@ -805,7 +809,13 @@ Migration:
   ships the value the kit is missing — `--shadow-toast: 0 20px 44px -20px rgba(20,25,31,.9)` in
   `tokens/elevation.css`. Transcribe it as `--upos-shadow-toast` and point `.u-toast` at it.
 - **Two ink steps only.** `--upos-ink` and `--upos-ink-subtle`; use opacity on `--upos-ink` for
-  anything between them.
+  anything between them. **`--upos-ink-subtle` is a quiet step, not an accessible one** — it reads
+  3.0:1 on white and fails AA at every size the product uses, which is why §11 forces a destructive
+  control's label to `--upos-ink` and why `.u-segmented__opt` does the same. The kit ships one
+  intermediate step and it is that opacity: an inactive segmented option is `--upos-ink` at `.66`,
+  which reads **5.3:1 in light and 6.3:1 in dark**, against `--upos-ink-subtle`'s 3.0:1 and 4.61:1
+  on the same track. Reach for the same step wherever quiet text is still text somebody has to read;
+  `--upos-ink-subtle` keeps the labels and meta lines nobody has to act on.
 - **The on-dark status tokens are named `--upos-kds-status-*`** but apply to every dark surface
   (§4). Read the name as "on dark", not "kitchen only".
 - **`.upos-kds` is a scope marker by convention.** It has no rule of its own; the KDS tokens sit on
@@ -2623,13 +2633,16 @@ pill has nothing to bind to (GAP-12).
 **Props:** `Options` (IReadOnlyList<string>), `Selected` (string), `OnSelect` (EventCallback<string>),
 `MinHeight` (int?, px).
 **States:** exactly one option active, on `--upos-surface` with `--upos-shadow-card`; the inactive
-options in `--upos-ink-subtle`; hover on an inactive option, pointer surfaces only.
+options in `--upos-ink` at `.66`; hover on an inactive option, pointer surfaces only.
 **Consumed by:** Item info modal (`PLATING` · `STACK`), Table drawer (`NOW` · `+5M` · `+10M`), Payment
 (`EVENLY` · `BY SEAT`), Menu manager (the plate-view tabs and the `REQUIRED` · `OPTIONAL` ·
 `NO / REMOVE` row), Kiosk flow (the grid and list toggle).
 **Notes:** terminal call sites pass `MinHeight` 48 to reach `--upos-touch-terminal`, against the
 artboard's 25–33px (Part II-A's preamble). The track is `--upos-surface-veil`, which inverts on dark
-rather than staying white, so an inactive option holds contrast on a dark theme (§7).
+rather than staying white (§7). **An inactive option is a tappable choice, not a disabled control, so
+it owes AA like any other label**: it takes `--upos-ink` at `.66` — 5.3:1 in light, 6.3:1 in dark —
+rather than `--upos-ink-subtle`, which fails at 3.0:1 on the light track. That is §12's one
+intermediate ink step, and it is the same ruling §11 makes for a destructive control's label.
 **The KDS station strip is not this component** — it pages with paddles and carries per-station counts
 and a late dot, and Station board specs it whole. `UposSwitch` is its two-state cousin, the last
 block below.

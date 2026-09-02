@@ -57,14 +57,19 @@
 
 /* Segmented control — the translucent veil on a pill, per "Transparency and blur".
    --upos-surface-veil moves with the theme; a literal rgba(255,255,255,.75) here
-   would leave an inactive option at 1.78:1 on a dark board. */
+   would leave an inactive option at 1.78:1 on a dark board.
+   An inactive option is a tappable choice, not a disabled control, so it owes
+   AA: --upos-ink at .66 rather than --upos-ink-subtle, which is the opacity step
+   handbook §3 and §12 prescribe between the kit's two ink tokens. Shipped
+   5.3:1 in light and 6.3:1 in dark, against --upos-ink-subtle's 3.0:1 and
+   4.61:1. The active option is unchanged: full --upos-ink on --upos-surface. */
 .u-segmented { display:inline-flex; gap:4px; padding:4px; border-radius:var(--upos-radius-pill);
   background:var(--upos-surface-veil); box-shadow:var(--upos-shadow-card); }
 .u-segmented__opt { display:inline-flex; align-items:center; justify-content:center; padding:7px 16px;
-  border:none; border-radius:var(--upos-radius-pill); background:transparent; color:var(--upos-ink-subtle);
+  border:none; border-radius:var(--upos-radius-pill); background:transparent; color:var(--upos-ink); opacity:.66;
   font:700 12px/1 Archivo,system-ui,sans-serif; cursor:pointer;
-  transition:background var(--upos-dur-fast) var(--upos-ease), color var(--upos-dur-fast) var(--upos-ease); }
-.u-segmented__opt.is-active { background:var(--upos-surface); color:var(--upos-ink); box-shadow:var(--upos-shadow-card); }
+  transition:background var(--upos-dur-fast) var(--upos-ease), opacity var(--upos-dur-fast) var(--upos-ease); }
+.u-segmented__opt.is-active { background:var(--upos-surface); opacity:1; box-shadow:var(--upos-shadow-card); }
 
 /* Switch — the segmented control's two-state cousin, for a setting rather than a
    view. 50x28 track carrying a 22px knob that slides 3px -> 25px; the knob is
