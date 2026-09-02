@@ -2383,8 +2383,9 @@ surfaces read the same library — the terminal in `Restaurant.Mobile`, the back
 Twenty-five components. Three exist in the POC and are restyled onto the kit; twenty-two are new,
 and between them they consume every class in `upos-components.css`. **Nothing else in Part II is a
 component.** The AI insight banner, the promo band, the concept and bag bars, the KDS station strip,
-the report bars and the plate-stack builder are screen-level markup over the same tokens, and their
-screen specs are their whole definition.
+the report bars, the plate-stack builder, the Integrations channel row with its accent icon tile, and
+the kiosk suggestion strip with its three cards are screen-level markup over the same tokens, and
+their screen specs are their whole definition.
 
 **Naming follows §12.** Five primitives take the `Upos*` prefix, because their bare names would
 collide with a BCL or Blazor type — `UposButton`, `UposIconButton`, `UposModal`, `UposDrawer` and
@@ -2437,7 +2438,7 @@ here and the kit had no recipe for it. `.u-switch` now ships in `upos-components
 | `TipPad` | `.u-tip-btn`, `.is-selected` | Payment | New |
 | `TenderTile` | `.u-tender-tile`, `.is-selected` | Payment · Offline behavior | New |
 | `ChitCard` | `.u-chit`, `.u-chit__timer`, `.u-chit__timer--late`; composes `.u-badge-channel`, `.u-chip-allergen` | Station board · Chit anatomy · Chit actions · KDS data contract | New |
-| `ChannelBadge` | `.u-badge-channel` | Channels queue · Chit anatomy · Integrations | New |
+| `ChannelBadge` | `.u-badge-channel` | Channels queue · Chit anatomy | New |
 | `OfflinePill` | `.u-pill-offline` | Order entry · Offline behavior | New |
 | `UposSwitch` | `.u-switch`, `.is-on` | Integrations · Modifier modal | New |
 
@@ -2566,7 +2567,12 @@ chip and its options), Kiosk flow (the merchandising tag and the combo chip).
 **Notes:** `.u-pill` is the neutral tag. Anything carrying a status word is a `StatusChip` and anything
 carrying an allergen is an `AllergenChip`, because the four hues and the violet are reserved (§4, §5).
 Padding is `--upos-space-pad-pill` at the call site; a tappable pill clears `--upos-touch-terminal` on
-the terminal and `--upos-touch-kiosk` on the kiosk. The loyalty pill has nothing to bind to (GAP-12).
+the terminal and `--upos-touch-kiosk` on the kiosk. **The kiosk merchandising tag overrides the recipe
+outright** — `--upos-accent` fill under white 800/14px `.1em`, against `.u-pill`'s inset fill and
+700/11px ink — the same kind of call-site restyle `SideNav` makes of `.u-nav-item`, and it is
+disclosed here rather than folded into the recipe (Kiosk flow). On a venue running sky that fill goes
+`--upos-accent-deep`, because white on sky does not clear AA (§3, Guest-facing rules). The loyalty
+pill has nothing to bind to (GAP-12).
 
 #### SegmentedControl
 
@@ -2588,7 +2594,7 @@ block below.
 #### StatCard
 
 **Classes:** `.u-stat-card`.
-**Props:** `Label` (string), `Value` (string, formatted upstream), `Comparison` (string?),
+**Props:** `Label` (string), `Value` (string, formatted upstream), `Comparison` (RenderFragment?),
 `ComparisonTone` (StatusTone?, null for `--upos-ink-subtle`), `Fill` (SurfaceFill: `Ground` · `Panel`).
 **States:** with or without a comparison line; ready-green when the figure beats its comparison,
 fired-orange when it misses a target, `--upos-ink-subtle` when it is neither; the empty day, where the
@@ -2597,9 +2603,11 @@ value reads `$0` or `0`.
 **Notes:** **`Fill` is the ruling Part II-B's preamble makes.** The kit ships `--upos-surface` plus
 `--upos-shadow-card`, which is right for a card on the ground and wrong for one inside the white panel,
 where §2's ladder puts blocks on `--upos-surface-inset` with no shadow. `Ground` is the kit recipe
-unchanged; `Panel` overrides the fill and drops the shadow, and it is what the dashboard passes. The
-comparison line is the only colored thing on the card and takes the text tokens, never the fills; the
-value never takes a status color (§4). Nothing on this card is interactive.
+unchanged; `Panel` overrides the fill and drops the shadow, and it is what the dashboard passes. **`Comparison`
+is a fragment rather than a string** because the dashboard's line opens with a direction arrow drawn
+as an inline SVG — §9's permitted glyphs carry no `↑`, so the arrow cannot be a character in a string
+(Dashboard). The comparison line is the only colored thing on the card and takes the text tokens,
+never the fills; the value never takes a status color (§4). Nothing on this card is interactive.
 
 #### DataRow
 
@@ -2619,7 +2627,8 @@ replaces `<table>` in the Bootstrap migration (§12). On the channels queue the 
 #### UposModal
 
 **Classes:** `.u-modal`, `.u-scrim`; the close control is `.u-modal .u-icon-btn`.
-**Props:** `Title` (string), `Width` (int, px — 380 through 940 across the specs), `MaxHeight` (int?),
+**Props:** `Title` (RenderFragment, plain text at most call sites), `Width` (int, px — 380 through
+940 across the specs), `MaxHeight` (int?),
 `ChildContent` (RenderFragment), `Footer` (RenderFragment?), `Scrim` (ScrimWeight: `Standard` ·
 `Light`), `OnClose` (EventCallback).
 **States:** open or closed; scrolling its own body past `MaxHeight`; the `Light` scrim the floor plan's
@@ -2631,7 +2640,10 @@ warning).
 while it is up the terminal's top bar drops its blur (§7). In the back office it scrims the main panel
 and leaves the sidebar lit, which is what `position:relative` on the panel is for. `Light` is the
 literal `rgba(20,25,31,.45)` today, and §12's rule is that a value with no token gets one, so **add
-`--upos-scrim-light`** rather than writing it in the component. Prefer a modal over navigation, and
+`--upos-scrim-light`** rather than writing it in the component. **`Title` is a fragment** because one
+call site's head is not a line of text: the kiosk combo sheet fills its head with
+`--upos-grad-primary` and stacks a kicker, a 50px headline and a supporting line inside it (Kiosk
+flow). Every other call site passes a string into it. Prefer a modal over navigation, and
 yield where the content does not fit — the kiosk builds an item on a screen rather than over one
 (§11, Kiosk flow).
 
@@ -2782,14 +2794,17 @@ tender flow as their neighbor (Payment).
 **Classes:** `.u-chit`, `.u-chit__timer`, `.u-chit__timer--late`; composes `<ChannelBadge>` and
 `<AllergenChip>`, both on their dark pairings, all inside the `.upos-kds` scope.
 **Props:** `Order` (OrderDto), `Lines` (IReadOnlyList<OrderItemDto>), `Station` (string?, null on an
-expo chit), `Now` (DateTime), `WarnAfter` (TimeSpan), `LateAfter` (TimeSpan), `Rush` (bool), `Struck`
-(IReadOnlyList<int>, client state), `Armed` (bool), `OnStrike` (EventCallback<int>), `OnBump`
-(EventCallback<int>).
+expo chit), `LineStations` (IReadOnlyList<string>?, the station that owes each line — expo chits
+only), `LinesUp` (IReadOnlyList<int>, the lines whose station has bumped them), `Now` (DateTime),
+`WarnAfter` (TimeSpan), `LateAfter` (TimeSpan), `Rush` (bool), `Struck` (IReadOnlyList<int>, client
+state), `Armed` (bool), `OnStrike` (EventCallback<int>), `OnBump` (EventCallback<int>).
 **States:** nothing started · some items struck · every item struck, and on an expo chit every station
 up and waiting to be bagged. The timer bands are `--upos-kds-ink` under `WarnAfter`,
 `--upos-status-fired` between, and `.u-chit__timer--late` pulsing `fl-pulse` past `LateAfter`, with
 the 5px status edge following. The bump bar is live (`BUMP`), refusing (`WAITING`) or bagging (`BAG IT`).
 `Armed` outlines the whole card 2px `--upos-accent` under plate view and suspends every other tap.
+An expo line carries two more marks: its station from `LineStations`, at the 10px label class in
+`--upos-kds-ink` at `.72`, and `UP` on `--upos-kds-status-ready` once that line is in `LinesUp`.
 **Consumed by:** Station board, Chit anatomy, Chit actions, KDS data contract.
 **Notes:** **both thresholds are per-station configuration**, derived on every tick and never stored —
 no endpoint returns an elapsed value or a late flag (§4). The 10px radius is the product's one square-ish
@@ -2798,6 +2813,9 @@ exception and it lives here, under `.upos-kds` (§7). The board restyle is decla
 badge on `--upos-kds-inset-hover`, because the kit's light pairing does not hold contrast there. The bump
 bar runs 56px at the full chit width so a gloved hand cannot fire the wrong ticket (§11), and a bump
 writes the whole order's status, so per-station progress stays client state until expo closes it.
+**`LineStations` and `LinesUp` are what the expo chit draws its two marks from**, and both arrive as
+parameters for the same reason: no station sits on `OrderItem` and no endpoint returns a per-station
+bump, so the parent holds them (Chit anatomy, Chit actions).
 
 #### ChannelBadge
 
@@ -2807,10 +2825,13 @@ writes the whole order's status, so per-station progress stays client state unti
 **States:** pill on light, `--upos-surface-inset` under `--upos-ink-subtle`; a 34px circle carrying the
 code in white 800/11px on the channel's own color (Channels queue); on dark, `--upos-kds-inset-hover`
 under `--upos-kds-ink` (Chit anatomy).
-**Consumed by:** Channels queue, Chit anatomy, Integrations.
+**Consumed by:** Channels queue, Chit anatomy.
 **Notes:** **`Color` is the split Part II-B's Integrations spec calls out.** Per-channel color exists on
 the terminal's queue and nowhere else today: either the integrations rows carry the same colors or both
-surfaces stay neutral, and the difference is not to be split. Nothing behind it binds — `Order` has no
+surfaces stay neutral, and the difference is not to be split. **Integrations is not a consumer of this
+component** — its rows draw a 38px `--upos-radius-inset` icon tile filled `--upos-accent` with an 18px
+white glyph, not a badge pill, and that tile is screen-level markup (Part II-B). If the split resolves
+toward color, this is the component the row would take. Nothing behind it binds — `Order` has no
 channel or order type, so the name, the code and the color are literals (GAP-04). **It never reaches the
 kiosk**: no channel badge is guest-facing (Guest-facing rules).
 
