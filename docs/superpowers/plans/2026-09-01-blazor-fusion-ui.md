@@ -463,3 +463,166 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 - Scope is the agreed foundation plus the Menu manager. The Dashboard's KPI strip, Integrations, Reports and the terminal preview are deliberately out — Home says so on the page rather than implying they are coming.
 - Task 4 fixes a real defect (the availability filter) rather than working around it, because the design cannot work otherwise and the fix is backward-compatible.
 - Every gapped feature is rendered as a marked placeholder in its designed position. That is the honest way to answer "what effect would this have" without pretending the schema is further along than it is.
+
+---
+
+# Addendum · The Dashboard (Tasks 7-8)
+
+Added 2026-09-02 at the project owner's request, after Tasks 1-6 shipped the foundation and the Menu manager.
+
+**Goal:** build the back-office Dashboard to the handbook's Part II-B spec, backed by a real aggregation
+endpoint rather than invented figures.
+
+**What the data supports — verified against the models, not assumed:**
+
+| Dashboard element | Computable? | From |
+| --- | --- | --- |
+| Net sales | Yes | `Order.TotalAmount` over a period |
+| Average ticket | Yes | net sales / order count |
+| Order count | Yes | `Order` rows in the period |
+| Sales by daypart | Yes | `Order.CreatedAt` bucketed by hour |
+| Top items | Yes | `OrderItem` grouped by `MenuItemId` |
+| **Covers** | **No** | there is no guest count on `Order` anywhere in the model — **GAP-07** |
+| **Labor %** | **No** | no employee, shift or wage model — **GAP-09** |
+| **Comps flagged for review** | **No** | no comp record; `OrderStatus.Cancelled` voids a whole order, not lines — **GAP-08** |
+
+So two of the design's four KPI tiles carry real numbers and two are blocked. Render the blocked two in
+position with their gap cited, exactly as the Menu manager does. Do not substitute a different metric to
+fill the slot, and do not quietly drop the tile.
+
+---
+
+### Task 7: Dashboard aggregation, end to end
+
+**Files:**
+- Create: `src/Restaurant.Shared/Models/Dtos/DashboardDto.cs`
+- Create: `src/Restaurant.Api/Controllers/ReportsController.cs`
+- Modify: `src/Restaurant.UI.Shared/Services/RestaurantApiService.cs`
+- Create: `src/Restaurant.UI.Shared/Services/DashboardDataSource.cs`
+- Create: `src/Restaurant.UI.Shared/Services/SeedDashboardData.cs`
+- Modify: `src/Restaurant.Blazor/Program.cs`
+
+**Interfaces:**
+- Produces: `DashboardDto` (`NetSales` decimal, `OrderCount` int, `AverageTicket` decimal, `Dayparts`
+  `List<DaypartSliceDto>` of `Name`/`Sales`/`OrderCount`, `TopItems` `List<TopItemDto>` of
+  `MenuItemId`/`Name`/`QuantitySold`/`Sales`, `From`/`To` DateTime); `GET /api/reports/dashboard`;
+  `RestaurantApiService.GetDashboardAsync(DateTime? from, DateTime? to)`; and
+  `DashboardDataSource.GetAsync()` plus `bool IsLive`. Task 8 binds to `DashboardDataSource` and nothing else.
+
+- [ ] **Step 1: The DTO**
+
+One file, plain properties, no logic. Dayparts are named `Breakfast`, `Lunch`, `Dinner`, `Late night`,
+matching the handbook's chart. Money is `decimal`.
+
+- [ ] **Step 2: The endpoint**
+
+New `ReportsController` at `api/[controller]`, following `MenuController`'s existing shape — constructor
+injection of `RestaurantDbContext`, `[HttpGet]`, `ActionResult<T>`, async EF queries.
+
+`GET /api/reports/dashboard?from=&to=` — when `from`/`to` are omitted, default to the current calendar day
+in UTC (`DateTime.UtcNow.Date` to `.AddDays(1)`), and say so in a comment: the business day is a real
+configuration concern that needs a venue to hang off, which is GAP-13, so UTC midnight is a stated stand-in
+rather than a decision.
+
+Exclude `OrderStatus.Cancelled` from every figure — a voided order is not sales. State that in a comment.
+Group dayparts by `CreatedAt.Hour`: breakfast under 11, lunch 11 to 16, dinner 16 to 22, late night
+otherwise. Do the grouping in memory after a single filtered query rather than four round trips.
+
+Return zeros and empty lists for a period with no orders — never null, so the client needs no null dance.
+
+- [ ] **Step 3: Client method**
+
+Add to `RestaurantApiService` in its existing style. Build the query string only for the parameters that
+were supplied.
+
+- [ ] **Step 4: `SeedDashboardData` and `DashboardDataSource`**
+
+Mirror `MenuDataSource` exactly — it is the established pattern in this codebase and Task 8's honesty
+banner depends on the same contract. Read it before writing this.
+
+Specifically: fall back only on connection-level failure (`HttpRequestException` **with a null
+`StatusCode`**, and `TaskCanceledException`); let a 500 propagate; `IsLive` describes the data on screen,
+not the last call. The seed figures should look like a plausible mid-size service so the chart and the
+top-items list have shape — state in a comment that they are invented for design-time rendering and are
+not derived from anything.
+
+- [ ] **Step 5: Register and build**
+
+Register `DashboardDataSource` scoped in `Program.cs` beside `MenuDataSource`.
+
+```bash
+cd /c/Users/h_ozs/UPOS/poc && export PATH="/c/Program Files/dotnet:$PATH"
+dotnet build src/Restaurant.Blazor/Restaurant.Blazor.csproj -v q --nologo
+dotnet build src/Restaurant.Api/Restaurant.Api.csproj -v q --nologo
+```
+
+Both must succeed with zero warnings.
+
+- [ ] **Step 6: Verify both paths**
+
+You have no database. Verify the fallback path against the real unreachable address, and verify the live
+path and the 500 path against a stub, the way Task 4 did — its report describes the harness. Report the
+figures returned on each path.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add -A && git commit -m "feat: add the dashboard aggregation endpoint and its client
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
+```
+
+---
+
+### Task 8: The Dashboard screen
+
+**Files:** rewrite `src/Restaurant.Blazor/Components/Pages/Home.razor` (+ a `.razor.css` if needed).
+
+Build to the handbook's Part II-B "Dashboard" spec. It carries, in order: the AI insight banner, the
+heading row, the four-tile KPI strip, then a two-column row of sales-by-daypart and top items, with the
+exception row beneath the top-items list.
+
+- [ ] **Step 1: The AI insight banner**
+
+`--upos-grad-primary` card, kicker `ASK THE BRAIN`, one quoted sentence. Part I §10 is explicit that AI copy
+is **always quoted as a draft, never stated as fact** — and here there is no model behind it at all, so
+label it plainly as a sample of the pattern rather than an insight the system produced. Keep the artboard's
+dismiss/toggle affordance.
+
+- [ ] **Step 2: KPI strip**
+
+Four `StatCard`s in the handbook's order: net sales, labor, covers, average ticket. Net sales and average
+ticket carry real figures from `DashboardDataSource`. Labor and covers render as blocked tiles citing
+GAP-09 and GAP-07 respectively, quiet rather than alarming, saying what they need — matching the Menu
+manager's blocked-panel treatment.
+
+- [ ] **Step 3: Sales by daypart**
+
+Four vertical bars from `Dayparts`, filled with `--upos-grad-bar-v`. §8's `fl-grow` is a `scaleX` keyframe;
+the handbook's own clause says a vertical bar runs the same growth on `scaleY` from
+`transform-origin: bottom` at the call site — do that. Bars scale to the largest slice. Label each with its
+daypart name and value. Respect `prefers-reduced-motion`.
+
+- [ ] **Step 4: Top items and the exception row**
+
+Top items as rows of name plus quantity and sales, tabular numerals. Beneath it, the comps exception row
+from the artboard, rendered blocked citing GAP-08.
+
+- [ ] **Step 5: Honesty line**
+
+When `DashboardDataSource.IsLive` is false, the same quiet seed-data line the Menu manager uses. Read
+`IsLive` after awaiting the load.
+
+- [ ] **Step 6: Build, then verify**
+
+Build clean, then load `/` and check: the KPI strip reads correctly with two real and two blocked tiles;
+the chart bars are proportional and grow from the bottom; top items are ordered by sales; the seed line
+shows; theme and all four accents hold. The controller will click through it.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add -A && git commit -m "feat: build the Dashboard in the Fluid language
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
+```
