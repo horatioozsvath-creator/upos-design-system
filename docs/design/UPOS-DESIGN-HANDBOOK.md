@@ -2553,8 +2553,14 @@ thing a manager came for and the host's own reach is how a row gets added to it.
     `--upos-border`.
   - The detail pane carries the name at 800/18px with its actions on the right, then labeled inset
     blocks in the Menu manager's geometry — `--upos-space-pad-inset` at `--upos-radius-card` under a
-    700/11px `.08em` `--upos-ink-subtle` label. Three blocks: `WHAT IT IS FOR`, `HOW IT IS REACHED`,
-    `TEST PRINT`.
+    700/11px `.08em` `--upos-ink-subtle` label. Reading a row, three blocks: `WHAT IT IS FOR`,
+    `HOW IT IS REACHED`, `TEST PRINT`.
+  - **Adding and editing happen in the detail pane, not in the list.** Six fields do not fit a 320px
+    column without wrapping every label onto its own line, and the pane is already the place a
+    record's fields are read — putting the form somewhere else would mean a person reads a printer in
+    one column and writes it in another. `+ ADD PRINTER` clears the selection and opens the same form
+    the `Edit` action opens, because both write the same fields to the same endpoint and two forms
+    are two places for one validation rule to drift.
   - Empty is a statement (§10): `No printers registered. Add the first one and every terminal can
     find it.`
 - **Panel two · this host's own printer.** The Part II-A · Printer setup screen, reused verbatim with
