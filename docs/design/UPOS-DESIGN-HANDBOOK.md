@@ -65,6 +65,8 @@ All four parts are complete.
     - [Payment](#payment)
     - [Channels queue](#channels-queue)
     - [Offline behavior](#offline-behavior)
+    - [Printer setup](#printer-setup)
+    - [Bag ticket](#bag-ticket)
   - [Part II-B · Back office](#part-ii-b--back-office)
     - [Dashboard](#dashboard)
     - [Menu manager](#menu-manager)
@@ -815,6 +817,41 @@ would be the first one drawn as though it were real, and it would be the one a p
 rule is stated once, here, and Order entry's instrument cluster implements it: **render the reading,
 or render the absence of the reading, and never render a number nobody measured.**
 
+**Printing from a shared component: `IReceiptPrinter` over `IPrinterTransport`.**
+
+The printer is the second reading `Restaurant.UI.Shared` cannot take for itself, and it takes the
+same shape as the first. The library owns two interfaces and neither of them mentions a radio.
+
+- **`IReceiptPrinter`** is what a screen talks to: what is paired, discover, select, forget, print a
+  ticket, print a test label, and a `Changed` event. Its state is one enum — `NoPrinter`, `Searching`,
+  `NotTested`, `Ready`, `Printing`, `Unreachable`, `PaperOut`, `Failed` — and `NotTested` exists for
+  the same reason `IDeviceStatus` returns `double?`: a printer that has been chosen and never talked
+  to is not a working one, and drawing it green would be the battery mistake again.
+- **`IPrinterTransport`** is what carries bytes: enumerate candidate devices, open a connection, write
+  to it, read from it. `Restaurant.Mobile` registers the Bluetooth Classic RFCOMM implementation.
+  **A network printer is a second implementation of this one interface and nothing else changes** —
+  the ticket builder, the screen, the state machine and the command bytes are all above the seam,
+  because a socket is a socket whether the far end is a radio or an IP address.
+- **The ticket is bytes, built by a pure function.** `BagTicket.Build(OrderDto)` takes a DTO and
+  returns `byte[]`. It touches no platform, opens nothing, and is the one part of printing that can
+  be tested without the hardware in the room — which is exactly why it is the part that holds the
+  layout and the command set.
+
+**The command set is Star Line Mode, not ESC/POS.** The TSP143IV supports both, and Star Line is what
+it is in when it comes out of the box: ESC/POS is an emulation reached by changing a memory switch on
+the printer, which makes it a step somebody has to perform on the hardware before one byte of this
+works, and a step nobody performs on the replacement unit two years later. The two differ in more
+than dialect — alignment is `ESC GS a n` in Star Line and `ESC a n` in ESC/POS, emphasis is `ESC E` /
+`ESC F` rather than `ESC E n`, and the cut is `ESC d n` — so the choice has to be made once and held.
+Every command byte in the build sits in one file with its name beside it, so a byte that turns out
+wrong is corrected in one place without touching a line of layout.
+
+**The back office registers the printer that says there is no printer.** Same rule as
+`UnknownDeviceStatus`, same reason: a desktop browser has no Bluetooth radio the terminal preview can
+reach, and a preview that drew a plausible printer would be the one placeholder in this product a
+person acts on. It answers `NoPrinter`, discovers nothing, and refuses to print with a sentence
+saying why.
+
 **Bootstrap: remove it.**
 
 Rationale:
@@ -985,8 +1022,9 @@ kitchen and charge.
   and §11's floor for adjacent targets, which the handheld rule leans on. 1px top hairline. Five `.u-nav-item`
   buttons, each `flex:1` capped at 150px, `--upos-radius-inset`, a 17px icon over a 700/10.5px
   label — ORDER · TABLES · PAYMENTS · CHANNELS · MORE. The active destination fills with
-  `--upos-grad-primary` and white ink; the rest are `--upos-ink-subtle` on transparent. MORE is a
-  placeholder in this handoff and renders one statement line.
+  `--upos-grad-primary` and white ink; the rest are `--upos-ink-subtle` on transparent. MORE is the
+  terminal's overflow and now opens Printer setup, which is the one setting this handoff builds; the
+  three destinations between ORDER and MORE are still specced and unbuilt.
 - **Category rail, 170px**, inset fill, right hairline, padding `14px 10px`, 6px gaps. One button per
   category at `--upos-radius-inset`, 700/13px, active on `--upos-grad-primary`.
 - **Item grid**, fills the middle, 22px padding, its own scroll. Above it, right-aligned, the
@@ -1771,6 +1809,171 @@ replay has to honor: a write that reaches the API twice must not produce two ord
 
 - GAP-10 — no offline queue table and no idempotency key on `CreateOrderDto`, so a replayed write can
   double an order.
+
+#### Printer setup
+
+**Purpose.** You pair this terminal with the ticket printer beside it, see whether the pairing still
+works, and print a test label before service rather than during it.
+
+**Where it lives, and why it is not in the back office.** The bottom nav's `MORE` is the terminal's
+overflow destination and carries no built screen in the rest of this handoff. It carries this one.
+The reasoning is about what a Bluetooth bond is: a bond is a fact about one radio and one piece of
+glass. The back office is a browser on a manager's laptop — it cannot enumerate the tablet's bonded
+devices, cannot open an RFCOMM socket from it, and cannot make the printer beside the tablet emit a
+label. A pairing screen that cannot pair is a form, not a screen. So the pairing surface is on the
+device that holds the radio, and `MORE` is where a terminal-level setting goes, because the other
+four destinations are the check, the floor, the tender and the queue and printing is none of them.
+
+The back office's roadmap `Devices` destination is not made redundant by this and is not the same
+screen. It is the venue's record — which terminals exist, which printer each one claims, when each
+was last seen — and it is what a manager reads from a desk to answer "why is counter 2 not printing".
+That record is a new table contradicting nothing in the current schema, which the Employees, Devices,
+Settings (roadmap) spec already rules is additive API work rather than a gap, and the same ruling
+covers it here. **One screen pairs, the other reports.** Neither can do the other's job: a laptop
+cannot pair a tablet's radio, and a tablet cannot tell you about the terminal in the other room.
+
+**Layout.** One column inside the shell, `--upos-space-pad-panel`, 640px maximum measure, centered,
+its own scroll. Four blocks top to bottom, each an inset at `--upos-radius-card` under a 700/11px
+`.08em` `--upos-ink-subtle` label — the Menu manager's block geometry, which this screen inherits
+rather than inventing.
+
+- **Header.** A `MORE · TERMINAL SETUP` kicker in the label class over `Printer` at
+  `--upos-type-display`, then one 400/13px line naming the terminal this pairing belongs to.
+- **The paired printer**, labelled `PAIRED PRINTER`. With a printer paired: its name at 800/18px, its
+  address at `--upos-type-mono` in `--upos-ink-subtle`, a `StatusChip` carrying the connection state
+  (§4's four hues and no fifth), and one `.u-btn--ghost` reading `Forget this printer` with its label
+  forced to `--upos-ink` (§11 — the red arrives on the confirming step, never at rest). With none:
+  the statement `No printer paired. Pick one below and print a test label.` and no chip, because a
+  state nothing is in has no status to show.
+- **Nearby printers**, labelled `PAIRED WITH THIS TABLET`. A `+ SCAN` text button in
+  `--upos-accent-deep` on the block's header row, then `.u-data-row` rows 8px apart, each at least
+  `--upos-touch-terminal` — the device name at 700/13px, its address in the mono role beneath, and
+  the row selected by tapping it. Empty: `Nothing paired yet. Pair the printer in Android settings,
+  then scan.`
+- **Test print**, labelled `TEST PRINT`. One `.u-btn--secondary` at 48px reading `Print a test label`,
+  disabled with no printer selected, and beneath it the result line — one sentence, middot-separated,
+  naming the cause and the next move (§10).
+- **What is not built**, in the blocked treatment: a dashed `--upos-border` inset on
+  `--upos-surface-inset` naming, in `--upos-ink-subtle`, the two things `MORE` will hold that this
+  pass does not build — routing a line to a station's own printer (GAP-06) and the venue's device
+  registry (API work, per the Devices spec).
+
+**States.** Seven, and every one of them is a sentence the screen can actually justify.
+
+| State | What put it there | What the screen says |
+| --- | --- | --- |
+| No printer | Nothing selected, nothing remembered | `No printer paired. Pick one below and print a test label.` |
+| Searching | `SCAN` tapped, the platform enumerating | `Searching` with the list dimmed; the scan control is the only thing disabled |
+| Ready | A printer selected and the last exchange succeeded | The chip reads `READY` in `--upos-status-ready` |
+| Printing | A job on the socket | The chip reads `PRINTING` in `--upos-status-new`; the test control is disabled for the duration |
+| Unreachable | The socket would not open, or the write failed | `Printer unreachable · check it is powered on and in range` in `--upos-status-late-text` |
+| Paper out | The printer answered, and its status said the cover is open or the paper ran out | `Paper out · load a roll and print again` |
+| Failed | Anything else, carrying the platform's own reason | `Could not print · {reason}` |
+
+The screen never renders a green `READY` it has not earned. A printer that has been selected but
+never talked to reads `NOT TESTED` in the neutral chip — §12's rule about the battery, applied to a
+second reading: render the reading, or render the absence of the reading, and never render a state
+nobody measured. A permission the user has not granted is its own line, not an error:
+`Bluetooth permission is off · grant it in Android settings and scan again`.
+
+**Interactions.** `MORE` in the bottom nav opens this screen; `ORDER` returns. Tapping a row selects
+that printer and remembers it, so the pairing survives a restart. `Print a test label` sends one
+label and reports on the same screen, never in a log. Nothing on this screen blocks the UI thread:
+discovery, connection and the write all run off it, and the chip is what moves while they do. Rows
+lift on hover on the preview and not on the device (§8) — the terminal is touch, so the press
+feedback is the ripple tint.
+
+**Data.** Nothing from the API and nothing from the schema. The paired printer's identity is a device
+preference on `Restaurant.Mobile` — an address and a display name — and the connection state is read
+off the transport at the moment it is asked. `MenuItem`, `Table`, `Order` and `OrderItem` describe
+food and checks; none of them describes a peripheral, and none of them should. A venue-wide registry
+of which terminal claims which printer is the `Devices` record above, which is additive API work.
+
+**Gaps.**
+
+- GAP-06 — no station on `OrderItem`, so nothing can route a line to the grill's printer rather than
+  to the bag printer. This screen pairs one printer per terminal and says so.
+- GAP-13 — no venue entity, so the ticket's header has no venue name to carry and does not carry one.
+
+---
+
+#### Bag ticket
+
+**Purpose.** The check leaves the terminal as an adhesive label that goes on the bag, so whoever
+assembles the order knows what is in it and what was asked for.
+
+**This is not a receipt, and the difference is not cosmetic.** A customer receipt states what was
+tendered — subtotal, tax, the tender taken, the change given, the last four of a card. GAP-08 records
+that the POC has no payments domain at all: nothing records how a check settled, and there is no tax
+rule to apply. A receipt printed from this data would be a document making claims about money that
+nothing behind it can support, which is §12's invented battery in paper form. So the terminal prints
+the one artifact its data can honestly produce: what was ordered, when, and what was asked for.
+
+**Layout.** 48 columns at Font A on 80mm stock, which is what the TSP143IV prints unexpanded. The
+stock is linerless — the label is cut and stuck to a bag — so the ticket is as short as it can be and
+its length varies with the check. There is no logo band, no footer rule and no thank-you line; every
+line on the label is a line somebody assembling a bag needs.
+
+```
+                    #482                     <- centered, double height and width, emphasized
+             ORD-20260904-A1B2C3D4           <- centered, the traceable id
+                 14:32  TABLE 12             <- centered, wall time and the table
+------------------------------------------------
+ 2  Ribeye
+    * no garlic, sauce on side
+ 1  Caesar Salad
+------------------------------------------------
+ 3 ITEMS
+```
+
+- **The number is the biggest thing on the label** because it is what a person matches against a bag
+  at arm's length. It is `Order.Id` — the short number the check header already shows as `Order #482`
+  — and the long `Order.OrderNumber` sits under it at normal size for tracing, because
+  `ORD-20260904-A1B2C3D4` at double width is 21 of the 24 available columns and unreadable as an
+  identifier anyway.
+- **A line is `{qty}  {name}`**, wrapped at the column width and indented to the name's own column on
+  a continuation, so a two-line dish still reads as one line item.
+- **`OrderItem.SpecialInstructions` prints under its line**, prefixed `*` and indented, and is
+  **omitted entirely when empty** — a `Notes:` label over nothing is a line that costs label length
+  and says nothing.
+- **The footer is the line count** and nothing else. No subtotal, no tax, no total: see above.
+- **The ticket is ASCII.** Anything outside `0x20`–`0x7E` is transliterated before it reaches the
+  printer — `Crème Brûlée` prints as `Creme Brulee` — and anything with no transliteration prints as
+  `?`. The alternative is choosing a code page and hoping the printer is on it; a label with a
+  mojibake dish name is worse than a label with a plain one. **This is the one place in the product
+  where §10's middot separator does not appear**, because `·` is not ASCII: on the label the
+  separator is whitespace and a rule line.
+
+**States.** The label varies in three ways and no others: its length, with the number of lines; the
+presence of a table line, which is dropped when the order has no table; and the presence of an
+instruction line under any given item. A check with no lines still prints a header and a cut, so a
+mis-tap produces a short label rather than a jam.
+
+**Interactions.** The ticket prints when `SEND ALL TO KITCHEN` succeeds and the terminal has a
+printer, off the `OrderDto` the API returned — which is the first moment the order has a number at
+all. A print failure never blocks or reverses the send: the check reached the kitchen, and the label
+failing to cut does not undo that. It surfaces on the check as one line, `Order #482 · sent · label
+did not print`, with the reason on the printer setup screen.
+
+**Data.** `OrderDto.Id`, `OrderNumber`, `CreatedAt`, `TableNumber`, and per line
+`OrderItemDto.Quantity`, `MenuItemName` and `SpecialInstructions`. That is the whole binding, and
+every field of it exists today. `SpecialInstructions` round-trips through `POST /api/orders` and back
+out of `MapToDto`, so the line is real end to end — **but no screen in this pass collects it**, so in
+practice it prints only for an order written by something that set it. The field is the carrier
+GAP-01 names; what is missing is the modal that fills it, not the column.
+
+**Gaps.**
+
+- GAP-01 — no modifier model, so a build reaches the label as free text or not at all. The `*` line
+  is `SpecialInstructions` and nothing structured sits behind it.
+- GAP-03 — no coursing, so the label is the whole check and cannot be one course of it. A second
+  send prints a second label carrying everything, and nothing marks which lines are new.
+- GAP-04 — no order type or channel, so the label cannot say `DINE IN` or `UBER EATS`, which is the
+  first thing an assembler wants from a bag label.
+- GAP-06 — no station on `OrderItem`, so one label carries every line rather than one per station.
+- GAP-08 — no payments domain, which is why this is a bag ticket and not a receipt.
+- GAP-09 — no employee record, so the label carries no server name.
+- GAP-13 — no venue entity, so the label carries no venue name.
 
 ### Part II-B · Back office
 
@@ -2901,18 +3104,18 @@ here and the kit had no recipe for it. `.u-switch` now ships in `upos-components
 | `MenuItemCard` | composes `.u-chip-allergen`, `.u-chip-status--late` | Order entry · Kiosk flow | Existing · restyle |
 | `OrderCard` | a `DataRow` (`.u-data-row`, `.is-late`) | Channels queue | Existing · restyle |
 | `OrderStatusBadge` | `.u-chip-status`, `.u-chip-status--new`, `.u-chip-status--fired`, `.u-chip-status--late`, `.u-chip-status--ready` | Channels queue | Existing · restyle |
-| `UposButton` | `.u-btn`, `.u-btn--primary`, `.u-btn--secondary`, `.u-btn--ghost` | Order entry · Modifier modal · Floor plan · Table drawer · Payment · Employees, Devices, Settings (roadmap) · Kiosk flow · Guest-facing rules | New |
+| `UposButton` | `.u-btn`, `.u-btn--primary`, `.u-btn--secondary`, `.u-btn--ghost` | Order entry · Printer setup · Modifier modal · Floor plan · Table drawer · Payment · Employees, Devices, Settings (roadmap) · Kiosk flow · Guest-facing rules | New |
 | `UposIconButton` | `.u-icon-btn` | Order entry · Modifier modal · Item info modal · Floor plan · Table drawer · Payment · Menu manager | New |
-| `StatusChip` | `.u-chip-status`, `.u-chip-status--new`, `.u-chip-status--fired`, `.u-chip-status--late`, `.u-chip-status--ready` | Order entry · Table drawer · Channels queue | New |
+| `StatusChip` | `.u-chip-status`, `.u-chip-status--new`, `.u-chip-status--fired`, `.u-chip-status--late`, `.u-chip-status--ready` | Order entry · Printer setup · Table drawer · Channels queue | New |
 | `AllergenChip` | `.u-chip-allergen` | Order entry · Modifier modal · Item info modal · Menu manager · Chit anatomy · Kiosk flow | New |
 | `Pill` | `.u-pill` | Order entry · Modifier modal · Table drawer · Menu manager · Kiosk flow | New |
 | `SegmentedControl` | `.u-segmented`, `.u-segmented__opt`, `.is-active` | Item info modal · Table drawer · Payment · Menu manager · Kiosk flow | New |
 | `StatCard` | `.u-stat-card` | Dashboard | New |
-| `DataRow` | `.u-data-row`, `.is-late` | Channels queue · Employees, Devices, Settings (roadmap) | New |
+| `DataRow` | `.u-data-row`, `.is-late` | Printer setup · Channels queue · Employees, Devices, Settings (roadmap) | New |
 | `UposModal` | `.u-modal`, `.u-scrim` | Modifier modal · Item info modal · Floor plan · Payment · Menu manager · Kiosk flow · Guest-facing rules | New |
 | `UposDrawer` | `.u-drawer` | Table drawer · Payment | New |
 | `Toast` | `.u-toast` | None today — Order entry, Channels queue and Offline behavior each rule one out | New |
-| `BottomNav` | `.u-nav-bottom`, `.u-nav-item`, `.is-active` | Order entry (the shell every terminal destination inherits) | New |
+| `BottomNav` | `.u-nav-bottom`, `.u-nav-item`, `.is-active` | Order entry · Printer setup (the shell every terminal destination inherits) | New |
 | `SideNav` | `.u-nav-item` restyled at the call site | Dashboard · Menu manager · Integrations · Reports · Employees, Devices, Settings (roadmap) | New |
 | `FloorTable` | none of its own — status border, `--upos-shadow-card`, `--upos-radius-card` or `--upos-radius-pill` | Floor plan | New |
 | `CartLine` | composes `.u-qty-stepper`, `.u-icon-btn`, `.u-chip-allergen` | Order entry · Offline behavior · Kiosk flow | New |
@@ -3169,9 +3372,10 @@ status set (§4). `.u-toast` currently reuses `--upos-shadow-modal` — transcri
 **Props:** `Items` (IReadOnlyList<NavItem>: `Key` · `Label` · `Icon`), `Active` (string), `OnNavigate`
 (EventCallback<string>).
 **States:** exactly one destination active, filled `--upos-grad-primary` with white ink; the rest
-`--upos-ink-subtle` on transparent. `MORE` is a placeholder in this handoff and renders one statement
-line.
-**Consumed by:** Order entry — the shell's 78px bottom nav, which every terminal destination inherits.
+`--upos-ink-subtle` on transparent. `MORE` opens Printer setup and is the second of the five
+destinations to be built; `TABLES`, `PAYMENTS` and `CHANNELS` stay inert.
+**Consumed by:** Order entry and Printer setup — the shell's 78px bottom nav, which every terminal
+destination inherits.
 **Notes:** five items, each `flex:1` capped at 150px at `--upos-radius-inset`, a 17px icon over a
 700/10.5px label. **The kit's `.is-active` tints the ink `--upos-accent` and both consumers fill
 instead** — the terminal here, the sidebar in `SideNav` — so the active fill is a call-site override on

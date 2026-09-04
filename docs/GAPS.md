@@ -21,7 +21,13 @@ new ID rather than a renumbering.
 **Pure API work is not tracked here.** Where the fields already exist and only an endpoint is
 missing, the handbook's own Data sections say so and keep it: the dashboard and report aggregations,
 the Menu write endpoints behind the 86 badge and `Add`, a device registry, per-item done flags, and
-the assembly label on `Order`. The KDS data contract names a third item alongside those last two — a
+the assembly label on `Order`. **Ticket printing is on that list too.** The bag ticket binds fields
+that all exist — `OrderDto.Id`, `OrderNumber`, `CreatedAt`, `TableNumber`, and per line `Quantity`,
+`MenuItemName` and `SpecialInstructions` — and the two things it wants and does not have are a record
+of which printer a terminal claims and a record that a label was printed, both of which are new
+tables contradicting nothing in the current model. What printing genuinely cannot say is already
+carried below: a station to route a line to (GAP-06), an order type on the label (GAP-04), a course
+to print rather than the whole check (GAP-03), a server (GAP-09) and a venue (GAP-13). The KDS data contract names a third item alongside those last two — a
 station column on `OrderItem` — as the same kind of additive work; this register carries the
 item-to-station linkage itself as a schema gap under GAP-06, so the two statements stand side by side
 rather than one quietly dropping the other. Those are additive work that contradicts nothing in the
