@@ -21,7 +21,10 @@ new ID rather than a renumbering.
 **Pure API work is not tracked here.** Where the fields already exist and only an endpoint is
 missing, the handbook's own Data sections say so and keep it: the dashboard and report aggregations,
 the Menu write endpoints behind the 86 badge and `Add`, a device registry, per-item done flags, and
-the assembly label on `Order`. **Ticket printing is on that list too.** The bag ticket binds fields
+the assembly label on `Order`. The printer half of that device registry has since been built — the
+`Printer` entity, `/api/printers` and the back office's Printers destination — which is what that
+ruling predicted rather than a change to it. The terminal half is still unbuilt, and what it waits on
+is a terminal identity, which is GAP-13 below and not an endpoint. **Ticket printing is on that list too.** The bag ticket binds fields
 that all exist — `OrderDto.Id`, `OrderNumber`, `CreatedAt`, `TableNumber`, and per line `Quantity`,
 `MenuItemName` and `SpecialInstructions` — and the two things it wants and does not have are a record
 of which printer a terminal claims and a record that a label was printed, both of which are new
@@ -166,8 +169,8 @@ filter are literals and the board cannot decide which chit a line lands on. The 
 in this entry rather than with the order because which station makes an item is a property of how it
 is made.
 
-**Where it bites:** Item info modal · Menu manager · Reports · Station board · Chit actions · KDS
-data contract.
+**Where it bites:** Item info modal · Menu manager · Printers · Reports · Station board · Chit
+actions · KDS data contract.
 
 **Minimal suggestion:** `Recipe` on `MenuItem` → `RecipeComponent` (ingredient, quantity, unit,
 cost), with ordered `PrepStep` rows and plating assets; a `Station` entity with a routing link from
@@ -309,8 +312,8 @@ location, so a second restaurant has nowhere to keep its own. The per-station th
 its tax rate and both its timeouts have no scope to be stored on, and Settings has no scope at all —
 which is why it can be specified but not bound.
 
-**Where it bites:** Dashboard · Integrations · Reports · Employees, Devices, Settings · Station
-board · Guest-facing rules · UposSwitch.
+**Where it bites:** Dashboard · Integrations · Printers · Reports · Employees, Devices, Settings ·
+Station board · Guest-facing rules · UposSwitch.
 
 **Minimal suggestion:** `Organization` → `Location` → `RevenueCenter` → `Device`, with a `Setting`
 keyed by scope so a value can be set once and overridden per location; a location reference on every

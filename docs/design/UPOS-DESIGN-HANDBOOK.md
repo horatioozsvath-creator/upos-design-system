@@ -73,6 +73,7 @@ All four parts are complete.
   - [Part II-B · Back office](#part-ii-b--back-office)
     - [Dashboard](#dashboard)
     - [Menu manager](#menu-manager)
+    - [Printers](#printers)
     - [Integrations](#integrations)
     - [Reports](#reports)
     - [Employees, Devices, Settings (roadmap)](#employees-devices-settings-roadmap)
@@ -2112,13 +2113,20 @@ label. A pairing screen that cannot pair is a form, not a screen. So the pairing
 device that holds the radio, and `MORE` is where a terminal-level setting goes, because the other
 four destinations are the check, the floor, the tender and the queue and printing is none of them.
 
-The back office's roadmap `Devices` destination is not made redundant by this and is not the same
-screen. It is the venue's record — which terminals exist, which printer each one claims, when each
-was last seen — and it is what a manager reads from a desk to answer "why is counter 2 not printing".
-That record is a new table contradicting nothing in the current schema, which the Employees, Devices,
-Settings (roadmap) spec already rules is additive API work rather than a gap, and the same ruling
-covers it here. **One screen pairs, the other reports.** Neither can do the other's job: a laptop
-cannot pair a tablet's radio, and a tablet cannot tell you about the terminal in the other room.
+The back office's two printing destinations are not made redundant by this and are not the same
+screen. [Printers](#printers) is the venue's record of the printers it owns — the name, the job, the
+address — and it is built. `Devices` stays on the roadmap and is the venue's record of its terminals:
+which pieces of glass exist, which registry printer each one claims, when each was last seen, and it
+is what a manager reads from a desk to answer "why is counter 2 not printing". **This screen pairs,
+Printers catalogues, Devices reports.** None can do another's job: a laptop cannot pair a tablet's
+radio, a catalogue cannot know which tablet is using which row, and a tablet cannot tell you about
+the terminal in the other room.
+
+**What this screen chooses stays this tablet's own.** A row in the venue's registry does not
+re-point this terminal, and nothing in the back office does either — the pairing below is stored on
+this device and is changed here or not at all. That is deliberate: a manager silently re-pointing a
+tablet from the office would leave the person holding it with no way to know why the label went
+somewhere else.
 
 **Layout.** One column inside the shell, `--upos-space-pad-panel`, 640px maximum measure, centered,
 its own scroll. Four blocks top to bottom, each an inset at `--upos-radius-card` under a 700/11px
@@ -2143,8 +2151,10 @@ rather than inventing.
   naming the cause and the next move (§10).
 - **What is not built**, in the blocked treatment: a dashed `--upos-border` inset on
   `--upos-surface-inset` naming, in `--upos-ink-subtle`, the two things `MORE` will hold that this
-  pass does not build — routing a line to a station's own printer (GAP-06) and the venue's device
-  registry (API work, per the Devices spec).
+  pass does not build — routing a line to a station's own printer (GAP-06), and reading this
+  tablet's pairing back into the venue's terminal record, which needs the `Devices` destination and
+  a terminal identity (GAP-13). The venue's **printer** registry is built and is
+  [Printers](#printers) in the back office; it lists printers and never sets this tablet's pairing.
 
 **States.** Seven, and every one of them is a sentence the screen can actually justify.
 
@@ -2173,9 +2183,11 @@ feedback is the ripple tint.
 
 **Data.** Nothing from the API and nothing from the schema. The paired printer's identity is a device
 preference on `Restaurant.Mobile` — an address and a display name — and the connection state is read
-off the transport at the moment it is asked. `MenuItem`, `Table`, `Order` and `OrderItem` describe
-food and checks; none of them describes a peripheral, and none of them should. A venue-wide registry
-of which terminal claims which printer is the `Devices` record above, which is additive API work.
+off the transport at the moment it is asked. The venue's `Printer` table exists now and this screen
+still does not read it: a registry row is the venue's record that a printer is owned, and a bond is
+this radio's record that a printer is reachable, and the second is not derivable from the first. What
+does not exist is the record of **which terminal claims which printer**, which is the `Devices`
+destination and needs a terminal identity (GAP-13).
 
 **Gaps.**
 
@@ -2480,6 +2492,151 @@ restores the item's default build.
 - GAP-11 — no stock model, so 86ing an item is a manual flag rather than the consequence of a count
   reaching zero.
 
+#### Printers
+
+**Purpose.** You keep the venue's record of the printers it owns — what each one is called, what it
+is for, and how it is reached — and you prove any one of them prints before service rather than
+during it.
+
+**Where the back office actually runs, and what that costs.** The back office is a browser pointed at
+a central server. It is not hosted on each terminal. `Restaurant.Blazor` is Blazor Server, so the C#
+behind this screen executes in the ASP.NET process, and every peripheral this screen can touch is a
+peripheral of **that one machine** — not of the laptop the manager is reading on, and not of the
+tablet on the counter.
+
+That has a plain consequence worth stating before anybody is surprised by it: **a Bluetooth scan run
+from the back office in production will usually find nothing, and that is correct behaviour.** A
+central server sits in a rack or an office; the printer is fifty metres away behind the pass, and
+Bluetooth Classic does not travel. The server-side Bluetooth transport stays in the product because
+it is the right answer for a venue that self-hosts on the counter PC beside its printer, and because
+it reports honestly when the host has no radio. **In production, the network transport is the one
+that matters.** A network printer is reachable from anywhere on the venue LAN, which is exactly what
+a central server is. So the screen names whose radio and whose network it is speaking for, in a line,
+above the list — and the empty Bluetooth result reads as a fact about the host rather than as a fact
+about the room.
+
+**Printers and `Devices` are two destinations, and this is the line between them.** The registry
+below is a list of **printers**: things at an address, with a job, that a venue owns. `Devices`
+remains a roadmap destination and narrows to **terminals**: things that hold a session, that somebody
+signs into, that have a last-seen heartbeat, and that each claim one printer out of this registry.
+The two nouns have nothing in common except the word *hardware*, and one screen holding both would
+be a list where half the rows have a battery and an operator and half have a paper roll.
+
+**Neither screen can do the other's job, and there are three of them, not two:**
+
+| Screen | Whose list | What it answers |
+| --- | --- | --- |
+| Terminal · **Printer setup** (Part II-A) | This tablet's | Which printer does this piece of glass print to, and does the bond still work |
+| Back office · **Printers** (here) | The venue's | Which printers does this venue own, what is each one for, and does that one print |
+| Back office · **Devices** (roadmap) | The venue's terminals | Which terminals exist, which registry printer each claims, when each was last seen |
+
+**The registry does not choose a printer for anybody.** That is the distinction this whole spec turns
+on. A row here says the venue owns a printer called `Kitchen` at `192.168.1.50:9100` whose job is
+kitchen chits. It does not say that counter 2 prints to it. **Which printer a device prints to stays
+the device's own choice, stored on the device** — `IPrinterPreference` on the terminal, and the
+selection on the host serving this page. A registry that also set the per-device selection would be
+a manager in the office silently re-pointing a tablet on the floor, and the tablet would have no way
+to say so. Reading those per-device choices back into one venue-wide view is the `Devices`
+destination, and it needs a terminal identity that does not exist yet (GAP-13).
+
+**Layout.** Two panels stacked in the rail layout, in this order, because the venue's record is the
+thing a manager came for and the host's own reach is how a row gets added to it.
+
+- **Panel one · the registry.** The Employees, Devices, Settings geometry, which this inherits rather
+  than invents: a **320px list column** with a right hairline and its own scroll, and a detail pane
+  filling the rest at `24px 28px` with 16px gaps.
+  - The list header is `16px 24px` above a hairline carrying `Printers · {n}` at 800/14px with one
+    bare `+ ADD PRINTER` text button in `--upos-accent-deep`.
+  - Rows are `.u-data-row` 8px apart — the printer's name at 700/13px, its address in the mono role
+    beneath, and a `Pill` carrying the role. A printer marked out of service carries
+    `--upos-status-late` on the row border (§4) and an `OUT OF SERVICE` pill; every other row keeps
+    `--upos-border`.
+  - The detail pane carries the name at 800/18px with its actions on the right, then labeled inset
+    blocks in the Menu manager's geometry — `--upos-space-pad-inset` at `--upos-radius-card` under a
+    700/11px `.08em` `--upos-ink-subtle` label. Three blocks: `WHAT IT IS FOR`, `HOW IT IS REACHED`,
+    `TEST PRINT`.
+  - Empty is a statement (§10): `No printers registered. Add the first one and every terminal can
+    find it.`
+- **Panel two · this host's own printer.** The Part II-A · Printer setup screen, reused verbatim with
+  its back-office copy — the transport rows, the host note, the scan, the typed address and the test
+  label. It is the same component the terminal renders, for the reason that spec gives: every state
+  on it is one a transport can prove, and a second copy would be a second place to keep seven states
+  honest in.
+
+**Adding a printer from a scan.** The add form takes a name, a role, a transport and an address, and
+above those it offers **what the scan below found** as a prefill: pick a discovered printer and the
+transport and address fill in, leaving you the name and the role — the two things only a person
+knows. Discovery is not rebuilt for this screen. It is the same `IReceiptPrinter.Found` list panel
+two renders, read from the same host.
+
+**States.** Seven, and each is one the screen can account for.
+
+| State | What put it there | What the screen says |
+| --- | --- | --- |
+| Loading | The registry is being read | `Reading the venue's printers.` and no list |
+| Unreachable | The API did not answer | `The printer registry is unreachable · check the API is running, then reload` — and **no rows**, because a registry that cannot be read has no contents to imply |
+| Empty | The API answered with nothing | `No printers registered. Add the first one and every terminal can find it.` |
+| Loaded, none selected | Rows, no detail | The detail pane carries the empty statement |
+| Editing | A row in edit, or the add form open | The save control is live; nothing else changes |
+| Rejected | The API refused the write | The server's own sentence — a duplicate address, a missing name, an address that will not parse — naming what is wrong and what to correct |
+| Confirming removal | `Remove` pressed | The consequence in `--upos-status-late-text` (§11), with the printer's name in it |
+
+**No row on this screen is ever drawn as working.** A registry row is a record that a venue owns a
+printer, which is a different claim from the printer being switched on: the record survives the power
+cut and the printer does not. So a row carries its role and its address and no connection state, and
+the only thing that says a printer answers is the test label — which reports on the row it was fired
+from, in the seven states Part II-A already defines, and never as a stored flag.
+
+**Interactions.** Pick a row to load its detail. `+ ADD PRINTER` opens the form at the top of the
+list. `Edit` turns the detail blocks into fields; `Save` writes and `Cancel` restores. `Remove` takes
+`.u-btn--ghost` at rest with its label at `--upos-ink`, and the red arrives only on the confirming
+step (§11). `Print a test label` in the detail sends one label to **that** printer and reports
+beside the control — it does not change what this host or any terminal prints to, and the screen
+says so. Rows lift on hover and the detail rises with `fl-rise`.
+
+**Data.** `Printer` — a new entity, and the first schema change in this body of work.
+
+| Field | Why it is here |
+| --- | --- |
+| `Id` | Surrogate key, the convention every other model already uses |
+| `Name` | What a person calls it. `Kitchen`, `Bar`, `Front counter`. The only field a human matches a row against at a glance |
+| `Role` | **What it is for** — `Receipts`, `Kitchen`, `Bar`, `Labels`. A venue with three printers tells them apart by job, not by address. This is the field routing will read when GAP-06 closes |
+| `Transport` | `Network` or `Bluetooth`. The address is unreadable without it: `192.168.1.50:9100` and `00:11:62:4C:58:5D` are parsed by different code and dialled by different stacks |
+| `Address` | Host and port, or MAC. What the transport connects to |
+| `IsActive` | Whether the venue is using it today. A printer out for repair on Monday should not need its address retyped on Friday, and deleting the row is the wrong tool for a week |
+| `CreatedAt`, `UpdatedAt` | `MenuItem`'s convention, and the only way to answer "when did this change" |
+
+**What is deliberately not on it.** No connection state and no last-seen time: both are claims about
+right now that a table cannot honestly hold, and a green row read off a database is §12's invented
+battery in a third costume. No `Location` string: the name already carries where it is, and a second
+free-text field for the same fact is two things to keep in step. No terminal reference: that is the
+per-device selection and it belongs to the device (above).
+
+**Endpoints.** `GET /api/printers` (`?includeInactive=true` to see the ones out of service),
+`GET /api/printers/{id}`, `POST /api/printers`, `PUT /api/printers/{id}`, `DELETE /api/printers/{id}`,
+bound through `PrinterDto` and `RestaurantApiService`. `Transport` and `Address` together are unique:
+a registry whose purpose is to be the venue's one record of a printer must not hold two records of
+one printer, and a duplicate is refused with a sentence naming the row it collides with. A printer
+that genuinely serves two jobs is a routing question, and routing cannot be answered at all today
+(GAP-06) — two rows would be a guess at the answer rather than the answer.
+
+**Nothing is seeded.** A seeded printer row would be the product claiming the venue owns a device it
+does not, which is the one thing this whole printing feature has refused to do at every layer.
+
+**Gaps.**
+
+- GAP-06 — no station on `OrderItem`, so **nothing routes to a role**. A row can say a printer is for
+  the kitchen; no line of an order can be sent to it on that basis, and the terminal still prints the
+  whole check to the one printer it is paired with. The role is a record of intent and the screen
+  says so rather than letting a reader assume routing works.
+- GAP-13 — no venue or organization entity, so a printer cannot be scoped to a venue. Every row in
+  `Printers` belongs to the single implicit venue, exactly as every row in `MenuItem`, `Table` and
+  `Order` already does. **The registry adds no new single-location assumption; it inherits the one
+  the schema already has** — and it does not paper over it with a `LocationId` column pointing at a
+  table that does not exist, which would be a scope key nothing can populate and a false promise that
+  scoping works. Adding the key belongs to the schema-wide decision GAP-13 records, taken for every
+  table at once, and not to one new table unilaterally.
+
 #### Integrations
 
 **Purpose.** You connect the channels that send you orders, and you see at a glance which of them are
@@ -2611,9 +2768,15 @@ only states them. Bars grow with `fl-grow` on mount (§8).
 
 #### Employees, Devices, Settings (roadmap)
 
-**Purpose.** You manage who works here, what hardware is registered and how the venue is configured —
-three destinations the sidebar already carries, the artboards do not draw, and one spec covers,
-because they ship the same pattern.
+**Purpose.** You manage who works here, which terminals are registered and how the venue is
+configured — three destinations the sidebar already carries, the artboards do not draw, and one spec
+covers, because they ship the same pattern.
+
+**`Devices` is terminals, and no longer printers.** The venue's printers left this spec and became
+[Printers](#printers), a built destination with an entity and endpoints behind it. What stays here is
+the other noun: the terminals themselves — which pieces of glass exist, which registry printer each
+one claims, when each was last seen. That is deliberately the harder half, because a terminal has an
+identity that nothing in the schema can yet issue (GAP-13), where a printer only has an address.
 
 **Layout.** The artboard renders one placeholder for all three: a centered block at 60px padding and a
 500px minimum height, the destination name at 800/20px over one 400/14px `--upos-ink-subtle` line. Its
@@ -2653,12 +2816,17 @@ setting — take `.u-btn--ghost` at rest with the label at `--upos-ink`; the red
 confirming step, which names the consequence in `--upos-status-late-text` (§11). Rows lift on hover
 and the detail rises with `fl-rise`.
 
-**Data.** Nothing. None of the three destinations has a model, a DTO, a controller or an endpoint:
-`MenuItem`, `Table`, `Order` and `OrderItem` are the whole schema, and none of them describes a
-person, a device or a preference. That is why one spec covers three screens — there is nothing to bind
-that would make them differ. Devices is the one of the three that no gap ID covers, and none should:
-a registry of devices, their pairing and their last-seen time is a new table contradicting nothing in
-the current schema, so it is API work rather than a hole in an existing model.
+**Data.** Nothing, for all three. `MenuItem`, `Table`, `Order`, `OrderItem` and now `Printer` are the
+whole schema, and none of them describes a person, a terminal or a preference. That is why one spec
+still covers three screens — there is nothing to bind that would make them differ.
+
+Devices is the one of the three that no gap ID covers **for the table itself**, and none should: a
+registry of terminals, the printer each claims and its last-seen time is a new table contradicting
+nothing in the current schema, so it is API work rather than a hole in an existing model — the same
+ruling that let [Printers](#printers) be built. What Devices additionally needs and Printers did not
+is a way to *issue and recognise a terminal identity*, which is GAP-13's `Device` under
+`Organization` → `Location`, and that is a scope decision rather than one more table. So the printer
+half shipped and this half did not, and the difference is not effort.
 
 **Gaps.**
 
@@ -3392,19 +3560,19 @@ here and the kit had no recipe for it. `.u-switch` now ships in `upos-components
 | `MenuItemCard` | composes `.u-chip-allergen`, `.u-chip-status--late` | Order entry · Kiosk flow | Existing · restyle |
 | `OrderCard` | a `DataRow` (`.u-data-row`, `.is-late`) | Channels queue | Existing · restyle |
 | `OrderStatusBadge` | `.u-chip-status`, `.u-chip-status--new`, `.u-chip-status--fired`, `.u-chip-status--late`, `.u-chip-status--ready` | Channels queue | Existing · restyle |
-| `UposButton` | `.u-btn`, `.u-btn--primary`, `.u-btn--secondary`, `.u-btn--ghost` | Order entry · Printer setup · Modifier modal · Floor plan · Table drawer · Payment · Employees, Devices, Settings (roadmap) · Kiosk flow · Guest-facing rules | New |
+| `UposButton` | `.u-btn`, `.u-btn--primary`, `.u-btn--secondary`, `.u-btn--ghost` | Order entry · Printer setup · Printers · Modifier modal · Floor plan · Table drawer · Payment · Employees, Devices, Settings (roadmap) · Kiosk flow · Guest-facing rules | New |
 | `UposIconButton` | `.u-icon-btn` | Order entry · Modifier modal · Item info modal · Floor plan · Table drawer · Payment · Menu manager | New |
 | `StatusChip` | `.u-chip-status`, `.u-chip-status--new`, `.u-chip-status--fired`, `.u-chip-status--late`, `.u-chip-status--ready` | Order entry · Printer setup · Table drawer · Channels queue | New |
 | `AllergenChip` | `.u-chip-allergen` | Order entry · Modifier modal · Item info modal · Menu manager · Chit anatomy · Kiosk flow | New |
 | `Pill` | `.u-pill` | Order entry · Modifier modal · Table drawer · Menu manager · Kiosk flow | New |
 | `SegmentedControl` | `.u-segmented`, `.u-segmented__opt`, `.is-active` | Item info modal · Table drawer · Payment · Menu manager · Kiosk flow | New |
 | `StatCard` | `.u-stat-card` | Dashboard | New |
-| `DataRow` | `.u-data-row`, `.is-late` | Printer setup · Channels queue · Employees, Devices, Settings (roadmap) | New |
+| `DataRow` | `.u-data-row`, `.is-late` | Printer setup · Printers · Channels queue · Employees, Devices, Settings (roadmap) | New |
 | `UposModal` | `.u-modal`, `.u-scrim` | Modifier modal · Item info modal · Floor plan · Payment · Menu manager · Kiosk flow · Guest-facing rules | New |
 | `UposDrawer` | `.u-drawer` | Table drawer · Payment | New |
 | `Toast` | `.u-toast` | None today — Order entry, Channels queue and Offline behavior each rule one out | New |
 | `BottomNav` | `.u-nav-bottom`, `.u-nav-item`, `.is-active` | Order entry · Printer setup (the shell every terminal destination inherits) | New |
-| `SideNav` | `.u-nav-item` restyled at the call site | Dashboard · Menu manager · Integrations · Reports · Employees, Devices, Settings (roadmap) | New |
+| `SideNav` | `.u-nav-item` restyled at the call site | Dashboard · Menu manager · Printers · Integrations · Reports · Employees, Devices, Settings (roadmap) | New |
 | `FloorTable` | none of its own — status border, `--upos-shadow-card`, `--upos-radius-card` or `--upos-radius-pill` | Floor plan | New |
 | `CartLine` | composes `.u-qty-stepper`, `.u-icon-btn`, `.u-chip-allergen` | Order entry · Offline behavior · Kiosk flow | New |
 | `QtyStepper` | `.u-qty-stepper` | Order entry · Modifier modal · Floor plan · Payment | New |
@@ -3472,8 +3640,8 @@ screen that needs either of those uses `StatusChip` directly.
 **States:** rest; hover `translateY(-2px)` on pointer surfaces; pressed, which is the ripple tint on
 touch; disabled; and the two-second confirmed label some call sites hold — `SENT TO KITCHEN`,
 `RE-FIRED` — whose check is an inline SVG, never a `✓` character (§9).
-**Consumed by:** Order entry, Modifier modal, Floor plan, Table drawer, Payment, Kiosk flow,
-Guest-facing rules, and the Employees, Devices, Settings (roadmap) spec.
+**Consumed by:** Order entry, Printer setup, Printers, Modifier modal, Floor plan, Table drawer,
+Payment, Kiosk flow, Guest-facing rules, and the Employees, Devices, Settings (roadmap) spec.
 **Notes:** `.u-btn` sets `--upos-touch-terminal` 48px, so `MinHeight` is how a call site reaches the
 kiosk's `--upos-touch-kiosk` 60px and the 96px commit bands (Part II-D). **A destructive control is
 `Ghost` with its label forced to `--upos-ink`**, never a red variant: there is none in the kit, and the
@@ -3593,7 +3761,7 @@ never the fills; the value never takes a status color (§4). Nothing on this car
 **States:** rest — white fill, 1px border, no shadow; hover `translateY(-3px)` onto `--upos-shadow-card`
 on pointer surfaces; status-bordered where the record has a status; selected, where a list drives a
 detail pane.
-**Consumed by:** Channels queue, and the Employees, Devices, Settings (roadmap) spec.
+**Consumed by:** Printers, Channels queue, and the Employees, Devices, Settings (roadmap) spec.
 **Notes:** the one exception to "no borders as elevation" in the whole kit (§7), and one of §4's five
 named places where status shows. An offline device takes `--upos-status-late` on the border and every
 other record `--upos-border` (roadmap spec). **Rows never share a table border** — a list of these
