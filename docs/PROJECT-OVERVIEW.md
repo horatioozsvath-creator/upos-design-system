@@ -94,6 +94,18 @@ Nothing here is deployed, because there is nothing to deploy. The deliverable is
   because the panel has 1126px of height to stand a check in, and hiding it behind a sheet to buy a
   third grid column would spend the one thing the 1440 design is built around. 1440×900 and 393×785
   are unchanged, proved by computed-style fingerprint
+- 2026-09-04 — **The terminal prints.** A bag ticket goes to a Star TSP143IV-UEWB SK over Bluetooth
+  Classic RFCOMM when a check is sent, and `MORE` in the bottom nav opens a printer setup screen
+  with discovery, pairing, seven honest states and a test print. The command set is Star Line Mode,
+  chosen because it is the mode the printer is in out of the box. `IReceiptPrinter` and
+  `IPrinterTransport` follow `IDeviceStatus`'s pattern — the shared library owns the question,
+  `Restaurant.Mobile` answers it with a radio, the back office answers that it has none — so a
+  network transport for the same printer's Ethernet and Wi-Fi side is one new class and nothing
+  above it moves. 44 tests cover the ticket bytes and the print state machine. **None of it has
+  touched a printer**: no Android device and no printer were reachable, so the Star command
+  constants and the status-block bit positions are transcribed from the specification and are
+  unverified. `.superpowers/sdd/printer-report.md` lists exactly what the owner has to confirm and
+  how
 - 2026-09-02 — **The terminal owns the whole screen.** `MainActivity` hides Android's status and
   navigation bars (sticky immersive), because the navigation bar's back and home controls let a
   member of staff leave the app mid-order. The hidden status bar's instruments move into the
