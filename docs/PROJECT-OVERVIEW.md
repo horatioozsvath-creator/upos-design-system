@@ -77,6 +77,23 @@ Nothing here is deployed, because there is nothing to deploy. The deliverable is
 
 ## Recent progress
 
+- 2026-09-04 — **The terminal follows the OS theme, with no toggle of its own.** `ISystemTheme` is
+  the second question asked in `IDeviceStatus`'s shape: the shared library owns it, MAUI answers it
+  from `Application.RequestedTheme` and subscribes to `RequestedThemeChanged`, the back office
+  answers null so its rail's toggle keeps the attribute. The shell writes §11's contract —
+  `data-theme` on `<html>` — and nothing else. A manual override was considered and refused: a
+  terminal's appearance is an estate setting an MDM can push, not a control that gets pressed
+  mid-order, and there is nowhere honest on the chrome to put one. Dark is verified with no AA
+  failure in any of the three width bands, and the status hues do not move — only the ink roles,
+  to §4's on-dark set, stated once in the kit's dark block
+- 2026-09-04 — **The 10.1" tablet in portrait has a designed layout.** Order entry now has three
+  width bands rather than one step: three panes above 1000px, two panes from 771 to 1000 — rail as
+  the handheld's chip row, cart docked at 340px, two tiles abreast — and the handheld's single
+  column at 770 and below. 800×1280 used to land on the handheld side of an inclusive
+  `max-width: 800px` and got the phone layout stretched across a tablet. The cart stays docked
+  because the panel has 1126px of height to stand a check in, and hiding it behind a sheet to buy a
+  third grid column would spend the one thing the 1440 design is built around. 1440×900 and 393×785
+  are unchanged, proved by computed-style fingerprint
 - 2026-09-02 — **The terminal owns the whole screen.** `MainActivity` hides Android's status and
   navigation bars (sticky immersive), because the navigation bar's back and home controls let a
   member of staff leave the app mid-order. The hidden status bar's instruments move into the
@@ -184,3 +201,11 @@ gap between what is designed and what exists.
   shared components through an interface the library owns and each host implements, with nullable
   readings so a host with no device renders the absence rather than a plausible number. (Claude
   recommendation, approved)
+- 2026-09-04 — The terminal has three width bands and the shell's own width picks between them. No
+  device sniffing, no host flag, no manual switch: two container queries on the shell. The 10.1"
+  portrait band is a design; the handheld band is still a provisional degradation. (Horatio)
+- 2026-09-04 — The terminal's theme follows the operating system and the terminal ships no theme
+  control. The room changes and the terminal does not restart, so the setting is subscribed to
+  rather than sampled; and a theme control on a POS is an estate setting on the wrong surface. If a
+  fleet later needs an override it is three states in MORE → Settings, defaulting to System, and
+  never a two-state toggle on the top bar. (Claude recommendation, approved)

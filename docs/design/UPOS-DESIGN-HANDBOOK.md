@@ -57,7 +57,10 @@ All four parts are complete.
 - [Part II · Screen specs](#part-ii--screen-specs)
   - [Part II-A · Terminal](#part-ii-a--terminal)
     - [Order entry](#order-entry)
+      - [Width bands](#width-bands)
+      - [Tablet portrait](#tablet-portrait)
       - [Handheld](#handheld) · provisional
+      - [Dark](#dark)
     - [Modifier modal](#modifier-modal)
     - [Item info modal](#item-info-modal)
     - [Floor plan](#floor-plan)
@@ -142,7 +145,7 @@ Four surfaces run the same language at four densities:
 
 | Surface | Project | Hardware | Density |
 | --- | --- | --- | --- |
-| Terminal | `Restaurant.Mobile` (MAUI Blazor Hybrid, Android) | 1440×900 tablet, landscape | Dense · 13px body · 48px targets |
+| Terminal | `Restaurant.Mobile` (MAUI Blazor Hybrid, Android) | 1440×900 tablet, landscape; 800×1280 and 393×785 have bands | Dense · 13px body · 48px targets |
 | Back office | `Restaurant.Blazor` (Blazor Server) | Desktop web, 224px dark sidebar | Dense · 13px body · pointer input |
 | Kitchen display | New surface | 1280×800 to 1920×800 touchscreen | Dark board · read at two metres |
 | Kiosk | New surface | Portrait guest device | Guest scale · body ≥19px · 60px targets |
@@ -686,8 +689,15 @@ The terminal keeps taking orders with no network. Offline is a state, never a wa
   override. A component that hard-codes a hex breaks this contract.
 - Dark theme moves ground, surfaces, border and ink. Status hues, allergen violet and the accent
   presets are identical in both themes — a color that means "late" means it under any lighting.
-- Defaults per surface: terminal light (kitchen glare), back office the user's choice, kitchen
-  display always the dark board regardless of `data-theme`, kiosk light.
+  **The ink roles are not hues and they do move**: `[data-theme="dark"]` points
+  `--upos-status-late-text`, `--upos-status-ready-text` and `--upos-status-fired-text` at §4's
+  on-dark column, which is the same statement §4 makes, in the place a theme is declared. The hue a
+  reader sees is the same; the pairing that carries it holds contrast on the ground it is on.
+- Defaults per surface: **terminal follows the operating system's setting** and offers no control of
+  its own (Part II-A · Order entry · [Dark](#dark)), back office the user's choice, kitchen display
+  always the dark board regardless of `data-theme`, kiosk light. The terminal's default was "light
+  (kitchen glare)" while nothing on the terminal could read the room; the OS can, and a venue that
+  dims the lights at six should not have to power-cycle a terminal to say so.
 - Accent is per-venue branding, stored with the venue and applied at app start.
 
 #### Kitchen display derivation
@@ -815,6 +825,32 @@ would be the first one drawn as though it were real, and it would be the one a p
 rule is stated once, here, and Order entry's instrument cluster implements it: **render the reading,
 or render the absence of the reading, and never render a number nobody measured.**
 
+**Reading the OS theme from the same shared component: `ISystemTheme`.**
+
+The terminal follows Android's light/dark setting (Part II-A · Order entry · [Dark](#dark)), and the
+setting is a MAUI reading the shared library cannot take. So it is answered in exactly the shape
+above and deliberately not in a second one: `ISystemTheme` is declared beside `IDeviceStatus`,
+exposing a nullable `Theme` and a `Changed` event; `Restaurant.Mobile` registers the implementation
+that reads `Application.Current.RequestedTheme` and subscribes to `RequestedThemeChanged`; the back
+office registers the one that reads nothing. **Two questions in one shape is one thing to learn.**
+
+Three details are load-bearing.
+
+- **The reading is nullable and null writes nothing.** A host that cannot read a system theme has not
+  read a light one. If it answered light, the shell would strip a `data-theme` attribute it never
+  set — and in the back office it would strip the one the rail's own toggle just wrote, flipping the
+  whole page around the preview frame standing in it. Answering null leaves the attribute alone,
+  which is why the preview shows the terminal in whichever theme the person working on it chose.
+- **`RequestedTheme` and not `UserAppTheme`.** The first is the platform setting; the second is the
+  app's own override of it. The terminal sets no override, and reading the override would have the
+  implementation report its own answer back to itself.
+- **Subscribed, not sampled.** The event is the whole point: a reading taken once at startup leaves a
+  unit in the theme it was switched on in.
+
+The shell writes §11's contract and nothing else — `data-theme` on `<html>`, through the same
+`uposShell.setTheme` interop the back office's rail calls. It lives in the shell because the shell is
+the terminal's only chrome, which is the same reason the shell carries the clock.
+
 **Bootstrap: remove it.**
 
 Rationale:
@@ -846,6 +882,18 @@ Migration:
 
 **What the kit does not cover yet.** These are honest gaps, not oversights to work around silently:
 
+- **`.u-chip-allergen` has no theme rule.** §5 specifies the inversion — on a dark surface the fill
+  becomes `--upos-allergen-text` and the ink `--upos-kds-ink` — and `AllergenChip` ships the class
+  for it, but nothing selects it from `data-theme`, so a call site that does not pass the flag
+  renders the light pairing on a dark ground at 2.81:1. It is latent rather than live: no allergen
+  chip renders anywhere today, because `MenuItem` has no allergens (GAP-05). The fix is a
+  `[data-theme="dark"]` rule in the kit rather than at each call site, and it has to be written so
+  that the Menu manager's toggled-off state still outranks it.
+- **Elevation does not move with the theme.** `--upos-shadow-card`, `--upos-shadow-modal` and
+  `--upos-shadow-button` are tuned against a light ground and read as almost nothing on the dark
+  one. Nothing loses its outline today, because every surface that depends on a shadow for its edge
+  also carries a 1px `--upos-border`, but a dark elevation set is missing and the terminal's dark
+  treatment is the first surface that would spend one.
 - **`.u-toast` reuses `--upos-shadow-modal`.** Right family, heavier than a toast needs. The parent
   ships the value the kit is missing — `--shadow-toast: 0 20px 44px -20px rgba(20,25,31,.9)` in
   `tokens/elevation.css`. Transcribe it as `--upos-shadow-toast` and point `.u-toast` at it.
@@ -924,10 +972,17 @@ The terminal is one 1440×900 shell at `--upos-radius-panel` 26px (the artboard 
 them is a destination, and everything that is not a destination opens over the destination. Order
 entry carries the shell; the other seven specs assume it.
 
-**1440×900 is the terminal.** One provisional exception exists, and it is declared in one place:
-[Order entry · Handheld](#handheld) degrades that screen below 800px of shell width, because it
-reached a 393px device before the fleet was chosen. It applies to that screen and to no other spec
-below.
+**1440×900 is the terminal.** Two narrower layouts exist and both are declared in one place:
+[Order entry · Width bands](#width-bands) puts that screen into two panes at or below 1000px of
+shell width and into one column at or below 770px. The first is a design — a 10.1" panel in portrait
+is a fleet candidate and 800×1280 is a shape somebody chose. The second is still a provisional
+degradation, because it reached a 393px device before the fleet was chosen. Both apply to that
+screen and to no other spec below.
+
+**The terminal follows the operating system's light/dark setting**, and that ruling does apply to
+every spec below, because it moves no layout at all: it is §11's theming contract, driven by the
+host. [Order entry · Dark](#dark) states it, and it is the one thing in Part II-A written once for
+all eight screens.
 
 Three rulings hold across all eight specs, so no spec below repeats them. **Every round close, mirror
 and utility control is `.u-icon-btn`** — 34px at `--upos-radius-pill` — centered in a hit area of at
@@ -968,7 +1023,7 @@ kitchen and charge.
   - **Battery** is a 15px battery glyph whose fill is the charge, followed by the level at
     `--upos-type-mono` and `--upos-space-gap-chip` 7px. It inks `--upos-status-late-text` at or below
     **20%** — §4's rule that red marks a problem that exists, and a terminal about to die mid-service
-    is one. The 20 is a policy literal recorded here, like the 800 of the handheld step; it is a
+    is one. The 20 is a policy literal recorded here, like the 770 and 1000 of the width bands; it is a
     threshold a condition tests, not a value a declaration takes, so §12's add-the-token rule does
     not reach it.
   - **Neither is ever drawn from a guess.** A host that cannot read the device renders no glyph, no
@@ -1056,6 +1111,171 @@ kitchen and charge.
 - GAP-05 — `MenuItem` has no allergens, so every violet chip in the grid and the cart is design-only.
 - GAP-12 — no loyalty account entity; the cart-header loyalty toggle has nothing to attach to.
 
+##### Width bands
+
+Order entry is drawn three ways and the shell's own width picks between them. Nothing sniffs a
+device, nothing reads a user agent, and no host passes a flag: the two steps are container queries
+on the shell, so the layout that suits the panel is the layout that appears on it.
+
+| Band | Shell width | Layout |
+| --- | --- | --- |
+| Wide | 1001px and up | Three panes. The whole spec above. |
+| Tablet | 771-1000px | Two panes. Rail as a chip row, cart docked at 340px. |
+| Handheld | 770px and below | One column. Cart behind a summary bar as a sheet. |
+
+**Both steps are `max-width` and the narrower one is written second.** They overlap on purpose. An
+exclusive pair - `max-width: 1000px` for the tablet and `min-width: 771px` for the wide layout -
+leaves a shell 770.5px wide matching neither and falling back to the layout it fits least. Two
+overlapping ceilings with the narrower stated last cannot have a hole in them: every width matches
+at least the widest condition it is under, and the last matching block wins.
+
+**1000 is where the three panes stop meaning anything.** 170px rail + 380px cart + 44px of grid
+padding + two 190px tiles and their 16px gap is 990px. Under that the grid falls to one column and
+draws a single tile stretched - 306px wide at 900px of shell, which is a card with a hole in it. 990
+rounded up to the nearest hundred, so the number reads as what it is. The top bar agrees from inside
+the band: measured in the preview, the 1440 bar's content wraps at 946px.
+
+**770 is where the two panes stop.** A 340px cart, the page step at each grid edge and two 190px
+tiles with their 16px gap is 764px, rounded up to the nearest ten. Up and not down, because the
+rounding has to fall on the side that keeps the band honest - a tablet band reaching under 764 draws
+the same stretched tile the 1000 step exists to remove. Measured at 771px the grid gives two columns
+of 193.5px; at 770 the layout is the handheld's.
+
+**770 replaces the old handheld step of 800**, which was the three-pane's own floor - 170 + 380 + 44
++ one 190px tile = 784, rounded up - and which is no longer the question being asked. It also could
+not stay: `max-width` is inclusive, the 10.1" tablet in portrait is exactly 800px wide, and a step at
+800 handed the named tablet the phone's layout.
+
+**The density inverts at the top step, and that is the point.** At 1001px the wide layout draws two
+tiles; at 1000px the tablet draws three. The rail and the cart together cost 550px and the cart alone
+costs 340, so the band is exactly where the rail stops paying for itself. The rail is not lost - it
+is the chip row, in the same fill with the same selection rule.
+
+**Neither number becomes a token.** A custom property cannot be read inside a `@container` or
+`@media` condition, so `--upos-bp-tablet` would be a token nothing could spend. §12's add-the-token
+rule governs a value a declaration takes; these are values a condition takes, and they stay literals,
+recorded here.
+
+**The steps measure the shell, not the window.** Container queries on the element Part II-A calls
+"one 1440x900 shell", not viewport media queries, because the shell is what the panes have to fit
+inside and the viewport is only sometimes the same thing. On the device they are identical. In the
+back office's development preview they are not: the preview stands the shell in a fixed frame, so a
+viewport rule would flip a 1440px frame to a narrow layout the moment the browser window narrowed,
+and would report the opposite of the truth.
+
+##### Tablet portrait
+
+**The case.** A 10.1" Android tablet is 1280x800 CSS pixels whichever panel it ships - a 1920x1200
+screen at roughly 224ppi buckets to hdpi at a device pixel ratio of 1.5, a 1280x800 screen at roughly
+149ppi is mdpi at 1, and both land on the same viewport. Portrait is that pair rotated: **800x1280**.
+It is a named fleet candidate and portrait is a real orientation, so this is a design and not a
+degradation.
+
+**What the shape asks for.** Not enough width for three panes, and a great deal of height. 800x1280
+leaves 1126px between the shell's two bars, which is 226px more than the whole 1440x900 terminal is
+tall. Every decision below spends that height rather than fighting the width.
+
+**Two arrangements fit, and the docked cart wins.**
+
+- **Cart docked, rail as chips - what ships.** The check is never off the glass, which is the one
+  thing the 1440 design is built around, and the height pays for it: measured, the line list stands
+  11 lines before it scrolls at 800x1280, against 5 at 1440x900. What it costs is a grid column -
+  two tiles abreast at 208px rather than the three a full-width grid fits.
+- **Cart as the handheld's sheet, grid full width.** It buys that third column and pays for it by
+  putting the check behind a tap and a scrim, on a device with 600px of spare height to stand the
+  check in. It also carries the summary bar, the sheet, the scrim and the three-lines rule, every one
+  of which exists because a 393px phone has nowhere to put a panel. This panel has somewhere.
+
+A third arrangement - the cart docked along the bottom edge under a full-width grid - was not taken.
+The cart is a tall narrow column of three bands; a wide short box is a different component, so it
+would be a redesign rather than a reuse, and it turns the 1440 design's left-to-right reading through
+ninety degrees for no gain the height does not already give.
+
+**So the tablet is the 1440 layout with one move made, and the move is the handheld's.** Everything
+below that is not the grid template is a rule the handheld already ships, hoisted up a band so both
+spend it. Nothing here is a new pattern and no new component exists.
+
+**Layout.** Everything not named below is unchanged from the spec above.
+
+- **Two columns, two rows.** `minmax(0,1fr) 340px` across, `auto minmax(0,1fr)` down. The chip row
+  takes row 1 of column 1 and the menu row 2; **the cart spans both rows of column 2**, so it keeps
+  the full-height panel identity it has at 1440 - one pane, top bar to bottom nav, behind its left
+  hairline. The chip row therefore sits over the menu only, and its own bottom hairline reads as the
+  menu's header rule rather than as a band laid across the whole destination.
+- **Category rail, 170px column to the handheld's chip row, 62px.** Identical:
+  `--upos-surface-inset` behind a 1px `--upos-border` bottom, `7px var(--upos-space-page)`,
+  `--upos-space-gap-chip` between chips, `overflow-x:auto`, no wrap, each chip `--upos-radius-pill`
+  at `0 16px` clearing `--upos-touch-terminal`, filled `--upos-grad-primary` when selected.
+  `flex:none` and not the kiosk strip's `flex:1`, which is what keeps a chip the same size at 800px
+  as it is at 393px.
+- **Item grid: the tile, unchanged, at `auto-fill minmax(190px,1fr)`.** No rule is written for it.
+  The grid gets 432px - 800 less the cart and less the page step at each edge - and draws two tiles
+  at 208px, measured. The tile does not take the handheld's `ListRow` form: two abreast is a grid,
+  and the row form is for the width where a grid is no longer available.
+- **Grid padding 22px to `var(--upos-space-page)`.** Those 16px are 16px of tile, and they are what
+  turn a two-tile fit with 20px of slack into one with 36px - more than a classic scrollbar takes on
+  a host that draws one, which matters because a grid sized to the last pixel drops to one stretched
+  column the moment anything takes a pixel from it.
+- **Cart panel, 380px to 340px, docked, otherwise untouched.** Same three bands, same inset fill,
+  same left hairline, same scroll. No summary bar, no sheet, no scrim, no close control: those
+  elements are in the DOM at every width and stay `display:none` above the handheld step.
+- **The 340 comes from the check, not from the leftovers.** A cart line is two boxes: 211.94px of
+  controls at `flex:none` - the send button and the stepper bracketing a 52px total slot - and the
+  title, which takes the rest and wraps. Measured across the seed menu, the widest line's own
+  min-content is 293.24px, and with the page step at each side this pane gives the line 312px. No
+  line overflows the pane, with 18.76px in hand. The grid is then *checked* against what is left
+  rather than sized by it, and it clears by 36px. **376px is the widest cart two tiles would still
+  allow and it was not taken**: it leaves the grid nothing and the check gains 36px it does not need.
+- **The check's three bands keep 18px top and bottom and take the page step at their sides.** 22px is
+  a 1440 figure; on a 340px pane it is 13% of the width. The handheld sheet one band down makes the
+  same move on all four edges and states its reason as "a sheet is a page"; this pane is not a page,
+  so only the sides move.
+- **What the narrower pane costs is wrapping, and it is a difference of degree.** The 1440 pane gives
+  the line 336px and already wraps two of the five seed names. The tablet gives 312px and wraps more
+  of them. Below the min-content floor a title wraps to a further row rather than the panel breaking,
+  so this is a tighter check and not a fragile one.
+- **The cart header wraps to two rows**, and the order is set rather than left to the source. The
+  design header is three things - label, loyalty, close - and it would fit one row; what does not fit
+  is this build's two blocked GAP pills, which are development annotations rather than screen
+  content. So the second row is an artefact of the scaffolding and not of the design.
+- **Top bar: 76px, unchanged, with the blocked chips on their short labels.** The height stays
+  because height is the thing this panel has; the server name stays, because a 10.1" counter tablet
+  is not a device whose holder is self-evidently the server; the offline pill keeps its wifi-off
+  mark. Only the chips shorten - `OFFLINE QUEUE · GAP-10` becomes `GAP-10` - and that is forced for
+  most of the band and chosen over the top of it: the 1440 bar's content is measured to wrap at
+  946px, and rather than a third threshold 54px above the break, the band that stops drawing the rail
+  also stops drawing the long form of a label whose short form names the same gap.
+- **Bottom nav: 78px with its labels.** The handheld's icon-only strip is not taken here. The five
+  labels floor the strip at 442.93px, which overflows 393px and fits 800px with 329px to spare, so
+  the words stay and the icons stay at 17px.
+- **The footer's tax-and-tender paragraph stays.** The handheld folds it for want of 72px; this panel
+  has 1126px of height and no reason to.
+
+**States.** Every state in the spec above holds unchanged, and the three the handheld adds do not
+exist here: there is no sheet to open or close, no summary bar to empty, and the chip row's
+scrolled-or-at-rest state is the handheld's, carried over with the row. Nothing is added.
+
+**Interactions.** Tap a chip to filter and tap a tile to add, exactly as at 1440. No hover, at any
+width - §8 puts every lift inside `@media (hover:hover)` and a tablet reports `hover: none`. The
+horizontal scroll belongs to the chip row and to nothing else on the screen.
+
+**Not solved at this width, deliberately.**
+
+- **Landscape.** 1280x800 is a wide-band shell and takes the three panes with a three-column grid; it
+  needs no rule and has none. It is not verified on hardware.
+- **The other seven Part II-A screens.** Unchanged from the handheld subsection's answer: they are
+  drawn at 1440x900 and get no rule here. Order entry is the screen with a band scheme because it is
+  the screen that reached a device.
+- **Legibility.** A CSS pixel on Android is 1/160 inch against the preview's 1/96, so §6's ramp
+  renders smaller in the hand than in the frame - the same exposure the handheld subsection records,
+  and the same answer: if the fleet settles on a panel that needs it, the fix is a type role in
+  Part I and not a local override in a screen spec.
+- **Density.** No second cart column, no compact row, no swipe-to-remove. Every action is a tap on a
+  target clearing `--upos-touch-terminal` 48px.
+
+**Gaps.** The same five the spec above cites - GAP-01, GAP-02, GAP-04, GAP-05, GAP-12 - carried
+across unchanged. Width changes no binding and this subsection introduces no new gap.
+
 ##### Handheld
 
 **This subsection is provisional.** Order entry went to a real device before the fleet was chosen: a
@@ -1073,29 +1293,19 @@ spends 170px on the rail and 380px on the cart before a single item exists, and 
 `minmax(190px,1fr)` tile inside 22px of padding needs 234px more — **784px before the screen has one
 item on it, into 393px of glass.** The panes collide and the cart leaves the screen entirely.
 
-The counter unit, the 10.1" handheld and this 5.7" device are all still candidates, so what follows
+The counter unit and this 5.7" device are both still candidates, so what follows
 is a **graceful-degradation rule, not a designed-for target**: it keeps the screen usable on anything
 narrow. It is not a second design. Nothing else in Part II has been drawn for it, no artboard covers
 it, and when the fleet is settled this subsection is either promoted to a spec of its own or deleted.
 **1440×900 stays the primary design and nothing below changes it.**
 
-**The breakpoint.** One step, at **800px** — 784 rounded up to the nearest hundred, so the number is
-readable as what it is. Above it, everything above this subsection; at or below it, everything in it.
-There is no tablet tier and no second step: the rule exists so that one alternative layout has to be
-reasoned about and tested, and a scale of three would be a design nobody has drawn.
-
-**The step measures the shell, not the window.** It is a container query on the shell — the element
-Part II-A calls "one 1440×900 shell" — and not a viewport media query, because the shell is what the
-panes have to fit inside and the viewport is only sometimes the same thing. On the device they are
-identical. In the back office's development preview they are not: the preview stands the shell in a
-fixed frame, so a viewport rule would flip a 1440px frame to the handheld layout the moment the
-browser window narrowed, and would report the opposite of the truth. The width that matters is the
-shell's own.
-
-**The 800 does not become a token.** A custom property cannot be read inside a `@container` or
-`@media` condition, so `--upos-bp-handheld` would be a token nothing could spend. §12's
-add-the-token rule governs a value a declaration takes; this is a value a condition takes, and it
-stays a literal, recorded here.
+**The breakpoint.** The lower of the two steps [Width bands](#width-bands) defines: **770px**, the
+point at which the tablet's two panes stop fitting. It stood at 800 when this was the only step
+below 1440 and the number it was rounded from was the three-pane's floor of 784; it moved because a
+band scheme was drawn above it and because `max-width` is inclusive, so a step at 800 handed a
+800px-wide tablet the phone's layout. The derivation, the rounding direction, the overlap between
+the two conditions and the reason neither number is a token are all stated once in
+[Width bands](#width-bands) and not repeated here.
 
 **Layout.** Everything not named below is unchanged from the spec above.
 
@@ -1113,7 +1323,8 @@ stays a literal, recorded here.
   with their gaps, and an offline pill with §11's wifi-off icon takes 95px more — leaving the venue
   and terminal id 18px, which is not a truncation, it is a deletion. Two rules recover it, and both
   drop the redundant half of a pair rather than shrinking anything.
-  - **The blocked queue chip drops below 800px.** The 1440 bar carries `OFFLINE QUEUE · GAP-10`
+  - **The blocked queue chip drops below 770px.** The tablet band shortens it to `GAP-10`; here it
+    goes entirely. The 1440 bar carries `OFFLINE QUEUE · GAP-10`
     beside the pill; the handheld bar does not. Of the two, the red pill states the terminal's
     condition and the grey chip names a gap in the model, and on 393px of glass the condition wins.
     This is the move the footer's tax-and-tender paragraph already makes one screen over: the gap
@@ -1189,7 +1400,7 @@ stays a literal, recorded here.
   not by the `Layout` parameter.** Part III rules that no component takes a touch flag, because a
   host should not have to suppress an affordance the CSS already withholds; the same argument holds
   one step over, so **no component takes a width flag either**. The screen passes `Tile` at every
-  width and the container query puts the tile into the row form below 800px. `MenuItemCard` never
+  width and the container query puts the tile into the row form below 770px. `MenuItemCard` never
   learns how wide the shell is, and its call sites outside the shell — the Menu manager's cards —
   are untouched, because a container query on a container they do not sit in cannot match. Grid
   padding drops 22px →
@@ -1200,8 +1411,9 @@ stays a literal, recorded here.
   card with a hole in it.
 - **One column, not `auto-fill`.** A row grid at `minmax` would put two abreast at 560px and three at
   780px, which is neither the tile grid nor a list, and it would put a third layout into a rule whose
-  whole purpose is that there is one. Between 393px and 800px a single column of rows is wide. It is
-  also unambiguous, and the 5.7" device is the case this rule exists for.
+  whole purpose is that there is one. Between 393px and 770px a single column of rows is wide. It is
+  also unambiguous, and the 5.7" device is the case this rule exists for. Two abreast is what the
+  tablet band draws, in tiles rather than rows, above this step.
 - **Cart panel, 380px → a persistent summary bar plus a sheet.** The panel has nowhere to stand, so
   it collapses behind a bar directly above the bottom nav and opens over the menu on demand.
 - **Summary bar, 64px. This is Part II-D's bag bar, brought to the terminal.** The kiosk's is 96px on
@@ -1385,13 +1597,90 @@ added.
 - **Density.** No second column, no compact row, no swipe-to-remove on a line, no long-press. Every
   action is a tap on a target that clears 48px, which is the whole of §11's speed contract and the
   only part of it a narrow screen makes harder.
-- **The range between 393px and 800px is degraded, not designed.** One column of rows is correct at
-  393px and merely acceptable at 780px. The rule keeps that range usable; it does not claim to have
-  drawn it.
+- **The range between 393px and 770px is degraded, not designed.** One column of rows is correct at
+  393px and merely acceptable at 760px. The rule keeps that range usable; it does not claim to have
+  drawn it. What has changed is how much of it there is: 771px and up is now a designed layout
+  ([Tablet portrait](#tablet-portrait)), so what is left undrawn is 377px of range rather than 407px,
+  and the widest thing in it is a 7" tablet in portrait rather than a 10.1" one.
 
 **Gaps.** The same five the spec above cites — GAP-01, GAP-02, GAP-04, GAP-05, GAP-12 — carried
 across unchanged. Width changes no binding, and this subsection introduces no new gap: every element
 in it reads the data the 1440 spec already reads.
+
+##### Dark
+
+**The terminal follows the operating system's light/dark setting, and offers no control of its own.**
+This supersedes §11's "terminal light (kitchen glare)", which was a default chosen when nothing on
+the terminal could read the room.
+
+**Why the OS and not a startup default.** The room changes and the terminal does not restart. A
+counter under service lights at noon and a dining room at nine are different problems, and Android
+already has the answer to both — one setting, in one place, that every app on the device agrees
+about. Reading it costs nothing, keeps the terminal consistent with its own launcher and any other
+app on the panel, and can be pushed across a fleet by an MDM policy. Reading it **once at startup**
+would not: a venue that dims at six does not power-cycle its terminals to do it, so the setting is
+subscribed to and not sampled.
+
+**Why no manual override on the terminal, and it is a decision rather than an omission.**
+
+- **A terminal's appearance is an estate setting, not a personal preference.** Two units on the same
+  counter in two themes is a support call, and it is a support call whose cause is invisible: the
+  person who pressed the control was not the person who reports the fault. The OS setting is
+  administrable across a fleet; a control on the glass is not.
+- **The one thing a stray control on a POS reliably does is get pressed mid-order.** §11 already
+  refuses controls that do nothing for the check on the surfaces where a check is built. A theme
+  toggle is the purest example: it changes everything on the screen and nothing about the order.
+- **There is nowhere honest to put it.** The top bar is full at 393px — the handheld subsection
+  spends three paragraphs recovering 95px of it — and the bottom nav has five destinations. The only
+  available home is MORE, which is not built.
+- **The back office keeps its toggle, and that is not an inconsistency.** It is one person at one
+  desk in a browser, with no fleet and no check in flight. Its toggle is also what themes the
+  terminal *preview*, which is exactly where the terminal's dark treatment is worked on.
+
+**If the fleet later needs an override, this is the shape it takes**: three states in MORE →
+Settings — `System`, `Light`, `Dark`, defaulting to `System` — and never a two-state toggle. A
+two-state control cannot express "follow the room", which is the behavior that should stay the
+default, and it cannot be returned to it. It does not go on the top bar at any point.
+
+**What moves and what does not.** §11's theming contract, unchanged: one attribute on `<html>` and
+nothing else. Ground, surfaces, border and ink move. **Status hues do not** — `--upos-status-late` is
+`#ec3013` under any lighting, and so are fired, ready, new and the allergen violet, because a color
+that means "late" has to mean it in both themes. What moves with the theme is the **ink role**, and
+§4 already publishes the values: on a dark surface the on-dark set applies, so
+`--upos-status-late-text` `#ae1800` becomes `--upos-kds-status-late` `#ff8a70`,
+`--upos-status-ready-text` `#159548` becomes `--upos-kds-status-ready` `#9ee6b4`, and
+`--upos-status-fired-text` `#d95f06` becomes `--upos-status-fired` `#f97316`, which §4's on-dark
+column already lists as unchanged. That statement lives in the kit's `[data-theme="dark"]` block,
+once, rather than at each call site — it is the same statement §4 makes, in the place a theme is
+declared.
+
+**Accent ink is the one thing a screen has to restate.** §3 rules that on dark surfaces accents are
+`--upos-on-dark-accent`, and the accent presets themselves do not move between themes, so the ink
+role does. Two elements in Order entry are inked in `--upos-accent-deep` — the tile's price and the
+handheld summary bar's running total — and both take `--upos-on-dark-accent` under
+`[data-theme="dark"]`. This is the Menu manager's own rule, already in the product for the same two
+reasons.
+
+**Measured.** In the preview, in dark, across all three bands: no text on the terminal falls under
+§11's AA floor. 48 text nodes at 1440×900, 59 at 800×1280 and 39 at 393×785, worst case 4.63:1 (the
+clock, `--upos-ink-subtle` over the glass bar). The status inks land at 6.96:1 for late, 11.01:1 for
+ready and 5.72:1 for fired over `--upos-surface`; without the ink-role rule above they would be
+2.24:1, 4.14:1 and 3.40:1.
+
+**Not solved, deliberately.**
+
+- **The allergen chip's dark inversion is specified and not wired.** §5 states it — fill
+  `--upos-allergen-text`, ink `--upos-kds-ink` — and the component ships the class for it, but
+  nothing selects it by theme, so a light-pairing chip on a dark surface would land at 2.81:1. No
+  chip renders on the terminal today because `MenuItem` has no allergens (GAP-05), so this is latent
+  rather than live. It is recorded in §12's "what the kit does not cover yet" list and it is not
+  fixed here.
+- **First paint.** The host page loads before the shell renders, so a dark terminal shows one light
+  frame at startup. Nothing on the glass depends on it and no reading is wrong during it.
+- **Shadows.** `--upos-shadow-card` and `--upos-shadow-modal` do not move with the theme and read as
+  almost nothing on the dark ground. Every surface that depends on them for its edge also carries a
+  1px `--upos-border`, so nothing loses its outline; a dark elevation set is a kit question and not a
+  screen one.
 
 #### Modifier modal
 
@@ -3178,7 +3467,7 @@ instead** — the terminal here, the sidebar in `SideNav` — so the active fill
 both and the tint has no consumer in this handoff. Leave the recipe as it is; set the fill where it is
 used. This nav is the only full-screen transition in the order flow: everything else opens over the
 check (§11). The strip is touch, so it ships no `:hover` transform.
-**Below 800px of shell width the labels are laid out away and the icon steps to 20px** (Order entry ·
+**Below 770px of shell width the labels are laid out away and the icon steps to 20px** (Order entry ·
 Handheld, which carries the measurement and the three treatments weighed against it). **The component
 takes no width flag for this**, on the same rule `MenuItemCard` follows one screen over: the form is
 reached by a container query on the terminal shell, so the strip never learns how wide it is and the
